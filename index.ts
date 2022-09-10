@@ -1,6 +1,7 @@
 import express from "express";
 import { DB_Connection } from "./src/config/db_connection";
 import { Controller } from "./src/controllers/controller";
+import { checkHeader, checkToken, isBidCreator } from "./src/middleware/middlewareAuth";
 const controller = new Controller();
 
 // Constants
@@ -9,6 +10,8 @@ const HOST = '0.0.0.0';
 // App
 const app = express();
 app.use(express.json());
+
+app.use([checkHeader, checkToken]);
 
 
 app.get('/', (req: any, res: any) => {
@@ -20,7 +23,9 @@ app.get('/utenti', controller.getListUsers);
 
 app.get('/aste', controller.getListAste);
 
-app.get('/part', controller.getListPartecipazioni);
+app.get('/part', isBidCreator, (req, res) => {
+   controller.getListPartecipazioni(req, res);
+});
 
 
 

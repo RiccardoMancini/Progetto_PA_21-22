@@ -1,17 +1,5 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 require('dotenv').config();
-/** 
-import * as sql from "sequelize";
-import { SingletonDB } from "../model/Database";
-import * as User from "../model/User";
-*/
-
-/**
- * {
- * "Name": "Name"
- * "role": 1
- * }
- */
 
 /**
  * Check della presenza del parametro di autorizzazione
@@ -20,9 +8,9 @@ import * as User from "../model/User";
  * @param res risposta
  * @param next scorrimento nel midleware successivo
  */
-export var checkHeader = (req,res,next) => {
+export const checkHeader = (req,res,next) => {
     const authHeader = req.headers.authorization;
-    if (authHeader)next();
+    if (authHeader) next();
     else res.status(401).send("Unauthorized");
 
 };
@@ -43,7 +31,7 @@ export const checkToken = (req,res,next) => {
             req.token = bearerToken;// mi salvo il token
             next();
         }
-        else res.status(401);
+        else res.status(401).send('Undefined');
 };
 
 /**
@@ -53,9 +41,11 @@ export const checkToken = (req,res,next) => {
  * @param next 
  */
 
-export const isAdmin = (req,res,next) => {
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
-    if(decoded !== null && typeof decoded.username === "string" || (decoded.role === "admin" || decoded.role === "bid_creator")) {
+
+export const isBidCreator = (req,res,next) => {
+    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1 || decoded.role === 2)) {
+        console.log(decoded)
         next();
     }
     else res.status(401).send("Unauthorized");
