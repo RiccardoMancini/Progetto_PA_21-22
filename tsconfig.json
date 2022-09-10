@@ -1,6 +1,8 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "sourceMap": false
-    }
+  "compilerOptions": {
+    "module": "commonjs",
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "target": "es6"
+  }
 }

@@ -6,7 +6,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon -L index.ts",
-        "start": "nodemon index.ts"
+        "start": "tsc --project .\tsconfig.json & node index.js"
     },
     "dependencies": {
         "@types/node": "^18.7.13",
@@ -15,6 +15,6 @@
         "jsonwebtoken": "^8.5.1",
         "nodemon": "^2.0.19",
         "pg": "^8.7.3",
-        "proj4": "^2.8.0"
+        "sequelize": "^6.21.6"
     }
 }
