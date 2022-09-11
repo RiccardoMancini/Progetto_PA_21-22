@@ -25,7 +25,7 @@ app.get('/utenti', controller.getListUsers);
 
 app.get('/aste', controller.getListAste);
 
-app.get('/part', isBidCreator, (req, res) => {
+app.get('/part', (req, res) => {
    controller.getListPartecipazioni(req, res);
 });
 
@@ -33,19 +33,6 @@ app.get('/part', isBidCreator, (req, res) => {
 const privateKey = '-----BEGIN PRIVATE KEY-----\n'+'MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAMMsV0E0hp8aCCW8QdTLUfl7lEzUzLbSyO/Y0XehBa8x+BWJav9gMlbp1GiL2oXeM2CKCRGVVJBnHSoBl+3x/l4q9BASVtMkLbWoe62OaHPZakN7o4rfil7KyIAER+rOqDtnJmtXhc2ZeA/1olUQ4FAQterj0CbAgVE2DroWMZXVAgMBAAECgYEAqhkR7p01mqIYabLZ+Pg+eF1w0UlBJTEtuINRg55NkvPM0BBUtT8EgGUIHxmMGNGgG0oSP0XTTorfiwWagOFAGw8xEDxRbiJNisN7LW9J9M+HV3ZU4SIv05Bp4LgLcqOPVhdFz/DGn5CRFC4WSFNtlM0T+8cTDY2QecQxf6Ow1p0CQQD94TVA3wCoKpEvNMKGJcJtvptKkE38Rw2evsxhff+Rj+drCFycsW7RUeLbZqQinuhDZ25fus1eIFaAnfdXwDkTAkEAxM2ec9ugQESu0N/BcQIcbmrWg9IhO7vgM5DTRl5bKxYbRoYkiWY0d1XUipUEH3bOzO5aHbpjWFbFs4eqJUx6dwJBAK0BbzzJurTebRlyJq0rxhbrMP/a3onwEYQAGV7GcgZLvjPd+t58uzvBRYqlo2xERZrJPRnXPmPKPahf/VG7GCkCQGQe61arzAoGJx2SR/ozBb3S0pE7jLaz7Oqu6h0pkZ4I4BVv1xSjj1uKqdda2j8blTfCpsvq7/GYK3obMZ9KGh8CQQDzrvgOblEt7y2f7R1GGX0lKC03X4g3aouOhtbuN1b3pp8jPqwQbWCNYb7BwG91S9vZGK/yQ2e5gNvS93BG6ATH\n'+'-----END PRIVATE KEY-----';
 const text_b64 = 'VCVcDQTEKUUIr27fOiz1KIslA2fiUqF36ZR+PYhI9Imy9H1d8QtLLx7rcETTDnYWITwtAeAUlvYQPrEtx9MDmbJrGlqcsljycmWYFgGJAHA/w+oYZJu9A/YR1vgM3sAIFGbOO1/eQDLWax62jsVC6Se/BPAHP00DYWsY5Z+Jum0='
 
-
-/*const encryptedData = crypto.publicEncrypt(
-  {
-    key: publicKey,
-    padding: crypto.constants.RSA_PKCS1_PADDING
-  },
-  // We convert the data string to a buffer using `Buffer.from`
-  Buffer.from(data)
-);
-
-
-console.log("encypted data: ", Buffer.from(encryptedData.toString("base64"), 'base64'));
-console.log("encypted data: ", encryptedData);*/
 
 const decryptedData = crypto.privateDecrypt(
   {
