@@ -49,6 +49,8 @@ export class Partecipazione{
         return partecipazioni;
     }
 
+
+    
     public getModelPartecipazione(){
         return this.partecipazione;
     }

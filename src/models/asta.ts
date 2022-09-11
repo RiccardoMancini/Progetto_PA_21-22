@@ -68,6 +68,8 @@ export class Asta{
         return aste;
     }
 
+    
+
     public getModelAsta(){
         return this.asta;
     }
