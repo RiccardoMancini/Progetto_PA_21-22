@@ -27,6 +27,8 @@ app.get('/part', isBidCreator, (req, res) => {
    controller.getListPartecipazioni(req, res);
 });
 
+app.get('/cre',controller.updataCredit);
+
 
 
 app.listen(PORT, HOST);

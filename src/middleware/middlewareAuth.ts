@@ -3,24 +3,16 @@ require('dotenv').config();
 
 /**
  * Check della presenza del parametro di autorizzazione
- *  
- * @param req richiesta
- * @param res risposta
- * @param next scorrimento nel midleware successivo
  */
 export const checkHeader = (req,res,next) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader) next();
+    const aHeader = req.headers.authorization;
+    if (aHeader) next();
     else res.status(401).send("Unauthorized");
 
 };
 
 /**
  * Funzione che fa il check della bearerHeader
- * 
- * @param req richiesta
- * @param res risposta
- * @param next scorrimento del midleware successivo
  */
 
 export const checkToken = (req,res,next) => {
@@ -35,22 +27,41 @@ export const checkToken = (req,res,next) => {
 };
 
 /**
- * Funzione che verifica la correttezza del token JWT e decodifica il payload.
- * @param req 
- * @param res 
- * @param next 
+ * Funzione che verifica il BidCreator
  */
 
 
 export const isBidCreator = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1 || decoded.role === 2)) {
+    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1)){
         console.log(decoded)
         next();
     }
     else res.status(401).send("Unauthorized");
 }
 
+/**
+ * Funzione che verifica l'admin
+ */
 
+export const isAdmin = (req,res,next) => {
+    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 2)){
+        console.log(decoded)
+        next();
+    }
+    else res.status(401).send("Unauthorized");
+}
 
+/**
+ * Funzione che verifica BidParticipant 
+ */
 
+export const isBidParticipant = (req,res,next) => {
+    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 3)) {
+        console.log(decoded)
+        next();
+    }
+    else res.status(401).send("Unauthorized");
+}
