@@ -56,21 +56,6 @@ export const verifyAndAuthenticate = (req,res,next) => {
     }
 };
 
-/**
- * Funzione che verifica la correttezza del token JWT e decodifica il payload.
- * @param req 
- * @param res 
- * @param next 
- */
-export const isBidCreator = (req,res,next) => {
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1 || decoded.role === 2)) {
-        console.log(decoded)
-        next();
-    }
-    else res.status(401).send("Unauthorized");
-}
-
 
 
 
