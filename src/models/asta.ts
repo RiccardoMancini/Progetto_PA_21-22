@@ -43,7 +43,7 @@ export class Asta{
         this.asta.belongsTo(this.chiavi.getModelChiavi(), { foreignKey: 'chiavi_id'});
     }
 
-    public async getAste(): Promise<Object>{
+    public async getAste(){
         let aste = await this.asta.findAll();
 
         return aste;
