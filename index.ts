@@ -21,6 +21,7 @@ app.use(express.json());
  */
 app.get('/aste', controller.getListAste);
 
+
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 
 

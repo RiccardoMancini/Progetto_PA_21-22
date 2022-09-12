@@ -36,7 +36,13 @@ export class Utenti{
         return await this.utenti.findAll();
     }
 
+    public async getUtenteById(user_id:any){
+      return await this.utenti.findOne(user_id);
+  }
+
     public getModelUtenti(){
         return this.utenti;
     }
+
+
 }
