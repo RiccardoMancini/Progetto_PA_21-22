@@ -39,17 +39,53 @@ export class Partecipazione{
 
     }
 
-    public async getPartecipazioni(): Promise<Object>{
-        
-        let partecipazioni = await this.partecipazione.findAll({
-            include: [this.asta.getModelAsta(), this.utenti.getModelUtenti()],
-            
-        });
+    public async getPartecipazioni(): Promise<Object>{        
+      let partecipazioni = await this.partecipazione.findAll({
+          include: [this.asta.getModelAsta(), this.utenti.getModelUtenti()],
+          
+      });
 
-        return partecipazioni;
+      return partecipazioni;
     }
 
+    public async getClosedAsteByUserID(user_id: number){
+      /*const date_i = String(date_obj_i.getFullYear())+'-'+String(date_obj_i.getMonth()+1)+'-'+String(date_obj_i.getDate())
+      const date_f = String(date_obj_f.getFullYear())+'-'+String(date_obj_f.getMonth()+1)+'-'+String(date_obj_f.getDate())
+      console.log(date_i, date_f)*/
+      let partecipazioni = await this.partecipazione.findAll({
+        include: [{
+        model: this.utenti.getModelUtenti(),
+        where: {
+          user_id: user_id
+        }}, 
+        {
+        model: this.asta.getModelAsta(),
+        where: {
+          stato: 3
+          /*from: {
+            $between: [date_i, date_f]
+        }*/}}]
+        
+    });
 
+    return partecipazioni;
+
+    }
+  
+    public async getAsteByUserID(user_id: number){
+      let partecipazioni = await this.partecipazione.findAll({
+        include: {
+        model: this.asta.getModelAsta(),
+        where: {
+          stato: [2, 3]
+        }},
+        where: {
+          user_id: user_id
+        }
+        
+    });
+    return partecipazioni
+    }
     
     public getModelPartecipazione(){
         return this.partecipazione;

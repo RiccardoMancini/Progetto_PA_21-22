@@ -56,10 +56,16 @@ INSERT INTO Chiavi (public_key, private_key) VALUES
 INSERT INTO Asta (tipo, p_min, stato, data_i, data_f, chiavi_id) VALUES
 (2, 15, 3, '2020-12-15', '2020-12-17', 2),
 (3, 10, 3, '2021-11-13', '2021-12-13', 4),
-(2, 50, 1, '2022-06-27', '2022-12-17', 5);
+(2, 50, 1, '2022-06-27', '2022-12-17', 5),
+(1, 10, 3, '2021-11-14', '2021-12-15', 4),
+(1, 10, 3, '2021-11-11', '2021-12-15', 1);
 
 INSERT INTO Partecipazione (user_id, asta_id, aggiudicata, offerta) VALUES
-(2, 2, FALSE, 40),
+(2, 5, FALSE, 40),
 (5, 1, TRUE, 20),
 (1, 2, FALSE, 15),
-(6, 2, FALSE, 15);
+(6, 2, FALSE, 15),
+(2, 4, TRUE, 40),
+(2, 5, TRUE, 20),
+(2, 1, TRUE, 15),
+(2, 4, FALSE, 15);

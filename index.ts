@@ -24,6 +24,9 @@ app.get('/aste', controller.getListAste);
 
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 
+app.get('/storico/aste/closed', controller.getMyClosedAste);
+
+app.get('/storico/aste', controller.getMyAste);
 
 app.get('/', (req: any, res: any) => {
   let conn = DB_Connection.getInstance().getConnection();

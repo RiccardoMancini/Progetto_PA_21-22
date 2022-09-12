@@ -14,13 +14,13 @@ export const checkHeader = (req,res,next) => {
 /**
  * Funzione che fa il check della bearerHeader
  */
-
 export const checkToken = (req,res,next) => {
 
     const bearerHeader = req.headers.authorization;
-        if(typeof bearerHeader!=='undefined'){ // controllo che esista bearerHeader
-            const bearerToken = bearerHeader.split(' ')[1]; // mi prendo il token
-            req.token = bearerToken;// mi salvo il token
+        if(typeof bearerHeader!=='undefined'){
+            const bearerToken = bearerHeader.split(' ')[1];
+            req.token = bearerToken;
+            
             next();
         }
         else res.status(401).send('Undefined');
@@ -31,12 +31,9 @@ export const verifyAndAuthenticate = (req,res,next) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
         if(decoded !== null){
-            if((decoded.role === "admin" || 
-                decoded.role === "bid_partecipant" || 
-                decoded.role === "bid_creator") &&
-                typeof decoded.username === "string"){
-                 req.user = decoded.username
-                 next()
+            if(decoded.role === 1 || decoded.role === 2 || decoded.role === 3){
+                req.user_id = decoded.id;                
+                next();
             } else {
                 //DA GESTIRE CON L'ERROR HANDLER
                 res.status(500).send('No permessi')
@@ -48,6 +45,8 @@ export const verifyAndAuthenticate = (req,res,next) => {
         console.log('Sono nel catch!')
     }
 };
+
+
 
 /**
  * Funzione che verifica il BidCreator

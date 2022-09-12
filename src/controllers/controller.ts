@@ -67,7 +67,6 @@ export class Controller {
     /**
      * Creazione di una nuova asta
      */
-
     public async createAsta ( req:any, res:any){
         const aste = await new Asta().getModelAsta();
         let newrowasta = req.body;
@@ -78,7 +77,6 @@ export class Controller {
     /**
      * verifica del credito dell'utente
      */
-
      public async verificaCredito( req:any, res:any){
         let user_id = req.idreq; 
         let userbyid = await new Utenti().getUtenteById(user_id);
@@ -86,6 +84,35 @@ export class Controller {
         res.send(credituser);
      }
 
+    public async getMyClosedAste(req: any, res: any){
+        /*const date_obj_i = new Date(Number(req.query.date_i));
+        const date_obj_f = new Date(Number(req.query.date_f));*/
+        let part = await new Partecipazione().getClosedAsteByUserID(req.user_id);
+        part = part.sort((a, b) => {return a.asta_id-b.asta_id})
+                .filter((elem, index, array) => {
+                    if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
+                    (index > 0 && elem.asta_id === array[index-1].asta_id)){
+                        if((index < array.length-1 && elem.aggiudicata === array[index+1].aggiudicata) || 
+                        (elem.aggiudicata === false &&  array[index+1].aggiudicata === true) || 
+                        (elem.aggiudicata === false &&  array[index-1].aggiudicata === true)){
+                            return false;                        
+                        }               
+                    } 
+                    return true;
+                });                       
+
+        res.send(part)
+    }
+
+    public async getMyAste(req: any, res: any){
+        let part = await new Partecipazione().getAsteByUserID(req.user_id);
+
+        /**
+         * DA COMPLETARE
+         */
+
+        res.send(part)
+    }
 
     
 }
