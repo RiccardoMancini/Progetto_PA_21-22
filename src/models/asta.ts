@@ -2,12 +2,12 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 import { DB_Connection } from '../config/db_connection'
 import { Chiavi } from './chiavi';
 
-enum tipo_asta{
+export enum tipo_asta{
     ASTA_APERTA = 1,
     ASTA_CHIUSA_1 = 2,
     ASTA_CHIUSA_2 = 3
 }
-enum stato_asta {
+export enum stato_asta {
     NON_APERTA = 1,
     IN_ESECUZIONE = 2,
     TERMINATA = 3
@@ -43,27 +43,8 @@ export class Asta{
         this.asta.belongsTo(this.chiavi.getModelChiavi(), { foreignKey: 'chiavi_id'});
     }
 
-    public async getAste(): Promise<Object>{
-        let aste = await this.asta.findAll({
-            include: this.chiavi.getModelChiavi()
-        });
-
-        aste.map((value: any) => {
-            value.tipo = value.tipo === tipo_asta.ASTA_CHIUSA_1? 'Asta_chiusa_1': 'Asta_chiusa_2';
-            switch (value.stato) {
-                case stato_asta.NON_APERTA:
-                  value.stato = 'Non aperta';
-                  break;
-                case stato_asta.IN_ESECUZIONE:
-                  value.stato = 'In esecuzione';
-                  break;
-                case stato_asta.TERMINATA:
-                  value.stato = 'Terminata';
-                  break;
-                default:
-                  break;
-              }
-        });
+    public async getAste(){
+        let aste = await this.asta.findAll();
 
         return aste;
     }

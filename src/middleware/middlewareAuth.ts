@@ -26,11 +26,32 @@ export const checkToken = (req,res,next) => {
         else res.status(401).send('Undefined');
 };
 
+
+export const verifyAndAuthenticate = (req,res,next) => {
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
+        if(decoded !== null){
+            if((decoded.role === "admin" || 
+                decoded.role === "bid_partecipant" || 
+                decoded.role === "bid_creator") &&
+                typeof decoded.username === "string"){
+                 req.user = decoded.username
+                 next()
+            } else {
+                //DA GESTIRE CON L'ERROR HANDLER
+                res.status(500).send('No permessi')
+            }
+        }else{
+            res.status(500).send('Errore di firma')
+        }
+    }catch(error){
+        console.log('Sono nel catch!')
+    }
+};
+
 /**
  * Funzione che verifica il BidCreator
  */
-
-
 export const isBidCreator = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1)){
@@ -43,7 +64,6 @@ export const isBidCreator = (req,res,next) => {
 /**
  * Funzione che verifica l'admin
  */
-
 export const isAdmin = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 2)){
@@ -56,7 +76,6 @@ export const isAdmin = (req,res,next) => {
 /**
  * Funzione che verifica BidParticipant 
  */
-
 export const isBidParticipant = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 3)) {
