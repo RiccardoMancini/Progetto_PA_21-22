@@ -54,7 +54,7 @@ export class Controller {
     /**
      * aggiornamento del credito
      */
-    public async updataCredito ( req:any, res:any){
+    public async updateCredito ( req:any, res:any){
         let user_id = req.idreq; 
         let oldcrediti = await new Utenti().getUtenteById(user_id);
         console.log(oldcrediti);

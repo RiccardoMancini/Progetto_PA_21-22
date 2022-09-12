@@ -26,9 +26,6 @@ export const checkToken = (req,res,next) => {
         else res.status(401).send('Undefined');
 };
 
-/**
- * Funzione che verifica il BidCreator
- */
 
 export const verifyAndAuthenticate = (req,res,next) => {
     try{
@@ -52,6 +49,9 @@ export const verifyAndAuthenticate = (req,res,next) => {
     }
 };
 
+/**
+ * Funzione che verifica il BidCreator
+ */
 export const isBidCreator = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1)){
@@ -64,7 +64,6 @@ export const isBidCreator = (req,res,next) => {
 /**
  * Funzione che verifica l'admin
  */
-
 export const isAdmin = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 2)){
@@ -77,7 +76,6 @@ export const isAdmin = (req,res,next) => {
 /**
  * Funzione che verifica BidParticipant 
  */
-
 export const isBidParticipant = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
     if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 3)) {
