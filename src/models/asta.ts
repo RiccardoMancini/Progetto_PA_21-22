@@ -45,22 +45,6 @@ export class Asta{
 
     public async getAste(){
         let aste = await this.asta.findAll();
-        /*aste.map((value: any) => {
-            value.tipo = value.tipo === tipo_asta.ASTA_CHIUSA_1? 'Asta_chiusa_1': 'Asta_chiusa_2';
-            switch (value.stato) {
-                case stato_asta.NON_APERTA:
-                  value.stato = stato_asta[1];
-                  break;
-                case stato_asta.IN_ESECUZIONE:
-                  value.stato = stato_asta[2];
-                  break;
-                case stato_asta.TERMINATA:
-                  value.stato = stato_asta[3];
-                  break;
-                default:
-                  break;
-              }
-        });*/
 
         return aste;
     }
