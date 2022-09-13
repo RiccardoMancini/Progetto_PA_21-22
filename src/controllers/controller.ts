@@ -1,6 +1,7 @@
 import { Utenti } from '../models/utenti'
 import { Asta, stato_asta, tipo_asta} from '../models/asta';
 import { Partecipazione } from '../models/partecipazione';
+import { Chiavi } from '../models/chiavi';
 
 export class Controller {
 
@@ -9,6 +10,13 @@ export class Controller {
 
         res.send(users);
     }
+
+    public async getChiavi(req: any, res:any){
+        const chiavi = await new Chiavi().getModelChiavi();
+
+        res.send(chiavi);
+    }
+
 
     public async getListAste(req: any, res:any){
         let aste = await new Asta().getAste();
@@ -83,6 +91,11 @@ export class Controller {
         let userbyid = await new Utenti().getUtenteById(user_id);
         let credituser  = userbyid.credito;
         res.send(credituser);
+     }
+     public async generaAsta( req:any, res:any){
+        let num = Math.round(Math.random() *5);
+        let rKey = await new Chiavi().getChiaviById(num);
+        res.send(rKey);
      }
 
 
