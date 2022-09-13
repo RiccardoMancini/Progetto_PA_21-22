@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "c3ee8aa1-c85c-4e58-b004-74ed6ebcf30a",
+		"name": "PA project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8923110"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/aste",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/aste",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"aste"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/credito",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJyb2xlIjozfQ.U6iIAb_vTqIcl86WEJ_Yi_4o9yh_d2wW-UEX0oQ-_k4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/credito",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"credito"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/admin/accredito",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJyb2xlIjozfQ.U6iIAb_vTqIcl86WEJ_Yi_4o9yh_d2wW-UEX0oQ-_k4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": 2,\r\n    \"credito\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/accredito",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"accredito"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/storico/aste/closed?date_i=1607629561000&date_f=1608925561000",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJyb2xlIjozfQ.U6iIAb_vTqIcl86WEJ_Yi_4o9yh_d2wW-UEX0oQ-_k4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/storico/aste/closed?date_i=1607629561000&date_f=1608925561000",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"storico",
+						"aste",
+						"closed"
+					],
+					"query": [
+						{
+							"key": "date_i",
+							"value": "1607629561000"
+						},
+						{
+							"key": "date_f",
+							"value": "1608925561000"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
