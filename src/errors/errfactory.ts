@@ -1,53 +1,31 @@
-class HttpError extends Error{
-    message: string;
-    status: number;
-    
-    constructor(message: string, status: number){
-        super(message);
-        this.message = message;
-        this.status = status;
-    }
-}
+export class Risposta{
+    private cod_stato: number;
+    private stato: String;
+    private messaggio: String; 
 
-class UtenteNonVerificato extends HttpError{
-    constructor(){
-        super('Utente non verificato', ErrEnum.BadRequest);
-    }
-    
-}
+    constructor(){};
 
-class HeaderAssente extends HttpError{
-    constructor(){
-        super('Header non presente ', ErrEnum.BadRequest);
+    setStato (stato:String){
+        this.stato = stato;
+        return this;
     }
-    
-}
-
-class ErrToken extends HttpError{
-    constructor(){
-        super('Element not found!', ErrEnum.NotFound);
+    setCodStato (cod_stato:number){
+        this.cod_stato = cod_stato;
+        return this;
     }
-}
-
-export enum ErrEnum {
-    None = 0,
-    BadRequest = 400,
-    NotFound = 404
-}
-
-export class ErrorFactory {
-    constructor(){}
-    getError (type:ErrEnum):HttpError{
-        let retval:HttpError = null;
-        switch (type){
-            case ErrEnum.NotFound:
-                retval = new ();
-                break;
-            case ErrEnum.BadRequest:
-                retval = new BadRequest();
-                break; 
-                               
-        }
-        return retval;
+    setMessaggio (messaggio:String){
+        this.messaggio = messaggio;
+        return this;
     }
+
+    getStato ():String{
+        return this.stato;
+    }
+    getCodStato ():number{
+        return this.cod_stato;
+    }
+    getMessaggio ():String{
+        return this.messaggio;
+    }
+
 }

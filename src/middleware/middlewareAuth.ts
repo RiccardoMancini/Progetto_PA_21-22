@@ -7,7 +7,7 @@ require('dotenv').config();
 export const checkHeader = (req,res,next) => {
     const aHeader = req.headers.authorization;
     if (aHeader) next();
-    else res.status(401).send("Unauthorized");
+    else res.status(400).send('Bad request');
 
 };
 
@@ -23,7 +23,7 @@ export const checkToken = (req,res,next) => {
             req.token = bearerToken;// mi salvo il token
             next();
         }
-        else res.status(401).send('Undefined');
+        else res.status(400).send('Bad request');
 };
 
 
