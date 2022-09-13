@@ -67,7 +67,6 @@ export class Controller {
     /**
      * Creazione di una nuova asta
      */
-
     public async createAsta ( req:any, res:any){
         const aste = await new Asta().getModelAsta();
         let newrowasta = req.body;

@@ -17,17 +17,12 @@ class AstaNotCreate extends HttpError{
     
 }
 
-class UtenteNonTrovato extends HttpError{
+class ElementNotFound extends HttpError{
     constructor(){
-        super('Utente non trovato!', ErrEnum.NotFound);
+        super('Elemento non trovato!', ErrEnum.NotFound);
     }
 }
 
-class AstaNonTrovata extends HttpError{
-    constructor(){
-        super('Asta non trovata!', ErrEnum.NotFound);
-    }
-}
 class CreditoInsufficiente extends HttpError{
     constructor(){
         super('Credito insufficiente!', ErrEnum.BadRequest);
@@ -40,7 +35,7 @@ class UtenteNonAutorizzato extends HttpError{
     }
 }
 
-class TokenNonValido extends HttpError{
+class BadRequest extends HttpError{
     constructor(){
         super('Il token inserito non è valido', ErrEnum.BadRequest);
     }
@@ -65,7 +60,8 @@ export enum ErrEnum {
     None = 0,
     BadRequest = 400,
     Unauthorized=401,
-    NotFound = 404
+    NotFound = 404,
+    InternalServerError = 500
 }
 
 export class ErrorFactory {
@@ -74,14 +70,16 @@ export class ErrorFactory {
         let retval:HttpError = null;
         switch (type){
             case ErrEnum.NotFound:
-                retval = new NotFound();
+                retval = new ElementNotFound();
                 break;    
             case ErrEnum.Unauthorized:
-                retval = new Unauthorized();
+                retval = new UtenteNonAutorizzato();
                 break;
             case ErrEnum.BadRequest:
                 retval = new BadRequest();
-                break;                
+                break;  
+            default:
+                break;              
         }
         return retval;
     }
