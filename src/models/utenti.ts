@@ -10,9 +10,8 @@ export class Utenti{
     credito: string;*/
     utenti: any;
 
-    constructor()
+    constructor(sequelize: Sequelize)
     {
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
 
         this.utenti = sequelize.define("utenti", {
             user_id: {
@@ -32,7 +31,7 @@ export class Utenti{
 
     }
 
-    public async getUtenti(): Promise<Object>{
+    public async getUtenti(){
         return await this.utenti.findAll();
     }
 

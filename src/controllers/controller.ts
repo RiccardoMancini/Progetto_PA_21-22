@@ -1,14 +1,14 @@
-import { Utenti } from '../models/utenti'
+import { ProxyUtenti } from '../proxy/proxyUtenti'
 import { Asta, stato_asta, tipo_asta} from '../models/asta';
 import { Partecipazione } from '../models/partecipazione';
 
 export class Controller {
 
-    public async getListUsers(req: any, res:any){
-        const users = await new Utenti().getUtenti();
+    /*public async getListUsers(req: any, res:any){
+        const users = await new ProxyUtenti().getUtenti();
 
         res.send(users);
-    }
+    }*/
 
     public async getListAste(req: any, res:any){
         let aste = await new Asta().getAste();
@@ -64,7 +64,7 @@ export class Controller {
      * Verifica del credito dell'utente
      */
     public async getMyCredito(req: any, res: any){
-        let credito = await new Utenti().getCreditoByUserID(req.user_id).then(value => value.credito);
+        let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
         res.send({"credito": credito});
     }
 
@@ -73,10 +73,7 @@ export class Controller {
      * Aggiornamento del credito di un determinato utente
      */
     public async updateCredito (req: any, res: any){
-        let userByID = await new Utenti().getUserByID(req.body.user_id);
-        let up_credito = userByID.credito + req.body.credito;
-        userByID.credito = up_credito;
-        await userByID.save();
+        let userByID = await new ProxyUtenti().updateCreditoUtente(req.body)
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
