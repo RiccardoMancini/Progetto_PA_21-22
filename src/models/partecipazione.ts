@@ -12,7 +12,7 @@ export class Partecipazione{
     constructor()
     {
         this.utenti = new Utenti(DB_Connection.getInstance().getConnection());
-        this.asta = new Asta();
+        this.asta = new Asta(DB_Connection.getInstance().getConnection());
         let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
 
         this.partecipazione = sequelize.define("partecipazione", {

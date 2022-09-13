@@ -1,5 +1,4 @@
-import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection'
+import { DB_Connection } from '../config/db_connection';
 import { Utenti } from "../models/utenti";
 
 const checkBodyHandler = {
@@ -23,11 +22,7 @@ const checkBodyHandler = {
               }
             
             return obj[prop];
-        }
-
-        
-
-
+        }      
     }
 }
 
@@ -57,9 +52,7 @@ export class ProxyUtenti{
         }
         catch(err){
             console.log(err);
-        }
-        
-        
+        }          
     }
 
     public async updateCreditoUtente(payload: any){
@@ -71,15 +64,14 @@ export class ProxyUtenti{
 
             let userByID = await this.getUserByID(val_user_id);
             userByID.credito = userByID.credito + val_credito;
-            await userByID.save();
+            let userUpdated = this.modelUtenti.updateCreditoUtente(userByID);
         
-            return userByID;
+            return userUpdated;
 
         }
         catch(err){
             console.log(err);
-        }
-        
+        }        
   }
 
     public async checkUserExists(user_id: number): Promise<void>{

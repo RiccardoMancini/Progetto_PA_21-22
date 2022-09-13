@@ -1,5 +1,6 @@
 import { ProxyUtenti } from '../proxy/proxyUtenti'
-import { Asta, stato_asta, tipo_asta} from '../models/asta';
+import { ProxyAsta } from '../proxy/proxyAsta';
+import { stato_asta, tipo_asta} from '../models/asta';
 import { Partecipazione } from '../models/partecipazione';
 
 export class Controller {
@@ -11,7 +12,7 @@ export class Controller {
     }*/
 
     public async getListAste(req: any, res:any){
-        let aste = await new Asta().getAste();
+        let aste = await new ProxyAsta().getAste();
 
         if(Object.keys(req.query).length !== 0){
             aste = aste.filter(asta => asta.stato === Number(req.query.stato));
@@ -53,12 +54,12 @@ export class Controller {
     /**
      * Creazione di una nuova asta
      */
-    public async createAsta ( req:any, res:any){
+    /*public async createAsta ( req:any, res:any){
         const aste = await new Asta().getModelAsta();
         let newrowasta = req.body;
         let newasta = await aste.create(newrowasta);  
         res.send(newasta);
-    }
+    }*/
 
     /**
      * Verifica del credito dell'utente
@@ -73,7 +74,7 @@ export class Controller {
      * Aggiornamento del credito di un determinato utente
      */
     public async updateCredito (req: any, res: any){
-        let userByID = await new ProxyUtenti().updateCreditoUtente(req.body)
+        let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
