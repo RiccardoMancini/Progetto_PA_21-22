@@ -36,7 +36,11 @@ export class Utenti{
         return await this.utenti.findAll();
     }
 
-    public async getCreditoByUserID(user_id:any){
+    public async getUserByID(user_id: number){
+      return await this.utenti.findByPk(user_id);
+    }
+
+    public async getCreditoByUserID(user_id: number){
       return await this.utenti.findOne({
         attributes: ['credito'],
         where: {

@@ -73,11 +73,11 @@ export class Controller {
      * Aggiornamento del credito di un determinato utente
      */
     public async updateCredito (req: any, res: any){
-        let old_credito = await new Utenti().getCreditoByUserID(req.body.user_id).then(value => value.credito);
-        let up_credito = old_credito + req.body.credito;
-        console.log(up_credito);
-        /*await upcredito.save(); 
-        res.status(200).send(upcredito);*/
+        let userByID = await new Utenti().getUserByID(req.body.user_id);
+        let up_credito = userByID.credito + req.body.credito;
+        userByID.credito = up_credito;
+        await userByID.save();
+        res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
     public async getMyClosedAste(req: any, res: any){

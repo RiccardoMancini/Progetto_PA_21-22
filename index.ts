@@ -17,6 +17,8 @@ app.use(express.json());
  * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
  */
 
+
+
 /**
  * il filtraggo delle aste avviene tramite query string. 
  * es1: localhost:8080/aste  <-- mostra tutte le aste
