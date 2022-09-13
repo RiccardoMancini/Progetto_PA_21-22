@@ -40,8 +40,6 @@ export class Controller {
              aste = {"info": 'Non esistono aste in questo stato!'};
         }
 
-
-        
         res.send(aste);
     }
 
@@ -49,18 +47,6 @@ export class Controller {
         let part = await new Partecipazione().getPartecipazioni()
 
         res.send(part);
-    }
-
-    /**
-     * aggiornamento del credito
-     */
-    public async updateCredito ( req:any, res:any){
-        let user_id = req.idreq; 
-        let oldcrediti = await new Utenti().getUtenteById(user_id);
-        console.log(oldcrediti);
-        let upcredito = oldcrediti.credito + req.adcredito;
-        await upcredito.save(); 
-        res.status(200).send(upcredito);
     }
 
 
@@ -75,20 +61,30 @@ export class Controller {
     }
 
     /**
-     * verifica del credito dell'utente
+     * Verifica del credito dell'utente
      */
-     public async verificaCredito( req:any, res:any){
-        let user_id = req.idreq; 
-        let userbyid = await new Utenti().getUtenteById(user_id);
-        let credituser  = userbyid.credito;
-        res.send(credituser);
-     }
+    public async getMyCredito(req: any, res: any){
+        let credito = await new Utenti().getCreditoByUserID(req.user_id).then(value => value.credito);
+        res.send({"credito": credito});
+    }
+
+
+    /**
+     * Aggiornamento del credito di un determinato utente
+     */
+    public async updateCredito (req: any, res: any){
+        let old_credito = await new Utenti().getCreditoByUserID(req.body.user_id).then(value => value.credito);
+        let up_credito = old_credito + req.body.credito;
+        console.log(up_credito);
+        /*await upcredito.save(); 
+        res.status(200).send(upcredito);*/
+    }
 
     public async getMyClosedAste(req: any, res: any){
         /*const date_obj_i = new Date(Number(req.query.date_i));
         const date_obj_f = new Date(Number(req.query.date_f));*/
         let part = await new Partecipazione().getClosedAsteByUserID(req.user_id);
-        part = part.sort((a, b) => {return a.asta_id-b.asta_id})
+        part = part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .filter((elem, index, array) => {
                     if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
                     (index > 0 && elem.asta_id === array[index-1].asta_id)){
@@ -105,12 +101,32 @@ export class Controller {
     }
 
     public async getMyAste(req: any, res: any){
+        let app = [];
+        let rilanci = [];
         let part = await new Partecipazione().getAsteByUserID(req.user_id);
-
-        /**
-         * DA COMPLETARE
-         */
-
+        part = part.sort((a, b) => { return b.part_id - a.part_id })
+        .filter((elem) => {
+            let obj = {"asta_id": elem.asta_id};
+            let exists = app.find(value => value.asta_id === obj.asta_id);
+            if (typeof exists==='undefined'){
+                app.push(obj);
+                rilanci.push({"asta_id": elem.asta_id, "offerta": [elem.offerta]});
+                return true;
+            }
+            else{
+                let obj2 = rilanci.find(value => value.asta_id === exists.asta_id);
+                obj2.offerta.push(elem.offerta);                
+                return false;
+            }
+        })
+        .map((elem, index) => {
+            return {
+                "asta_id": elem.asta_id,
+                "stato": elem.stato === 2? stato_asta[2]:stato_asta[3],
+                "rilanci / offerta": rilanci[index].offerta
+            }
+        })
+        
         res.send(part)
     }
 
