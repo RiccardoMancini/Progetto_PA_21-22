@@ -53,7 +53,6 @@ export class Asta{
         return await this.asta.create(asta);
     }
 
-
     public getModelAsta(){
         return this.asta;
     }
