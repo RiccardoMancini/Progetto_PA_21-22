@@ -21,6 +21,12 @@ export class Chiavi{
         
     }
 
+    public async getRandomKey(){
+      let max = await this.chiavi.count();
+      let keyID = Math.round(Math.random() * (max - 1) + 1);
+      return keyID;
+  }
+
     public getModelChiavi(){
         return this.chiavi;
     }

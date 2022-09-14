@@ -26,6 +26,8 @@ app.use(express.json());
  */
 app.get('/aste', controller.getListAste);
 
+app.get('/asta/new', controller.createAsta)
+
 
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 

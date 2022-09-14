@@ -46,7 +46,10 @@ export class Asta{
         return await this.asta.findAll();        
     }
 
-    
+    public async createAsta(asta:any){
+        let newAsta = await this.asta.create(asta);
+        return newAsta;
+    }
 
     public getModelAsta(){
         return this.asta;

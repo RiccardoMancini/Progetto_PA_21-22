@@ -1,7 +1,9 @@
 import { ProxyUtenti } from '../proxy/proxyUtenti'
 import { ProxyAsta } from '../proxy/proxyAsta';
-import { stato_asta, tipo_asta} from '../models/asta';
+import { Asta , stato_asta, tipo_asta} from '../models/asta';
+import { Chiavi } from '../models/chiavi';
 import { Partecipazione } from '../models/partecipazione';
+import { DB_Connection } from '../config/db_connection'
 
 export class Controller {
 
@@ -54,12 +56,19 @@ export class Controller {
     /**
      * Creazione di una nuova asta
      */
-    /*public async createAsta ( req:any, res:any){
-        const aste = await new Asta().getModelAsta();
-        let newrowasta = req.body;
-        let newasta = await aste.create(newrowasta);  
-        res.send(newasta);
-    }*/
+     public async createAsta( req:any, res:any){
+        let keyID = await new Chiavi().getRandomKey();
+
+        let newAsta = await new Asta(DB_Connection.getInstance().getConnection()).createAsta({"tipo":req.body.tipo,
+                                            "p_min":req.body.p_min,
+                                            "stato":1,
+                                            "data_i":"2022-04-12",    
+                                            "data_f":"2022-04-12", 
+                                            "chiavi_id":keyID });
+        
+        res.send(newAsta);
+
+     }
 
     /**
      * Verifica del credito dell'utente
