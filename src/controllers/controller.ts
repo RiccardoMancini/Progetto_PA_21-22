@@ -4,6 +4,7 @@ import { Asta , stato_asta, tipo_asta} from '../models/asta';
 import { Chiavi } from '../models/chiavi';
 import { Partecipazione } from '../models/partecipazione';
 import { DB_Connection } from '../config/db_connection'
+import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 
 export class Controller {
 
@@ -53,11 +54,11 @@ export class Controller {
         res.send(aste);
     }
 
-    public async getListPartecipazioni(req: any, res: any){
+    /*public async getListPartecipazioni(req: any, res: any){
         let part = await new Partecipazione().getPartecipazioni()
 
         res.send(part);
-    }
+    }*/
 
 
     /**
@@ -97,7 +98,7 @@ export class Controller {
     public async getMyClosedAste(req: any, res: any){
         /*const date_obj_i = new Date(Number(req.query.date_i));
         const date_obj_f = new Date(Number(req.query.date_f));*/
-        let part = await new Partecipazione().getClosedAsteByUserID(req.user_id);
+        let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id);
         part = part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .filter((elem, index, array) => {
                     if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
@@ -117,7 +118,7 @@ export class Controller {
     public async getMyAste(req: any, res: any){
         let app = [];
         let rilanci = [];
-        let part = await new Partecipazione().getAsteByUserID(req.user_id);
+        let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
         part = part.sort((a, b) => { return b.part_id - a.part_id })
         .filter((elem) => {
             let obj = {"asta_id": elem.asta_id};

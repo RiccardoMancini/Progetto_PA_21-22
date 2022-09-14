@@ -7,7 +7,7 @@ CREATE TABLE Utenti(
     nome VARCHAR(30) NOT NULL,
     cognome VARCHAR(30) NOT NULL,
     ruolo int NOT NULL,
-    credito int NOT NULL
+    credito float8 NOT NULL
 );
 
 CREATE TABLE Chiavi (
@@ -19,10 +19,10 @@ CREATE TABLE Chiavi (
 CREATE TABLE Asta (
     asta_id SERIAL PRIMARY KEY,
     tipo int NOT NULL,
-    p_min int NOT NULL,
+    p_min float8 NOT NULL,
     stato int NOT NULL,
-    data_i date NOT NULL,
-    data_f date NOT NULL,
+    data_i TIMESTAMP NOT NULL,
+    data_f TIMESTAMP NOT NULL,
     chiavi_id int,
     CONSTRAINT FK_Chiavi FOREIGN KEY (chiavi_id) REFERENCES Chiavi(chiavi_id) ON UPDATE CASCADE ON DELETE CASCADE
 );

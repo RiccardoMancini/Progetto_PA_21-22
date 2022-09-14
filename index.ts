@@ -45,9 +45,9 @@ app.patch('/admin/accredito', controller.updateCredito);
 
 //app.get('/utenti', controller.getListUsers);
 
-app.get('/part', (req, res) => {
+/*app.get('/part', (req, res) => {
    controller.getListPartecipazioni(req, res);
-});
+});*/
 
 
 

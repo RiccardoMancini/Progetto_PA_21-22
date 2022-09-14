@@ -23,7 +23,7 @@ export class Utenti{
             nome: { type: DataTypes.STRING },
             cognome: { type: DataTypes.STRING },
             ruolo: { type: DataTypes.SMALLINT },
-            credito: { type: DataTypes.BIGINT }
+            credito: { type: DataTypes.FLOAT }
           }, {
             tableName: 'utenti',
             timestamps: false

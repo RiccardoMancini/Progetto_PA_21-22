@@ -28,7 +28,7 @@ export class Asta{
               primaryKey: true
             },
             tipo: { type: DataTypes.TINYINT /*validate: {is: /^[0,1,2]{1}$/ }*/},
-            p_min: { type: DataTypes.BIGINT },
+            p_min: { type: DataTypes.FLOAT },
             stato: { type: DataTypes.TINYINT },
             data_i: { type: DataTypes.DATE },
             data_f: { type: DataTypes.DATE },

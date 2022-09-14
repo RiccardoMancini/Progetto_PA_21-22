@@ -9,11 +9,10 @@ export class Partecipazione{
     utenti: any;
     asta: any;
 
-    constructor()
+    constructor(sequelize: Sequelize)
     {
-        this.utenti = new Utenti(DB_Connection.getInstance().getConnection());
-        this.asta = new Asta(DB_Connection.getInstance().getConnection());
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
+        this.utenti = new Utenti(sequelize);
+        this.asta = new Asta(sequelize);
 
         this.partecipazione = sequelize.define("partecipazione", {
             part_id: {
