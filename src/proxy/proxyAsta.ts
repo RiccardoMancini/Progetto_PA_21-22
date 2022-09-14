@@ -51,4 +51,20 @@ export class ProxyAsta{
     public async getAste(){
         return this.modelAsta.getAste();
     }
+
+    // metodo che scrive la data nel modo corretto per Timestamp
+
+    public converterData(data:String){
+        var sData = data.split(' ',3);
+        var nData:String = "";
+
+        if ((sData[1].length!==4)
+            && (sData[2].length>2 && Number(sData[2])>12 && Number(sData[2])<1)
+            && (sData[3].length>2 && Number(sData[3])>31 && Number(sData[2])<1)){
+            var cData:String[]=[sData[3],sData[2],sData[1]];
+            var nData:String=cData.join(' ');
+            return nData;
+        }
+
+    }
 }
