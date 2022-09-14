@@ -62,11 +62,9 @@ export class ProxyUtenti{
             const val_user_id = this.proxyUtenteValidator.user_id;
             await this.checkUserExists(val_user_id);
 
-            let userByID = await this.getUserByID(val_user_id);
-            userByID.credito = userByID.credito + val_credito;
-            let userUpdated = this.modelUtenti.updateCreditoUtente(userByID);
+            let userByID = this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
         
-            return userUpdated;
+            return userByID;
 
         }
         catch(err){

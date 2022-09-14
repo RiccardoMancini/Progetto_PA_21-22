@@ -51,9 +51,11 @@ export class Utenti{
     // Questo trick è stato fatto per avere lo stesso tipo di return del proxy
     // però in caso si potrebbe risolvere se l'interfaccia che implementeranno (UtenteInterface)
     // restituissero qualcosa di generico <T>
-    public async updateCreditoUtente(user_obj: any){
-      await user_obj.save();
-      return user_obj;
+    public async updateCreditoUtente(user_id: number, credito: number){
+      let userByID = await this.getUserByID(user_id);
+      userByID.credito = userByID.credito + credito;
+      await userByID.save();
+      return userByID;
     }
 
     public getModelUtenti(){
