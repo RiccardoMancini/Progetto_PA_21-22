@@ -5,16 +5,6 @@ import { Partecipazione } from '../models/partecipazione';
 const __Handler = {
     get: (obj, prop) => {                
         
-        if(prop === 'user_id'){
-            if (!Number.isInteger(obj[prop])) {
-                throw new TypeError('The user_id is not an integer');
-              }
-            if (obj[prop] < 1) {
-                throw new RangeError('The user_id seems invalid. Choose a number > 0');
-              }
-            
-            return obj[prop];
-        } 
     }
 }
 
