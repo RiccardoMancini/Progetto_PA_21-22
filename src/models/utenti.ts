@@ -10,9 +10,8 @@ export class Utenti{
     credito: string;*/
     utenti: any;
 
-    constructor()
+    constructor(sequelize: Sequelize)
     {
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
 
         this.utenti = sequelize.define("utenti", {
             user_id: {
@@ -32,13 +31,32 @@ export class Utenti{
 
     }
 
-    public async getUtenti(): Promise<Object>{
+    public async getUtenti(){
         return await this.utenti.findAll();
     }
 
-    public async getUtenteById(user_id:any){
-      return await this.utenti.findOne(user_id);
-  }
+    public async getUserByID(user_id: number){
+      return await this.utenti.findByPk(user_id);
+    }
+
+    public async getCreditoByUserID(user_id: number){
+      return await this.utenti.findOne({
+        attributes: ['credito'],
+        where: {
+          user_id: user_id 
+        },
+      })
+    }
+
+    // Questo trick è stato fatto per avere lo stesso tipo di return del proxy
+    // però in caso si potrebbe risolvere se l'interfaccia che implementeranno (UtenteInterface)
+    // restituissero qualcosa di generico <T>
+    public async updateCreditoUtente(user_id: number, credito: number){
+      let userByID = await this.getUserByID(user_id);
+      userByID.credito = userByID.credito + credito;
+      await userByID.save();
+      return userByID;
+    }
 
     public getModelUtenti(){
         return this.utenti;

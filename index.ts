@@ -13,6 +13,11 @@ const HOST = '0.0.0.0';
 const app = express();
 app.use(express.json());
 
+/**
+ * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
+ */
+
+
 
 /**
  * il filtraggo delle aste avviene tramite query string. 
@@ -22,16 +27,24 @@ app.use(express.json());
 app.get('/aste', controller.getListAste);
 app.get('/chiavi', controller.generaAsta);
 
+app.get('/asta/new', controller.createAsta)
+
 
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 
+app.get('/storico/aste/closed', controller.getMyClosedAste);
 
-app.get('/', (req: any, res: any) => {
-  let conn = DB_Connection.getInstance().getConnection();
-  console.log(conn)
-});
+app.get('/storico/aste', controller.getMyAste);
 
-app.get('/utenti', controller.getListUsers);
+app.get('/credito', controller.getMyCredito);
+
+app.patch('/admin/accredito', controller.updateCredito);
+
+
+
+
+
+//app.get('/utenti', controller.getListUsers);
 
 app.get('/part', (req, res) => {
    controller.getListPartecipazioni(req, res);

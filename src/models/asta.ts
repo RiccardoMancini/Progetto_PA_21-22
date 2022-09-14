@@ -17,10 +17,9 @@ export enum stato_asta {
 export class Asta{
     asta: any;
     chiavi: any
-    constructor()
-    {
-        this.chiavi = new Chiavi()
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
+
+    constructor(sequelize: Sequelize){
+        this.chiavi = new Chiavi();
 
         this.asta = sequelize.define("asta", {
             asta_id: {
@@ -44,9 +43,12 @@ export class Asta{
     }
 
     public async getAste(){
-        let aste = await this.asta.findAll();
+        return await this.asta.findAll();        
+    }
 
-        return aste;
+    public async createAsta(asta:any){
+        let newAsta = await this.asta.create(asta);
+        return newAsta;
     }
 
 
