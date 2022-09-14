@@ -25,7 +25,6 @@ app.use(express.json());
  * es2: localhost:8080/aste?stato=2  <-- mostra le aste filtrate con stato
  */
 app.get('/aste', controller.getListAste);
-app.get('/chiavi', controller.generaAsta);
 
 app.get('/asta/new', controller.createAsta)
 

@@ -13,6 +13,13 @@ export class Controller {
         res.send(users);
     }*/
 
+    public async getChiavi(req: any, res:any){
+        const chiavi = await new Chiavi().getModelChiavi();
+
+        res.send(chiavi);
+    }
+
+
     public async getListAste(req: any, res:any){
         let aste = await new ProxyAsta().getAste();
 

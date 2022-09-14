@@ -56,10 +56,6 @@ export class Asta{
         return this.asta;
     }
 
-    public async createAsta(asta:any){
-        let newAsta = await this.asta.create(asta);
-        return newAsta;
-    }
 
 
 }

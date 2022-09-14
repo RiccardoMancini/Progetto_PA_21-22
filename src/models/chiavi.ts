@@ -21,11 +21,6 @@ export class Chiavi{
         
     }
 
-    public async getRandomKey(){
-      let max = await this.chiavi.count();
-      let keyID = Math.round(Math.random() * (max - 1) + 1);
-      return keyID;
-  }
 
     public getModelChiavi(){
         return this.chiavi;
@@ -40,15 +35,12 @@ export class Chiavi{
       let tchiavi= await this.chiavi.findByPk(Key_id);
       return tchiavi;
     }
-    // fare una lista con l'elenco degli id presenti nel modello chiavi;
-    // estrai randomicamente uno degli indici della lista
-    // poi estrarre con findByPk il valore dell'indice estratto nel modello chiavi
-    public async randomKey(){
-        let max = await this.chiavi.count();
-        let keyID = Math.round(Math.random() * (max - 1) + 1);
-        return keyID;
-    }
 
+    public async getRandomKey(){
+      let max = await this.chiavi.count();
+      let keyID = Math.round(Math.random() * (max - 1) + 1);
+      return keyID;
+  }
    
 
 }
