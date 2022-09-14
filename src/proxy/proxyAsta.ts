@@ -60,13 +60,18 @@ export class ProxyAsta{
         var sData = date.split(' ',3);
         var nData:String = "";
 
-        if ((sData[1].length===4)
-            && (sData[3].length >=1 && sData[2].length <= 2 && Number(sData[2])<=12 && Number(sData[2])>=1)
-            && (sData[3].length >=1 && sData[3].length <= 2 && Number(sData[3])<=31 && Number(sData[2])>=1)){
-            var cData:String[]=[sData[3],sData[2],sData[1]];// riordinami la data
-            var nData:String=cData.join(' ');
-            return nData;
-        }
+        
+            if ((sData[1].length===4)
+                && (sData[3].length >=1 && sData[2].length <= 2 && Number(sData[2])<=12 && Number(sData[2])>=1)
+                && (sData[3].length >=1 && sData[3].length <= 2 && Number(sData[3])<=31 && Number(sData[2])>=1)){
+                var cData:String[]=[sData[3],sData[2],sData[1]];// riordinami la data
+                var nData:String=cData.join(' ');
+                return nData;
+            }
+            else{
+                throw new TypeError('The credito is not an integer');
+            }
+        
 
     }
 }
