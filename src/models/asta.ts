@@ -51,7 +51,6 @@ export class Asta{
         return newAsta;
     }
 
-
     public getModelAsta(){
         return this.asta;
     }

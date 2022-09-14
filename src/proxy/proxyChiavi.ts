@@ -14,7 +14,7 @@ const checkBodyHandler = {
 
     export class ProxyChiavi{
         modelChiavi: any ;
-        proxyChiaviValidator: any;
+        proxyChiaviValidator: any
     
         constructor(){
     
