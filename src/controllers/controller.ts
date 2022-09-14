@@ -93,9 +93,20 @@ export class Controller {
         res.send(credituser);
      }
      public async generaAsta( req:any, res:any){
-        let num = Math.round(Math.random() *5);
-        let rKey = await new Chiavi().getChiaviById(num);
-        res.send(rKey);
+        let chiaviModel = new Chiavi();
+        let max = await chiaviModel.getModelChiavi().count();
+        let keyID = Math.round(Math.random() * (max - 1) + 1);
+
+        let newAsta = await new Asta().createAsta({"tipo":req.body.tipo,
+                                            "p_min":req.body.p_min,
+                                            "stato":1,
+                                            "data_i":"2022-04-12",    
+                                            "data_f":"2022-04-12", 
+                                            "chiavi_id":keyID });
+        
+        res.send(newAsta);
+
+
      }
 
 

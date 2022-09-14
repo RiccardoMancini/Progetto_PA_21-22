@@ -54,13 +54,10 @@ export class Asta{
         return this.asta;
     }
 
-    
-
-    public async setParamiter(tipo_asta:number,base_asta:number,data_i:number,data_f:number){
-        this.asta.tipo = tipo_asta;
-        this.asta.p_min = base_asta;
-        this.asta.data_i = data_i;
-        this.asta.data_f = data_f;
+    public async createAsta(asta:any){
+        let newAsta = await this.asta.create(asta);
+        return newAsta;
     }
+
 
 }
