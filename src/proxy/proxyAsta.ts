@@ -54,14 +54,16 @@ export class ProxyAsta{
 
     // metodo che scrive la data nel modo corretto per Timestamp
 
-    public converterData(data:String){
-        var sData = data.split(' ',3);
+    //Devo richiamare questo metodo  in cima dove vaso a checcare le date 
+
+    public normalizeDate(date:String){
+        var sData = date.split(' ',3);
         var nData:String = "";
 
-        if ((sData[1].length!==4)
-            && (sData[2].length>2 && Number(sData[2])>12 && Number(sData[2])<1)
-            && (sData[3].length>2 && Number(sData[3])>31 && Number(sData[2])<1)){
-            var cData:String[]=[sData[3],sData[2],sData[1]];
+        if ((sData[1].length===4)
+            && (sData[3].length >=1 && sData[2].length <= 2 && Number(sData[2])<=12 && Number(sData[2])>=1)
+            && (sData[3].length >=1 && sData[3].length <= 2 && Number(sData[3])<=31 && Number(sData[2])>=1)){
+            var cData:String[]=[sData[3],sData[2],sData[1]];// riordinami la data
             var nData:String=cData.join(' ');
             return nData;
         }
