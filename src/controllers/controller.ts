@@ -3,11 +3,18 @@ import { ProxyAsta } from '../proxy/proxyAsta';
 import { ProxyChiavi } from '../proxy/proxyChiavi';
 import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
+import { type } from 'os';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
     let indice = Math.round(Math.random() * (arrKey.length - 1));
     return arrKey[indice];
+}
+
+function checkDataFAsta(data_fine: Date){
+    const now = new Date(Date.now());
+    console.log(now.toISOString(), data_fine, now > data_fine)
+    return now > data_fine ? true : false
 }
 
 export class Controller {
@@ -29,7 +36,20 @@ export class Controller {
         if(aste.length !== 0)
         {
             aste.map((value: any) => {
-                            value.tipo = value.tipo === tipo_asta.ASTA_CHIUSA_1? 'Asta_chiusa_1': 'Asta_chiusa_2';
+                            switch (value.tipo){
+
+                                case tipo_asta.ASTA_APERTA:
+                                    value.tipo = tipo_asta[1];
+                                    break;
+                                case tipo_asta.ASTA_CHIUSA_1:
+                                    value.tipo = tipo_asta[2];
+                                    break;
+                                case tipo_asta.ASTA_CHIUSA_2:
+                                    value.tipo = tipo_asta[3];
+                                    break;
+                                default:
+                                    break;
+                            }
                             switch (value.stato) {
                                 case stato_asta.NON_APERTA:
                                     value.stato = stato_asta[1];
@@ -63,7 +83,8 @@ export class Controller {
      * Creazione di una nuova asta
      */
      public async createAsta( req:any, res:any){
-        let randKey = getRandomKey(await new ProxyChiavi().getChiavi());        
+        let randKey = getRandomKey(await new ProxyChiavi().getChiavi());       
+        console.log(req.body.tipo, typeof req.body.tipo) 
         let newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
                                             "p_min":req.body.p_min,
                                             "stato":1,
@@ -95,19 +116,40 @@ export class Controller {
 
 
     public async setAuctionWon(req: any, res: any){
+        let response = {}
         const asta = await new ProxyAsta().getOpenAstaByID(req.params.asta_id);
+        if (!checkDataFAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
 
-        //if asta.tipo !== tipoaste.Bustachiusasecondascelta (getFirstOffer())
-        const part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+        if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
+            let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
+            if(part !== false){
+                part.aggiudicata = true;
+                part = await new ProxyPartecipazione().updatePartecipazione(part);
+                await new ProxyUtenti().updateCreditoUtente({"user_id": part.user_id, "addebito": -part.offerta});
 
-        //else (getSecondOffer and the winner)
+                response = {"asta_id": part.asta_id, "user_id": part.user_id, "aggiudicata": part.aggiudicata, "offerta": part.offerta};
+            }
+            else{
+                response = {"info": "Nessuna offerta fatta per questa asta!"}
+            }
+        }
+        else{
+            let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+            
+        }
 
+        
 
-        //update aggiudicata in True,
+        
 
-        //update il credito del concorrente corrispondente
+        // close asta
 
-        res.send(part)
+        res.send(response)
+        
+
+        
+
+        
     }
 
     public async getMyClosedAste(req: any, res: any){

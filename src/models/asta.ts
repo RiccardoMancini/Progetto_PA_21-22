@@ -42,7 +42,7 @@ export class Asta{
     }
 
     public async getOpenAstaByID(asta_id: number){
-        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.TERMINATA }});
+        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.NON_APERTA }});
     }
 
     public async getAste(){

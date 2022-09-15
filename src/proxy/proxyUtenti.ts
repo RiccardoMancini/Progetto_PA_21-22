@@ -55,12 +55,22 @@ export class ProxyUtenti{
         }          
     }
 
-    public async updateCreditoUtente(payload: any){
+    public async updateCreditoUtente(payload: any, afterOffer: boolean = false){
         try{
-            this.proxyUtenteValidator = new Proxy(payload, checkBodyHandler);
-            const val_credito = this.proxyUtenteValidator.credito;
-            const val_user_id = this.proxyUtenteValidator.user_id;
-            await this.checkUserExists(val_user_id);
+            let val_credito = 0;
+            let val_user_id = 0;
+            if( afterOffer === false){
+                this.proxyUtenteValidator = new Proxy(payload, checkBodyHandler);
+                val_credito = this.proxyUtenteValidator.credito;
+                val_user_id = this.proxyUtenteValidator.user_id;
+                await this.checkUserExists(val_user_id);
+            }
+            else{
+                val_user_id = payload.user_id;
+                val_credito = payload.addebito;
+            }
+
+            console.log(val_user_id, val_credito);
 
             let userByID = this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
         
@@ -70,7 +80,7 @@ export class ProxyUtenti{
         catch(err){
             console.log(err);
         }        
-  }
+    }
 
     public async checkUserExists(user_id: number): Promise<void>{
         let userCheck = await this.modelUtenti.getModelUtenti().findByPk(user_id);

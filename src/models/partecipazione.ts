@@ -85,14 +85,29 @@ export class Partecipazione{
     return partecipazioni
     }
 
-    public async getOffersByAstaID(asta_id: number){
+    public async getFirstOfferByAstaID(asta_id: number){
       return await this.partecipazione.findOne({
           where: { 
             asta_id: asta_id
           },
           order: [['offerta', 'DESC']]
         })
-      }
+    }
+
+    public async getOffersByAstaID(asta_id: number){
+      return await this.partecipazione.findOne({
+          limit: 2,
+          where: { 
+            asta_id: asta_id
+          },
+          order: [['offerta', 'DESC']]
+        })
+    }
+
+    public async updatePartecipazione(part: any){
+      return await part.save();
+
+    }
     
     public getModelPartecipazione(){
         return this.partecipazione;
