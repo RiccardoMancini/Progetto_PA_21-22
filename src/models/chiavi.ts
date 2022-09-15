@@ -3,8 +3,7 @@ import { DB_Connection } from '../config/db_connection'
 
 export class Chiavi{
     chiavi: any;
-    constructor() {
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
+    constructor(sequelize: Sequelize) {
 
         this.chiavi = sequelize.define("chiavi", {
             chiavi_id: {
@@ -22,25 +21,21 @@ export class Chiavi{
     }
 
 
-    public getModelChiavi(){
-        return this.chiavi;
-    }
-
     public async getChiavi(){
-      let tChiavi= await this.chiavi.findAll();
-      return tChiavi;
+      return await this.chiavi.findAll();
     }
 
-    public async getChiaviById(Key_id){
-      let tchiavi= await this.chiavi.findByPk(Key_id);
+    public async getChiaviById(key_id: number){
+      let tchiavi= await this.chiavi.findByPk(key_id);
       return tchiavi;
     }
 
-    public async getRandomKey(){
-      let max = await this.chiavi.count();
-      let keyID = Math.round(Math.random() * (max - 1) + 1);
-      return keyID;
-  }
+    
+    public getModelChiavi(){
+      return this.chiavi;
+    }
+
+    
    
 
 }

@@ -19,7 +19,7 @@ export class Asta{
     chiavi: any
 
     constructor(sequelize: Sequelize){
-        this.chiavi = new Chiavi();
+        this.chiavi = new Chiavi(sequelize);
 
         this.asta = sequelize.define("asta", {
             asta_id: {

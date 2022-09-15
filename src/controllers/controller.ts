@@ -4,6 +4,15 @@ import { Asta , stato_asta, tipo_asta} from '../models/asta';
 import { Chiavi } from '../models/chiavi';
 import { Partecipazione } from '../models/partecipazione';
 import { DB_Connection } from '../config/db_connection'
+import { ProxyChiavi } from '../proxy/proxyChiavi';
+import { copyFileSync } from 'fs';
+
+async function getRandomKey(){
+    const listKeys = await new ProxyChiavi().getChiavi();
+    const arrKey = listKeys.map(elem => elem.chiavi_id)
+    let indice = Math.round(Math.random() * (arrKey.length - 1));
+    return arrKey[indice];
+}
 
 export class Controller {
 
@@ -13,11 +22,6 @@ export class Controller {
         res.send(users);
     }*/
 
-    public async getChiavi(req: any, res:any){
-        const chiavi = await new Chiavi().getModelChiavi();
-
-        res.send(chiavi);
-    }
 
 
     public async getListAste(req: any, res:any){
@@ -59,20 +63,19 @@ export class Controller {
         res.send(part);
     }
 
+    
 
     /**
      * Creazione di una nuova asta
      */
-     public async createAsta( req:any, res:any){
-        let keyID = await new Chiavi().getRandomKey();
-
+    public async createAsta( req:any, res:any){
+        let randKey = await getRandomKey();        
         let newAsta = await new Asta(DB_Connection.getInstance().getConnection()).createAsta({"tipo":req.body.tipo,
                                             "p_min":req.body.p_min,
                                             "stato":1,
                                             "data_i":"2022-04-12",    
                                             "data_f":"2022-04-12", 
-                                            "chiavi_id":keyID });
-        
+                                            "chiavi_id":randKey });
         
         
         res.send(newAsta);

@@ -10,22 +10,28 @@ const checkBodyHandler = {
               }
         }
         return obj[prop];
-    } 
+    }
+} 
 
-    export class ProxyChiavi{
-        modelChiavi: any ;
-        proxyChiaviValidator: any
+export class ProxyChiavi{
+
+modelChiavi: any;
+proxyChiaviValidator: any
+
+constructor(){
+
+    this.modelChiavi = new Chiavi(DB_Connection.getInstance().getConnection());
+
+}
+
+public async getChiavi(){
+    return await this.modelChiavi.getChiavi();
     
-        constructor(){
-    
-            this.modelChiavi = new Chiavi (DB_Connection.getInstance().getConnection());
-    
-        }
-        
-    
-        public async getChiaviById( chiavi_id: number){
-          return await this.ModelChiavi.getUserByID(chiavi_id);
-        }
+  }
+
+public async getChiaviById( chiavi_id: number){
+    return await this.modelChiavi.getUserByID(chiavi_id);
+}
 
 
 
