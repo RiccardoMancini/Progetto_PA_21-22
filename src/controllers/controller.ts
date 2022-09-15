@@ -95,6 +95,23 @@ export class Controller {
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
+
+    public async setAuctionWon(req: any, res: any){
+        const asta = await new ProxyAsta().getOpenAstaByID(req.params.asta_id);
+
+        //if asta.tipo !== tipoaste.Bustachiusasecondascelta (getFirstOffer())
+        const part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+
+        //else (getSecondOffer and the winner)
+
+
+        //update aggiudicata in True,
+
+        //update il credito del concorrente corrispondente
+
+        res.send(part)
+    }
+
     public async getMyClosedAste(req: any, res: any){
         /*const date_obj_i = new Date(Number(req.query.date_i));
         const date_obj_f = new Date(Number(req.query.date_f));*/

@@ -85,6 +85,15 @@ export class Partecipazione{
     });
     return partecipazioni
     }
+
+    public async getOffersByAstaID(asta_id: number){
+      return await this.partecipazione.findOne({
+          where: { 
+            asta_id: asta_id
+          },
+          order: [['offerta', 'DESC']]
+        })
+      }
     
     public getModelPartecipazione(){
         return this.partecipazione;

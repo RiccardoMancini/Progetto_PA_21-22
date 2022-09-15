@@ -28,6 +28,7 @@ app.get('/aste', controller.getListAste);
 
 app.get('/asta/new', controller.createAsta)
 
+app.get('/asta/:asta_id/close', controller.setAuctionWon)
 
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 
