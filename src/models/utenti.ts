@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection'
 
 export class Utenti{
     /*user_id: number;
@@ -48,9 +47,7 @@ export class Utenti{
       })
     }
 
-    // Questo trick è stato fatto per avere lo stesso tipo di return del proxy
-    // però in caso si potrebbe risolvere se l'interfaccia che implementeranno (UtenteInterface)
-    // restituissero qualcosa di generico <T>
+    
     public async updateCreditoUtente(user_id: number, credito: number){
       let userByID = await this.getUserByID(user_id);
       userByID.credito = userByID.credito + credito;

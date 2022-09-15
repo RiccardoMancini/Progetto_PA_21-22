@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection'
 import { Chiavi } from './chiavi';
 
 export enum tipo_asta{
@@ -19,7 +18,7 @@ export class Asta{
     chiavi: any
 
     constructor(sequelize: Sequelize){
-        this.chiavi = new Chiavi();
+        this.chiavi = new Chiavi(sequelize);
 
         this.asta = sequelize.define("asta", {
             asta_id: {
@@ -51,8 +50,7 @@ export class Asta{
     }
 
     public async createAsta(asta:any){
-        let newAsta = await this.asta.create(asta);
-        return newAsta;
+        return await this.asta.create(asta);
     }
 
 

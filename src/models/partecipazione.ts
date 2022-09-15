@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection';
 import { Utenti } from './utenti'
 import { Asta } from './asta';
 
