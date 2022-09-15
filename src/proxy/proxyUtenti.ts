@@ -4,8 +4,8 @@ import { Utenti } from "../models/utenti";
 const checkBodyHandler = {
     get: (obj, prop) => {                
         if(prop === 'credito'){
-            if (!Number.isInteger(obj[prop])) {
-                throw new TypeError('The credito is not an integer');
+            if (!Number(obj[prop])) {
+                throw new TypeError('The credito is not a number');
               }
             if (obj[prop] < 1) {
                 throw new RangeError('The credito seems invalid. Choose a number > 0');

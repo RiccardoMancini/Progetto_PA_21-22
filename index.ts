@@ -28,6 +28,7 @@ app.get('/aste', controller.getListAste);
 
 app.get('/asta/new', controller.createAsta)
 
+app.get('/asta/:asta_id/close', controller.setAuctionWon)
 
 app.use([checkHeader, checkToken, verifyAndAuthenticate]);
 
@@ -45,9 +46,9 @@ app.patch('/admin/accredito', controller.updateCredito);
 
 //app.get('/utenti', controller.getListUsers);
 
-app.get('/part', (req, res) => {
+/*app.get('/part', (req, res) => {
    controller.getListPartecipazioni(req, res);
-});
+});*/
 
 
 

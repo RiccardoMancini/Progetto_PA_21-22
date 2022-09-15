@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection';
 import { Utenti } from './utenti'
 import { Asta } from './asta';
 
@@ -9,11 +8,10 @@ export class Partecipazione{
     utenti: any;
     asta: any;
 
-    constructor()
+    constructor(sequelize: Sequelize)
     {
-        this.utenti = new Utenti(DB_Connection.getInstance().getConnection());
-        this.asta = new Asta(DB_Connection.getInstance().getConnection());
-        let sequelize: Sequelize = DB_Connection.getInstance().getConnection(); 
+        this.utenti = new Utenti(sequelize);
+        this.asta = new Asta(sequelize);
 
         this.partecipazione = sequelize.define("partecipazione", {
             part_id: {
@@ -86,6 +84,15 @@ export class Partecipazione{
     });
     return partecipazioni
     }
+
+    public async getOffersByAstaID(asta_id: number){
+      return await this.partecipazione.findOne({
+          where: { 
+            asta_id: asta_id
+          },
+          order: [['offerta', 'DESC']]
+        })
+      }
     
     public getModelPartecipazione(){
         return this.partecipazione;

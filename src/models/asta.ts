@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import { DB_Connection } from '../config/db_connection'
 import { Chiavi } from './chiavi';
 
 export enum tipo_asta{
@@ -28,7 +27,7 @@ export class Asta{
               primaryKey: true
             },
             tipo: { type: DataTypes.TINYINT /*validate: {is: /^[0,1,2]{1}$/ }*/},
-            p_min: { type: DataTypes.BIGINT },
+            p_min: { type: DataTypes.FLOAT },
             stato: { type: DataTypes.TINYINT },
             data_i: { type: DataTypes.DATE },
             data_f: { type: DataTypes.DATE },
@@ -42,13 +41,16 @@ export class Asta{
         this.asta.belongsTo(this.chiavi.getModelChiavi(), { foreignKey: 'chiavi_id'});
     }
 
+    public async getOpenAstaByID(asta_id: number){
+        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.TERMINATA }});
+    }
+
     public async getAste(){
         return await this.asta.findAll();        
     }
 
     public async createAsta(asta:any){
-        let newAsta = await this.asta.create(asta);
-        return newAsta;
+        return await this.asta.create(asta);
     }
 
     public getModelAsta(){

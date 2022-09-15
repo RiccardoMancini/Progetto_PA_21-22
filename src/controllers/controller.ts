@@ -1,15 +1,11 @@
 import { ProxyUtenti } from '../proxy/proxyUtenti'
 import { ProxyAsta } from '../proxy/proxyAsta';
-import { Asta , stato_asta, tipo_asta} from '../models/asta';
-import { Chiavi } from '../models/chiavi';
-import { Partecipazione } from '../models/partecipazione';
-import { DB_Connection } from '../config/db_connection'
 import { ProxyChiavi } from '../proxy/proxyChiavi';
-import { copyFileSync } from 'fs';
+import { stato_asta, tipo_asta} from '../models/asta';
+import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 
-async function getRandomKey(){
-    const listKeys = await new ProxyChiavi().getChiavi();
-    const arrKey = listKeys.map(elem => elem.chiavi_id)
+function getRandomKey(rawKeys: any){    
+    const arrKey = rawKeys.map(elem => elem.chiavi_id)
     let indice = Math.round(Math.random() * (arrKey.length - 1));
     return arrKey[indice];
 }
@@ -21,7 +17,6 @@ export class Controller {
 
         res.send(users);
     }*/
-
 
 
     public async getListAste(req: any, res:any){
@@ -57,20 +52,19 @@ export class Controller {
         res.send(aste);
     }
 
-    public async getListPartecipazioni(req: any, res: any){
+    /*public async getListPartecipazioni(req: any, res: any){
         let part = await new Partecipazione().getPartecipazioni()
 
         res.send(part);
-    }
+    }*/
 
-    
 
     /**
      * Creazione di una nuova asta
      */
-    public async createAsta( req:any, res:any){
-        let randKey = await getRandomKey();        
-        let newAsta = await new Asta(DB_Connection.getInstance().getConnection()).createAsta({"tipo":req.body.tipo,
+     public async createAsta( req:any, res:any){
+        let randKey = getRandomKey(await new ProxyChiavi().getChiavi());        
+        let newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
                                             "p_min":req.body.p_min,
                                             "stato":1,
                                             "data_i":"2022-04-12",    
@@ -99,10 +93,27 @@ export class Controller {
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
+
+    public async setAuctionWon(req: any, res: any){
+        const asta = await new ProxyAsta().getOpenAstaByID(req.params.asta_id);
+
+        //if asta.tipo !== tipoaste.Bustachiusasecondascelta (getFirstOffer())
+        const part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+
+        //else (getSecondOffer and the winner)
+
+
+        //update aggiudicata in True,
+
+        //update il credito del concorrente corrispondente
+
+        res.send(part)
+    }
+
     public async getMyClosedAste(req: any, res: any){
         /*const date_obj_i = new Date(Number(req.query.date_i));
         const date_obj_f = new Date(Number(req.query.date_f));*/
-        let part = await new Partecipazione().getClosedAsteByUserID(req.user_id);
+        let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id);
         part = part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .filter((elem, index, array) => {
                     if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
@@ -122,7 +133,7 @@ export class Controller {
     public async getMyAste(req: any, res: any){
         let app = [];
         let rilanci = [];
-        let part = await new Partecipazione().getAsteByUserID(req.user_id);
+        let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
         part = part.sort((a, b) => { return b.part_id - a.part_id })
         .filter((elem) => {
             let obj = {"asta_id": elem.asta_id};

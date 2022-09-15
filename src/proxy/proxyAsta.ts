@@ -75,12 +75,22 @@ export class ProxyAsta{
 
     }
 
+    public async getOpenAstaByID(asta_id: number){
+        const asta =  await this.modelAsta.getOpenAstaByID(asta_id);
+        return this.checkOpenAsta(asta) === true? asta : console.log('ERRORE: ASTA NON ESISTENTE'); 
+    }
+
     public async getAste(){
         return this.modelAsta.getAste();
     }
 
-    // metodo che scrive la data nel modo corretto per Timestamp
+    public async createAsta(asta:any){
+        // CHECK DELL'OGGETTO ASTA CON PROXY()
+        return await this.modelAsta.createAsta(asta);
+    }
 
-    //Devo richiamare questo metodo  in cima dove vaso a checcare le date 
+    public checkOpenAsta(asta: any){
+        return asta !== null? true : false;
+      }
 
 }
