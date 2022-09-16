@@ -84,6 +84,10 @@ export class ProxyAsta{
         return this.modelAsta.getAste();
     }
 
+    public async updateAsta(asta: any){
+        return await this.modelAsta.updateAsta(asta);
+    }
+
     public async createAsta(asta:any){
         // CHECK DELL'OGGETTO ASTA CON PROXY()
         return await this.modelAsta.createAsta(asta);

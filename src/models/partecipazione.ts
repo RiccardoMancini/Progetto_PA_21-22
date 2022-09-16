@@ -95,7 +95,7 @@ export class Partecipazione{
     }
 
     public async getOffersByAstaID(asta_id: number){
-      return await this.partecipazione.findOne({
+      return await this.partecipazione.findAll({
           limit: 2,
           where: { 
             asta_id: asta_id

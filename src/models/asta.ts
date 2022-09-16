@@ -42,11 +42,15 @@ export class Asta{
     }
 
     public async getOpenAstaByID(asta_id: number){
-        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.NON_APERTA }});
+        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.IN_ESECUZIONE }});
     }
 
     public async getAste(){
         return await this.asta.findAll();        
+    }
+
+    public async updateAsta(asta: any){
+        return await asta.save();
     }
 
     public async createAsta(asta:any){

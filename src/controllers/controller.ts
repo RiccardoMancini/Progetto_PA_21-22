@@ -11,7 +11,7 @@ function getRandomKey(rawKeys: any){
     return arrKey[indice];
 }
 
-function checkDataFAsta(data_fine: Date){
+function checkDataAsta(data_fine: Date){
     const now = new Date(Date.now());
     console.log(now.toISOString(), data_fine, now > data_fine)
     return now > data_fine ? true : false
@@ -114,40 +114,62 @@ export class Controller {
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
-
+    /**
+     * Metodo che determina il vincitore di una determinata asta; 
+     * scala l'offerta dal credito di quest'ultimo, rispettando i criteri dettati dal tipo di asta;
+     * chiude definitivamente l'asta.
+     */
     public async setAuctionWon(req: any, res: any){
         let response = {}
         const asta = await new ProxyAsta().getOpenAstaByID(req.params.asta_id);
-        if (!checkDataFAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
+        if (!checkDataAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
 
         if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
             let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
             if(part !== false){
                 part.aggiudicata = true;
                 part = await new ProxyPartecipazione().updatePartecipazione(part);
-                await new ProxyUtenti().updateCreditoUtente({"user_id": part.user_id, "addebito": -part.offerta});
-
-                response = {"asta_id": part.asta_id, "user_id": part.user_id, "aggiudicata": part.aggiudicata, "offerta": part.offerta};
+                await new ProxyUtenti().updateCreditoUtente({"user_id": part.user_id, "addebito": -part.offerta}, true);
+                
+                asta.stato = stato_asta.TERMINATA;
+                await new ProxyAsta().updateAsta(asta);
+                response = {"asta_id": part.asta_id, "user_id": part.user_id, "aggiudicata": part.aggiudicata, "offerta / addebito": part.offerta};
             }
             else{
+
                 response = {"info": "Nessuna offerta fatta per questa asta!"}
             }
         }
         else{
             let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+            if(part !== false){
+                let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
+                
+                part = await Promise.all(part.map(async (elem, index) => {
+                    if (index === 0){
+                        elem.aggiudicata = true;
+                        elem = await new ProxyPartecipazione().updatePartecipazione(elem);                     
+                    }
+                    return elem
+                    
+                })
+                .filter((elem, index) => index<1 ? true : false));               
+                
+                await new ProxyUtenti().updateCreditoUtente({"user_id": part[0].user_id, "addebito": -secondOffer}, true);
+
+                asta.stato = stato_asta.TERMINATA;
+                await new ProxyAsta().updateAsta(asta);                
+                response = {"asta_id": part[0].asta_id, "user_id": part[0].user_id, "aggiudicata": part[0].aggiudicata, "offerta": part[0].offerta, "addebito": secondOffer};
+                
+            }
+            else{
+
+                response = {"info": "Nessuna offerta fatta per questa asta!"}
+            }
             
         }
-
         
-
-        
-
-        // close asta
-
-        res.send(response)
-        
-
-        
+        res.send(response);     
 
         
     }
@@ -194,7 +216,7 @@ export class Controller {
         .map((elem, index) => {
             return {
                 "asta_id": elem.asta_id,
-                "stato": elem.stato === 2? stato_asta[2]:stato_asta[3],
+                "stato": elem.astum.stato === 2 ? stato_asta[2]:stato_asta[3],
                 "rilanci / offerta": rilanci[index].offerta
             }
         })

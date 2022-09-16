@@ -72,7 +72,7 @@ export class ProxyUtenti{
 
             console.log(val_user_id, val_credito);
 
-            let userByID = this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
+            let userByID = await this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
         
             return userByID;
 
