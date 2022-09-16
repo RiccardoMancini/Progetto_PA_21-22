@@ -162,6 +162,7 @@ export class Controller {
                 response = {"asta_id": part[0].asta_id, "user_id": part[0].user_id, "aggiudicata": part[0].aggiudicata, "offerta": part[0].offerta, "addebito": secondOffer};
                 
             }
+            // else if(part<2) Cancellare la prenotazione e chiudere l'asta. 
             else{
 
                 response = {"info": "Nessuna offerta fatta per questa asta!"}
