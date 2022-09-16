@@ -2,7 +2,7 @@ import express from "express";
 import { DB_Connection } from "./src/config/db_connection";
 import { Controller } from "./src/controllers/controller";
 import { checkHeader, checkToken, isBidCreator, verifyAndAuthenticate } from "./src/middleware/middlewareAuth";
-import crypto from 'crypto'
+import crypto from 'crypto';
 
 const controller = new Controller();
 

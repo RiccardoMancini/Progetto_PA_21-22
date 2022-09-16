@@ -1,30 +1,32 @@
 import { DB_Connection } from '../config/db_connection';
 import { Utenti } from "../models/utenti";
 
+//export function validateUser(){
 const checkBodyHandler = {
-    get: (obj, prop) => {                
-        if(prop === 'credito'){
-            if (!Number(obj[prop])) {
-                throw new TypeError('The credito is not a number');
-              }
-            if (obj[prop] < 1) {
-                throw new RangeError('The credito seems invalid. Choose a number > 0');
-              }
+        get: (obj, prop) => {                
+            if(prop === 'credito'){
+                if (!Number(obj[prop])) {
+                    throw new TypeError('The credito is not a number');
+                }
+                if (obj[prop] < 1) {
+                    throw new RangeError('The credito seems invalid. Choose a number > 0');
+                }
             
-            return obj[prop];
+                return obj[prop];
+            }
+            if(prop === 'user_id'){
+                if (!Number.isInteger(obj[prop])) {
+                    throw new TypeError('The user_id is not an integer');
+                }
+                if (obj[prop] < 1) {
+                    throw new RangeError('The user_id seems invalid. Choose a number > 0');
+                }
+                
+                return obj[prop];
+            }      
         }
-        if(prop === 'user_id'){
-            if (!Number.isInteger(obj[prop])) {
-                throw new TypeError('The user_id is not an integer');
-              }
-            if (obj[prop] < 1) {
-                throw new RangeError('The user_id seems invalid. Choose a number > 0');
-              }
-            
-            return obj[prop];
-        }      
     }
-}
+//}
 
 
 export class ProxyUtenti{

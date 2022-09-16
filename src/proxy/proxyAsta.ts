@@ -14,7 +14,7 @@ const dateCheck = (date:String) => {
             return nData;
         }
         else{
-            throw new TypeError('The credito is not an integer');
+            throw new TypeError('La data inserita non è corretta');
         }
     
 
