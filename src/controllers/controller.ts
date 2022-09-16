@@ -3,7 +3,7 @@ import { ProxyAsta } from '../proxy/proxyAsta';
 import { ProxyChiavi } from '../proxy/proxyChiavi';
 import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
-import  {ErrorMsgEnum} from './errors/errorfactory/';
+import  {ErrorMsgEnum} from '../errors/errorfactory';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
