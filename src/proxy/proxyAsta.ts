@@ -75,6 +75,7 @@ export class ProxyAsta{
 
     }
 
+
     public async getOpenAstaByID(asta_id: number){
         const asta =  await this.modelAsta.getOpenAstaByID(asta_id);
         return this.checkOpenAsta(asta) === true ? asta : console.log('ERRORE: ASTA NON ESISTENTE'); 

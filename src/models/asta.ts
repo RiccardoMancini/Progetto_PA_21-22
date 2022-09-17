@@ -42,7 +42,8 @@ export class Asta{
     }
 
     public async getOpenAstaByID(asta_id: number){
-        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.IN_ESECUZIONE }});
+        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.IN_ESECUZIONE },
+        include: this.chiavi.getModelChiavi()});
     }
 
     public async getAste(){

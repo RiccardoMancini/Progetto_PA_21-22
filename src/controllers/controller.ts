@@ -3,7 +3,7 @@ import { ProxyAsta } from '../proxy/proxyAsta';
 import { ProxyChiavi } from '../proxy/proxyChiavi';
 import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
-import { type } from 'os';
+import crypto from 'crypto';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -17,7 +17,16 @@ function checkDataAsta(data: Date){
     return now > data ? true : false
 }
 
+function checkCode64Offer(offerCripted: string, keys: Array<string>){
+    const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    console.log(base64regex.test(offerCripted));
+
+}
+
 export class Controller {
+
+    private static readonly headerPrivateKey = '-----BEGIN PRIVATE KEY-----\n';
+    private static readonly footerPrivateKey = '\n-----END PRIVATE KEY-----';
 
     public async getListAste(req: any, res:any){
         let aste = await new ProxyAsta().getAste();
@@ -107,14 +116,21 @@ export class Controller {
         //if (checkDataAsta(asta.data_f)) console.log("ERROR: E' troppo tardi per fare un'offerta!"); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
         if (asta.tipo !== tipo_asta.ASTA_APERTA){
             //decriptazione
+            let keys = [asta.chiavi.public_key, asta.chiavi.private_key];
+            const text_b64 = 'VCVcDQTEKUUIr27fOiz1KIslA2fiUqF36ZR+PYhI9Imy9H1d8QtLLx7rcETTDnYWITwtAeAUlvYQPrEtx9MDmbJrGlqcsljycmWYFgGJAHA/w+oYZJu9A/YR1vgM3sAIFGbOO1/eQDLWax62jsVC6Se/BPAHP00DYWsY5Z+Jum0='
+
+            checkCode64Offer(text_b64, keys)
+
+
+
             
         }
 
-        let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
+        //let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
         
 
 
-        res.send(resp)
+        res.send(asta)
 
 
 
@@ -150,7 +166,7 @@ export class Controller {
         }
         else{
             let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
-            if(part !== false){
+            if(part !== false && part.length > 1){
                 let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
                 
                 part = await Promise.all(part.map(async (elem, index) => {
@@ -169,9 +185,9 @@ export class Controller {
                 await new ProxyAsta().updateAsta(asta);                
                 response = {"asta_id": part[0].asta_id, "user_id": part[0].user_id, "aggiudicata": part[0].aggiudicata, "offerta": part[0].offerta, "addebito": secondOffer};
                 
-            }
-            // else if(part<2) Cancellare la prenotazione e chiudere l'asta. 
+            } 
             else{
+                //if(part.length === 1) Cancellare la prenotazione e chiudere l'asta.
 
                 response = {"info": "Nessuna offerta fatta per questa asta!"}
             }
