@@ -108,6 +108,19 @@ export class Partecipazione{
       return await part.save();
 
     }
+
+    public async setOffer(part: any){
+      return await this.partecipazione.create(part);
+      
+    }
+
+    public async getOffersByUserAstaID(user_id: number, asta_id:number){
+      return await this.partecipazione.findAll({
+        where: {user_id: user_id, asta_id: asta_id}
+      })
+      
+    }
+
     
     public getModelPartecipazione(){
         return this.partecipazione;

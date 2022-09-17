@@ -11,20 +11,13 @@ function getRandomKey(rawKeys: any){
     return arrKey[indice];
 }
 
-function checkDataAsta(data_fine: Date){
+function checkDataAsta(data: Date){
     const now = new Date(Date.now());
-    console.log(now.toISOString(), data_fine, now > data_fine)
-    return now > data_fine ? true : false
+    console.log(now.toISOString(), data, now > data)
+    return now > data ? true : false
 }
 
 export class Controller {
-
-    /*public async getListUsers(req: any, res:any){
-        const users = await new ProxyUtenti().getUtenti();
-
-        res.send(users);
-    }*/
-
 
     public async getListAste(req: any, res:any){
         let aste = await new ProxyAsta().getAste();
@@ -72,12 +65,6 @@ export class Controller {
         res.send(aste);
     }
 
-    /*public async getListPartecipazioni(req: any, res: any){
-        let part = await new Partecipazione().getPartecipazioni()
-
-        res.send(part);
-    }*/
-
 
     /**
      * Creazione di una nuova asta
@@ -112,6 +99,27 @@ export class Controller {
     public async updateCredito (req: any, res: any){
         let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
+    }
+
+    public async newOfferta(req: any, res: any){
+        let offerta: number;
+        const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
+        //if (checkDataAsta(asta.data_f)) console.log("ERROR: E' troppo tardi per fare un'offerta!"); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
+        if (asta.tipo !== tipo_asta.ASTA_APERTA){
+            //decriptazione
+            
+        }
+
+        let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
+        
+
+
+        res.send(resp)
+
+
+
+
+
     }
 
     /**

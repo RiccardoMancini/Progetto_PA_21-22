@@ -57,8 +57,8 @@ export class ProxyUtenti{
 
     public async updateCreditoUtente(payload: any, afterOffer: boolean = false){
         try{
-            let val_credito = 0;
-            let val_user_id = 0;
+            let val_credito: number;
+            let val_user_id: number;
             if( afterOffer === false){
                 this.proxyUtenteValidator = new Proxy(payload, checkBodyHandler);
                 val_credito = this.proxyUtenteValidator.credito;
