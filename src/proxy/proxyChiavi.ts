@@ -18,10 +18,6 @@ export class ProxyChiavi{
         
     }
 
-    public async getChiaviById( chiavi_id: number){
-        return await this.modelChiavi.getUserByID(chiavi_id);
-    }
-
 
 
 }

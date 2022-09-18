@@ -17,16 +17,19 @@ function checkDataAsta(data: Date){
     return now > data ? true : false
 }
 
-function checkCode64Offer(offerCripted: string, keys: Array<string>){
+function checkCode64Offer(offerCripted: string){
     const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    console.log(base64regex.test(offerCripted));
+    return base64regex.test(offerCripted) ? true : false;
 
 }
 
 export class Controller {
 
-    private static readonly headerPrivateKey = '-----BEGIN PRIVATE KEY-----\n';
-    private static readonly footerPrivateKey = '\n-----END PRIVATE KEY-----';
+    private static readonly headerPrivateKey: string = '-----BEGIN PRIVATE KEY-----\n';
+    private static readonly footerPrivateKey: string = '\n-----END PRIVATE KEY-----';
+
+    constructor(){
+    }
 
     public async getListAste(req: any, res:any){
         let aste = await new ProxyAsta().getAste();
@@ -79,14 +82,25 @@ export class Controller {
      * Creazione di una nuova asta
      */
      public async createAsta( req:any, res:any){
-        let randKey = getRandomKey(await new ProxyChiavi().getChiavi());       
-        console.log(req.body.tipo, typeof req.body.tipo) 
-        let newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
-                                            "p_min":req.body.p_min,
-                                            "stato":1,
-                                            "data_i":"2022-04-12",    
-                                            "data_f":"2022-04-12", 
-                                            "chiavi_id":randKey });
+        let newAsta: any;
+        if(req.body.tipo !== tipo_asta.ASTA_APERTA){
+            const randKey = getRandomKey(await new ProxyChiavi().getChiavi());
+            newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
+                                                "p_min":req.body.p_min,
+                                                "stato":1,
+                                                "data_i":"2022-04-12",    
+                                                "data_f":"2022-04-12", 
+                                                "chiavi_id":randKey });
+
+        }
+        else{
+            newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
+                                                "p_min":req.body.p_min,
+                                                "stato":1,
+                                                "data_i":"2022-04-12",    
+                                                "data_f":"2022-04-12"});
+
+        } 
         
         
         res.send(newAsta);
@@ -110,32 +124,61 @@ export class Controller {
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
 
+    
+
+
+
     public async newOfferta(req: any, res: any){
         let offerta: number;
         const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
         //if (checkDataAsta(asta.data_f)) console.log("ERROR: E' troppo tardi per fare un'offerta!"); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
         if (asta.tipo !== tipo_asta.ASTA_APERTA){
-            //decriptazione
-            let keys = [asta.chiavi.public_key, asta.chiavi.private_key];
-            const text_b64 = 'VCVcDQTEKUUIr27fOiz1KIslA2fiUqF36ZR+PYhI9Imy9H1d8QtLLx7rcETTDnYWITwtAeAUlvYQPrEtx9MDmbJrGlqcsljycmWYFgGJAHA/w+oYZJu9A/YR1vgM3sAIFGbOO1/eQDLWax62jsVC6Se/BPAHP00DYWsY5Z+Jum0='
-
-            checkCode64Offer(text_b64, keys)
-
-
-
+            //decriptazione 
+            let codedOfferta = req.body.offerta;
+            if(!checkCode64Offer(codedOfferta)) throw Error('ERROR: FORMATO BASE64 NON VALIDO!');            
+            
+            const decryptedData = Controller.decriptData(codedOfferta, asta.chiavi.private_key)
+            let offertaOBJ = JSON.parse(decryptedData.toString());
+            req.body.offerta = offertaOBJ.offerta;
             
         }
 
-        //let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
-        
+        let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);       
 
 
-        res.send(asta)
-
-
+        res.send(resp)
 
 
 
+    }
+
+    private static decriptData(codedData: string, private_key: string){
+        try{
+            return crypto.privateDecrypt(
+                {
+                  key: Controller.headerPrivateKey + private_key + Controller.footerPrivateKey,
+                  padding: crypto.constants.RSA_PKCS1_PADDING
+                },
+                Buffer.from(codedData, 'base64')
+              );
+
+        }
+        catch(err){
+            throw new Error("Errore di decodifica!");
+        }
+    }
+
+    public async openAsta(req: any, res: any){
+        const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
+        //if (!checkDataAsta(asta.data_i)) console.log("ERROR: Non si può ancora chiudere l'asta!");  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
+        asta.stato = stato_asta.IN_ESECUZIONE;
+        if(asta.tipo === tipo_asta.ASTA_APERTA){
+            //createWSS() || una rotta con axios che crea il websocket
+        }
+        await new ProxyAsta().updateAsta(asta);
+        let response = {"asta_id": asta.asta_id, "stato": asta.stato};
+
+        res.send(response);
     }
 
     /**
@@ -145,7 +188,7 @@ export class Controller {
      */
     public async setAuctionWon(req: any, res: any){
         let response = {}
-        const asta = await new ProxyAsta().getOpenAstaByID(req.params.asta_id);
+        const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
         if (!checkDataAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
 
         if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){

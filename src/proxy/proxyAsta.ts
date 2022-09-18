@@ -21,8 +21,23 @@ const dateCheck = (date:String) => {
 }
 const __Handler = {
     get: (obj, prop) => { 
-        if(prop === 'tipo' ){
+        if(prop === 'asta_id'){
             if(!Number.isInteger(obj[prop])){
+                throw new TypeError("formato dell'asta non valido");
+            }
+            if(obj[prop] < 1){
+                throw new Error("ID asta non valido");
+            }
+
+            return obj[prop];
+            
+            
+        }
+        if(prop === 'tipo'){
+            if(!Number.isInteger(obj[prop])){
+                throw new TypeError("formato dell'asta non valido");
+            }
+            if(!(obj[prop] >=1 && obj[prop]<=3)){
                 throw new TypeError("formato dell'asta non valido");
             }
 
@@ -53,7 +68,7 @@ const __Handler = {
         }    
 
         if(prop ==='p_min'){
-            if ((!Number.isInteger(obj[prop])) && obj[prop]<=0) {
+            if ((!Number(obj[prop])) && obj[prop]<=0) {
                 throw new TypeError('il prezzo di base non è valido');
             }
 
@@ -75,10 +90,20 @@ export class ProxyAsta{
 
     }
 
+    public async getNotOpenAstaByID(asta_id: number){
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
+        const val_asta_id = this.proxyAstaValidator.asta_id;
+        const asta =  await this.modelAsta.getNotOpenAstaByID(val_asta_id);
+        return this.checkAsta(asta) === true ? asta : console.log("ERRORE: ASTA NON TROVATA"); 
+
+    }
+
 
     public async getOpenAstaByID(asta_id: number){
-        const asta =  await this.modelAsta.getOpenAstaByID(asta_id);
-        return this.checkOpenAsta(asta) === true ? asta : console.log('ERRORE: ASTA NON ESISTENTE'); 
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
+        const val_asta_id = this.proxyAstaValidator.asta_id;
+        const asta =  await this.modelAsta.getOpenAstaByID(val_asta_id);
+        return this.checkAsta(asta) === true ? asta : console.log("ERRORE: ASTA NON TROVATA"); 
     }
 
     public async getAste(){
@@ -94,7 +119,7 @@ export class ProxyAsta{
         return await this.modelAsta.createAsta(asta);
     }
 
-    public checkOpenAsta(asta: any){
+    public checkAsta(asta: any){
         return asta !== null? true : false;
     }
 

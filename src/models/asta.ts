@@ -41,6 +41,10 @@ export class Asta{
         this.asta.belongsTo(this.chiavi.getModelChiavi(), { foreignKey: 'chiavi_id'});
     }
 
+    public async getNotOpenAstaByID(asta_id: number){
+        return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.NON_APERTA }});
+    }
+
     public async getOpenAstaByID(asta_id: number){
         return await this.asta.findOne({ where: { asta_id: asta_id, stato: stato_asta.IN_ESECUZIONE },
         include: this.chiavi.getModelChiavi()});

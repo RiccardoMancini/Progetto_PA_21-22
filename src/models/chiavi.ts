@@ -24,11 +24,6 @@ export class Chiavi{
       return await this.chiavi.findAll();
     }
 
-    public async getChiaviById(key_id: number){
-      let tchiavi= await this.chiavi.findByPk(key_id);
-      return tchiavi;
-    }
-
     
     public getModelChiavi(){
       return this.chiavi;

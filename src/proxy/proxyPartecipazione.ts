@@ -78,7 +78,7 @@ export class ProxyPartecipazione{
 
       }
       
-      if(await this.checkCreditoIsEnough(user_id, asta.p_min, val_offerta)){
+      if(await this.checkIfValidOffer(user_id, asta.p_min, val_offerta)){
 
         return this.modelPartecipazione.setOffer({"user_id": user_id, "asta_id": payload.asta_id, "aggiudicata": false, "offerta": val_offerta})
 
@@ -96,7 +96,7 @@ export class ProxyPartecipazione{
 
 
 
-    public async checkCreditoIsEnough(user_id: number, base_asta: number, offerta: number){
+    public async checkIfValidOffer(user_id: number, base_asta: number, offerta: number){
       let credito = await this.modelUtenti.getCreditoByUserID(user_id).then(value => value.credito);
       return (credito - offerta >= 0 && offerta > base_asta) ? true : false;
 
