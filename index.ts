@@ -1,9 +1,7 @@
 import express from "express";
-import { DB_Connection } from "./src/config/db_connection";
 import { Controller } from "./src/controllers/controller";
 import { checkHeader, checkToken, isBidCreator, verifyAndAuthenticate } from "./src/middleware/middlewareAuth";
-import crypto from 'crypto';
-const axios = require('axios').default;
+import { createWSS } from "./src/websockets/websocketserver";
 
 
 const controller = new Controller();
@@ -19,7 +17,16 @@ app.use(express.json());
  * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
  */
 
+ app.post('/redirect/WSServer', (req: any, res: any) =>{
+  
+  console.log(req.body);
+  createWSS(req.body);
 
+  //serve una rispostaa!!!
+
+
+
+})
 
 /**
  * il filtraggo delle aste avviene tramite query string. 
@@ -27,14 +34,6 @@ app.use(express.json());
  * es2: localhost:8080/aste?stato=2  <-- mostra le aste filtrate con stato
  */
 app.get('/aste', controller.getListAste);
-
-
-app.get('/aste2', async (req, res) =>{
-  const aste = await axios.get('http://localhost:8080/aste')
-  console.log(aste.data)
-
-
-})
 
 app.get('/asta/new', controller.createAsta)
 
