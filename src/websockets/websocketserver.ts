@@ -1,20 +1,20 @@
-import {WebSocketServer} from 'ws';
-import { MessageCode, Message, factoryMsg } from './Message';
+import {WebSocket, WebSocketServer} from 'ws';
+import { MessageCode, Message, factoryMsg } from './message';
 import * as dotenv from "dotenv";
 import path from 'path';
-dotenv.config({ path: path.join(__dirname, '..', './.env') });
+dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 
 export function createWSS(asta: any){
 
-  let base_asta = 5;
-  console.log(`Stanza dedicata all'asta con ID, in ascolto sulla porta: ${process.env.PORT}. Si parte da una base d'asta di ${base_asta}!`);
+  let base_asta = asta.p_min;
+  console.log(`Stanza dedicata all'asta con ${asta.asta_id}, in ascolto sulla porta: ${process.env.WSSPORT}. Si parte da una base d'asta di ${base_asta}!`);
 
   let n_client = +process.env.N_CLIENTS;
   let ws_userID = [];
   let semaphore = true;
   let bestOffer = base_asta;
 
-  const wss = new WebSocketServer({ port: +process.env.WSSPORT });
+  const wss = new WebSocketServer({ port: +process.env.WSSPORT, path: '/websocket' });
 
   function sendToAll(msg: any){
     wss.clients.forEach((client) => {
@@ -31,9 +31,8 @@ export function createWSS(asta: any){
     if (count <= n_client){
       sendToAll(count);    
       console.log("Nuovo concorrente collegato. Concorrenti totali:", count);
-
       setTimeout(() => {
-        ws.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WELCOME, 0, 2, base_asta)));
+        ws.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WELCOME, 0, asta.asta_id, base_asta)));
       }, 3000);
     }
     
@@ -69,8 +68,7 @@ export function createWSS(asta: any){
           if(client !== client_offer.ws){ 
             client.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WAIT)));        
           }
-        });
-        
+        });       
 
         console.log("L'utente: " + client_offer.user_id+ " ha alzato la base d'asta da "+ bestOffer + ' a '+ client_offer.offerte[client_offer.offerte.length - 1]);
         console.log("Elenco dei suoi rilanci: ", client_offer.offerte);
@@ -98,29 +96,30 @@ export function createWSS(asta: any){
     })
 
     ws.on("close", function(code: number){
+      //DA FINIRE DI GESTIRE CON TUTTE LE ECCEZIONI!
       let exit_client = ws_userID.find(item => item.ws_id === req.headers['sec-websocket-key']);
-      if(code === 1000){      
+      if(code === 1000 || code === 1006){      
         console.log(`L'utente ${exit_client.user_id} ha concluso l'asta!`);
-        ws_userID = ws_userID.filter(elem => elem !== exit_client)
-                .map(elem => { 
-                    //console.log(elem.ws_id, elem.user_id, elem.offerte);
-                    return elem;
-                  });
-        //add offerte di questo utente con axios
+        ws_userID = ws_userID.filter(elem => elem !== exit_client);
+        if(code === 1006){
+          //DELETE OFFER
+        }
       }
+      console.log(code)
 
-      if(wss.clients.size === 1){
-        //the winner is!!!
+      if(wss.clients.size === 1 && bestOffer !== base_asta){
+        //the winner!
         let winner_client = ws_userID[0];
-        //console.log(winner_client.ws_id, winner_client.user_id, winner_client.offerte)
         wss.clients.forEach((client) => {
-          client.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WINNER, bestOffer)));
-          setTimeout(() => {client.close()}, 1000);
+          client.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WINNER, winner_client.offerte[winner_client.offerte.length - 1])));
+          setTimeout(() => {client.close()}, 1000);     
 
-        })
-        //add offerte di questo utente con axios
+        });
+        //setAuctionWon
+        
 
         //WSS CLOSE
+        wss.close();
       }
       
       

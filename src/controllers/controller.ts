@@ -4,7 +4,8 @@ import { ProxyChiavi } from '../proxy/proxyChiavi';
 import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 import crypto from 'crypto';
-import axios from 'axios'
+import axios from 'axios';
+import { createWSS } from "../websockets/websocketserver";
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -174,7 +175,9 @@ export class Controller {
         //if (!checkDataAsta(asta.data_i)) console.log("ERROR: Non si può ancora chiudere l'asta!");  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
         asta.stato = stato_asta.IN_ESECUZIONE;
         if(asta.tipo === tipo_asta.ASTA_APERTA){
-            await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues);
+            let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues);
+            if(!response.data.server_active) throw new Error('Errore interno nel reindirizzamento al WSS');
+            console.log(response.data.server_active);
         }
         /*await new ProxyAsta().updateAsta(asta);
         let response = {"asta_id": asta.asta_id, "stato": asta.stato};

@@ -18,15 +18,10 @@ app.use(express.json());
  */
 
  app.post('/redirect/WSServer', (req: any, res: any) =>{
-  
-  console.log(req.body);
-  createWSS(req.body);
+  createWSS(req.body);  
+  res.send({"server_active": true})
 
-  //serve una rispostaa!!!
-
-
-
-})
+});
 
 /**
  * il filtraggo delle aste avviene tramite query string. 
@@ -55,5 +50,5 @@ app.patch('/admin/accredito', controller.updateCredito);
 
 
 
-app.listen(PORT, HOST);
+const server = app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

@@ -1,93 +1,103 @@
-import { MessageCode, Message, factoryMsg } from './Message';
+import { MessageCode, Message, factoryMsg } from './message';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 Object.assign(global, { WebSocket: require('ws') });
+import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import * as dotenv from "dotenv";
+import path from 'path';
+import { argv } from 'process';
+dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 
+(async () => {
 
-
-/*const creditoByUserID = await axios.get('http://localhost:8080/credito',{
-  headers: { Authorization: `Bearer ${process.env.TOKEN}` }}).then(value => console.log(value));
-*/
-//console.log(creditoByUserID);
-
-function rilancio(base_asta: number, myCredito: number){
-  console.log("Credito: ", myCredito);
-  let offerta: number;
-  if(base_asta > myCredito) return 0;
-  else{
-    offerta = base_asta + ((myCredito - base_asta)*10/100);
-    console.log(`Base d'asta attuale: ${Number(base_asta)} - Offerta: ${Number(offerta)}`)
-    return offerta;
-    
+  function rilancio(base_asta: number, myCredito: number){
+    console.log("Credito: ", myCredito);
+    let offerta: number;
+    if(base_asta > myCredito) return 0;
+    else{
+      offerta = base_asta + ((myCredito - base_asta)*10/100);
+      console.log(`Base d'asta attuale: ${Number(base_asta)} - Offerta: ${Number(offerta)}`)
+      return Number(offerta.toFixed(3));
+      
+    }
   }
-}
 
-let userStats = {
-  "user_id": Math.floor(Math.random() * 80),
-  "credito": Math.random()* 500
-}
+  let token: string;
+  switch (process.argv[2]) {
+    case "1":
+      token = process.env.TOKEN1;
+      break;
+    case "2":
+      token = process.env.TOKEN2;
+      break;
+    default:
+      break;
+  }
 
+  let credito = await axios.get('http://localhost:8080/credito',{
+    headers: { Authorization: `Bearer ${token}` }}).then(value => value.data.credito)
+  console.log(credito);
+  let decoded = jwt.verify(token, process.env.SECRET_KEY);
+  let user_id: number = decoded.id;
+  let globalTimer: ReturnType<typeof setTimeout>;
+  let actualCredito = credito;
 
-let globalTimer;
-let actualCredito = userStats.credito;
+  const subject = webSocket('ws://localhost:8081/websocket?user_id=' + user_id);
 
+  subject.subscribe({
+    next: (data: any) => {
 
-const subject = webSocket('ws://localhost:8081?user_id='+userStats.user_id);
-/*
-subject.subscribe({
-  next: (data: any) => {
+      let msg : Message = data;
 
-    let msg : Message = data;
-
-    if (msg.type === MessageCode.WELCOME){
-      console.log(`${msg.message} ${msg.asta_id}. La base d'asta è di: ${msg.base_asta}`);
-      subject.next(factoryMsg.getMessage(MessageCode.CLIENT_CHECK))
-    }
-
-
-    else if (msg.type === MessageCode.PRE_START){
-      console.log(msg.message)
-      console.log(`Prepara la tua offerta ${userStats.user_id}!`);      
-    }
-
-
-    else if (msg.type === MessageCode.START){
-      globalTimer = setTimeout(() => {
-        console.log('Rilancia!')
-        let offerta = rilancio(msg.offerta, actualCredito);
-        if(offerta > 0){
-          actualCredito = actualCredito - offerta;
-          subject.next(factoryMsg.getMessage(MessageCode.OFFER, offerta));
-        }
-        else{
-          subject.next(factoryMsg.getMessage(MessageCode.NO_CREDIT));
-        }
-      }, (Math.random() + 1) * 5000);
-
-    }
+      if (msg.type === MessageCode.WELCOME){
+        console.log(`${msg.message} ${msg.asta_id}. La base d'asta è di: ${msg.base_asta}`);
+        subject.next(factoryMsg.getMessage(MessageCode.CLIENT_CHECK))
+      }
 
 
-    else if (msg.type === MessageCode.WAIT)
-    {      
-      clearTimeout(globalTimer);
-      console.log(msg.message)
-    }
+      else if (msg.type === MessageCode.PRE_START){
+        console.log(msg.message)
+        console.log(`Prepara la tua offerta ${user_id}!`);      
+      }
 
-    else if(msg.type === MessageCode.TOO_LATE || msg.type === MessageCode.CLOSE){
-      console.log(msg.message);
-    }
 
-    else if(msg.type === MessageCode.WINNER){
-      console.log(msg.message, msg.offerta);
-    }
+      else if (msg.type === MessageCode.START){
+        globalTimer = setTimeout(() => {
+          console.log('Rilancia!')
+          let offerta = rilancio(msg.offerta, actualCredito);
+          if(offerta > 0){
+            subject.next(factoryMsg.getMessage(MessageCode.OFFER, offerta));
+          }
+          else{
+            subject.next(factoryMsg.getMessage(MessageCode.NO_CREDIT));
+          }
+        }, (Math.random() + 2) * 2000);
 
-    else console.log('Numero utenti collegati:', data);
+      }
+
+      else if (msg.type === MessageCode.WAIT)
+      {      
+        clearTimeout(globalTimer);
+        console.log(msg.message)
+      }
+
+      else if(msg.type === MessageCode.TOO_LATE || msg.type === MessageCode.CLOSE){
+        console.log(msg.message);
+      }
+
+      else if(msg.type === MessageCode.WINNER){
+        console.log(msg.message, msg.offerta);
+      }
+
+      else console.log('Numero utenti collegati:', data);
+      
+    },
     
-  },
-  
-  error: err => {
-    console.log({"error-code": err.code, "reason": 'Abnormal Closure!'});
-  },
-  complete: () => console.log('Arrivederci!')
- });
-*/
+    error: err => {
+      //CHECK THIS ERRORS!!!!
+      console.log({"error-code": err.code, "reason": 'Abnormal Function!'});
+    },
+    complete: () => console.log('Arrivederci!')
+  });
+
+})();
