@@ -1,6 +1,6 @@
 import express from "express";
 import { Controller } from "./src/controllers/controller";
-import { checkHeader, checkToken, isBidCreator, verifyAndAuthenticate } from "./src/middleware/middlewareAuth";
+import { checkHeader, checkToken, isAdmin, isBidCreator, isBidParticipant} from "./src/middleware/middlewareAuth";
 import { createWSS } from "./src/websockets/websocketserver";
 
 
@@ -30,23 +30,34 @@ app.use(express.json());
  */
 app.get('/aste', controller.getListAste);
 
-app.get('/asta/new', controller.createAsta)
-
 app.get('/asta/:asta_id/close', controller.setAuctionWon);
 
 app.patch('/asta/:asta_id/open', controller.openAsta);
 
-app.use([checkHeader, checkToken, verifyAndAuthenticate]);
+app.use([checkHeader, checkToken]);
 
-app.get('/storico/aste/closed', controller.getMyClosedAste);
+app.post('/asta/new', isBidCreator, (req: any, res: any) => {
+  controller.createAsta(req, res);
+});
 
-app.get('/storico/aste', controller.getMyAste);
+app.patch('/admin/accredito', isAdmin, (req: any, res: any) => { 
+  controller.updateCredito(req, res);
+});
+
+app.use(isBidParticipant);
 
 app.get('/credito', controller.getMyCredito);
 
 app.post('/asta/offerta', controller.newOfferta);
 
-app.patch('/admin/accredito', controller.updateCredito);
+app.get('/storico/aste/closed', controller.getMyClosedAste);
+
+app.get('/storico/aste', controller.getMyAste);
+
+
+
+
+
 
 
 

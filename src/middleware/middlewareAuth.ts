@@ -1,6 +1,12 @@
 import jwt from 'jsonwebtoken';
 require('dotenv').config();
 
+enum role{
+    ADMIN = 1,
+    BID_CREATOR = 2,
+    BID_PARTICIPANT = 3
+}
+
 /**
  * Check della presenza del parametro di autorizzazione
  */
@@ -27,47 +33,23 @@ export const checkToken = (req,res,next) => {
         else res.status(400).send('Bad request');
 };
 
-
-export const verifyAndAuthenticate = (req,res,next) => {
-    try{
-        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
-        if(decoded !== null){
-            if(decoded.role === 1 || decoded.role === 2 || decoded.role === 3){
-                req.user_id = decoded.id;                
-                next();
-            } else {
-                //DA GESTIRE CON L'ERROR HANDLER
-                res.status(500).send('No permessi')
-            }
-        }else{
-            res.status(500).send('Errore di firma')
-        }
-    }catch(error){
-        console.log('Sono nel catch!')
-    }
-};
-
-
-
 /**
- * Funzione che verifica il BidCreator
+ * Funzione che verifica l'admin
  */
-export const isBidCreator = (req,res,next) => {
+export const isAdmin = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1)){
-        console.log(decoded)
+    if(decoded !== null && (decoded.role === role.ADMIN)){
         next();
     }
     else res.status(401).send("Unauthorized");
 }
 
 /**
- * Funzione che verifica l'admin
+ * Funzione che verifica il BidCreator
  */
-export const isAdmin = (req,res,next) => {
+ export const isBidCreator = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 2)){
-        console.log(decoded)
+    if(decoded !== null && (decoded.role === role.BID_CREATOR)){
         next();
     }
     else res.status(401).send("Unauthorized");
@@ -78,8 +60,8 @@ export const isAdmin = (req,res,next) => {
  */
 export const isBidParticipant = (req,res,next) => {
     let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 3)) {
-        console.log(decoded)
+    if(decoded !== null && (decoded.role === role.BID_PARTICIPANT)) {
+        req.user_id = decoded.id;
         next();
     }
     else res.status(401).send("Unauthorized");
