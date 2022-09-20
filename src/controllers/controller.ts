@@ -5,7 +5,6 @@ import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 import crypto from 'crypto';
 import axios from 'axios';
-import { createWSS } from "../websockets/websocketserver";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 
 function getRandomKey(rawKeys: any){    
@@ -86,7 +85,6 @@ export class Controller {
         catch(err){
             next(err);
         }
-
     }
 
 
@@ -101,7 +99,7 @@ export class Controller {
                                                 "p_min":req.body.p_min,
                                                 "stato":1,
                                                 "data_i":"2022-04-12",    
-                                                "data_f":"2022-04-12", 
+                                                "data_f":"2022-12-12", 
                                                 "chiavi_id":randKey });
 
         }
@@ -112,8 +110,7 @@ export class Controller {
                                                 "data_i":"2022-04-12",    
                                                 "data_f":"2022-04-12"});
 
-        } 
-        
+        }       
         
         res.send(newAsta);
 
@@ -123,8 +120,13 @@ export class Controller {
      * Verifica del credito dell'utente
      */
     public async getMyCredito(req: any, res: any, next: any){
-        let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
-        res.send({"credito": credito});
+        try{
+            let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
+            res.send({"credito": credito});
+        }
+        catch(err){
+            next(err);
+        }
     }
 
 
@@ -132,36 +134,39 @@ export class Controller {
      * Aggiornamento del credito di un determinato utente
      */
     public async updateCredito (req: any, res: any, next: any){
-        let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
-        res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
-    }
+        try{
+            let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
+            res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
+        }
+        catch(err){
+            next(err)
+        }
 
-    
+    }
 
 
 
     public async newOfferta(req: any, res: any, next: any){
-        let offerta: number;
-        const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
-        //if (checkDataAsta(asta.data_f)) console.log("ERROR: E' troppo tardi per fare un'offerta!"); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
-        if (asta.tipo !== tipo_asta.ASTA_APERTA){
-            //decriptazione 
-            let codedOfferta = req.body.offerta;
-            if(!checkCode64Offer(codedOfferta)) throw Error('ERROR: FORMATO BASE64 NON VALIDO!');            
-            
-            const decryptedData = Controller.decriptData(codedOfferta, asta.chiavi.private_key)
-            let offertaOBJ = JSON.parse(decryptedData.toString());
-            req.body.offerta = offertaOBJ.offerta;
-            
+        try{
+            const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
+            //if (checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.ToLateToOffer); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
+            if (asta.tipo !== tipo_asta.ASTA_APERTA){
+                //decriptazione 
+                let codedOfferta = req.body.offerta;
+                if(!checkCode64Offer(codedOfferta)) throw new ErrorFactory().getError(ErrEnum.BadCriptedData);            
+                
+                const decryptedData = Controller.decriptData(codedOfferta, asta.chiavi.private_key)
+                let offertaOBJ = JSON.parse(decryptedData.toString());
+                req.body.offerta = offertaOBJ.offerta;
+                
+            }
+            let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
+            res.send(resp);
+
         }
-
-        let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);       
-
-
-        res.send(resp)
-
-
-
+        catch(err){
+            next(err);
+        }
     }
 
     private static decriptData(codedData: string, private_key: string){
@@ -173,26 +178,30 @@ export class Controller {
                 },
                 Buffer.from(codedData, 'base64')
               );
-
         }
         catch(err){
-            throw new Error("Errore di decodifica!");
+            throw new ErrorFactory().getError(ErrEnum.BadDecodeKey);
         }
     }
 
     public async openAsta(req: any, res: any, next: any){
-        const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
-        //if (!checkDataAsta(asta.data_i)) console.log("ERROR: Non si può ancora chiudere l'asta!");  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
-        asta.stato = stato_asta.IN_ESECUZIONE;
-        if(asta.tipo === tipo_asta.ASTA_APERTA){
-            let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues);
-            if(!response.data.server_active) throw new Error('Errore interno nel reindirizzamento al WSS');
-            console.log(response.data.server_active);
+        try{
+            const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
+            //if (!checkDataAsta(asta.data_i)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToOpen);  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
+            asta.stato = stato_asta.IN_ESECUZIONE;
+            if(asta.tipo === tipo_asta.ASTA_APERTA){
+                let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues);
+                if(!response.data.server_active) throw new Error('Errore interno nel reindirizzamento al WSS');
+                console.log(response.data.server_active);
+            }
+            /*await new ProxyAsta().updateAsta(asta);
+            let response = {"asta_id": asta.asta_id, "stato": asta.stato};*/
+            
+            res.send(asta);
         }
-        /*await new ProxyAsta().updateAsta(asta);
-        let response = {"asta_id": asta.asta_id, "stato": asta.stato};
-        */
-        res.send(asta);
+        catch(err){
+            next(err);
+        }        
     }
 
     /**
@@ -201,111 +210,122 @@ export class Controller {
      * chiude definitivamente l'asta.
      */
     public async setAuctionWon(req: any, res: any, next: any){
-        let response = {}
-        const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
-        if (!checkDataAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
-
-        if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
-            let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
-            if(part !== false){
-                part.aggiudicata = true;
-                part = await new ProxyPartecipazione().updatePartecipazione(part);
-                await new ProxyUtenti().updateCreditoUtente({"user_id": part.user_id, "addebito": -part.offerta}, true);
-                
-                asta.stato = stato_asta.TERMINATA;
-                await new ProxyAsta().updateAsta(asta);
-                response = {"asta_id": part.asta_id, "user_id": part.user_id, "aggiudicata": part.aggiudicata, "offerta / addebito": part.offerta};
-            }
-            else{
-
-                response = {"info": "Nessuna offerta fatta per questa asta!"}
-            }
-        }
-        else{
-            let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
-            if(part !== false && part.length > 1){
-                let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
-                
-                part = await Promise.all(part.map(async (elem, index) => {
-                    if (index === 0){
-                        elem.aggiudicata = true;
-                        elem = await new ProxyPartecipazione().updatePartecipazione(elem);                     
-                    }
-                    return elem
+        try{
+            let response = {};
+            const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
+            if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose);
+            if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
+                let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
+                if(part !== false){
+                    part.aggiudicata = true;
+                    part = await new ProxyPartecipazione().updatePartecipazione(part);
+                    await new ProxyUtenti().updateCreditoUtente({"user_id": part.user_id, "addebito": -part.offerta}, true);
                     
-                })
-                .filter((elem, index) => index<1 ? true : false));               
-                
-                await new ProxyUtenti().updateCreditoUtente({"user_id": part[0].user_id, "addebito": -secondOffer}, true);
+                    asta.stato = stato_asta.TERMINATA;
+                    await new ProxyAsta().updateAsta(asta);
+                    response = {"asta_id": part.asta_id, "user_id": part.user_id, "aggiudicata": part.aggiudicata, "offerta / addebito": part.offerta};
+                }
+                else{
 
-                asta.stato = stato_asta.TERMINATA;
-                await new ProxyAsta().updateAsta(asta);                
-                response = {"asta_id": part[0].asta_id, "user_id": part[0].user_id, "aggiudicata": part[0].aggiudicata, "offerta": part[0].offerta, "addebito": secondOffer};
-                
-            } 
+                    response = {"info": "Nessuna offerta fatta per questa asta!"}
+                }
+            }
             else{
-                //if(part.length === 1) Cancellare la prenotazione e chiudere l'asta.
+                let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+                if(part !== false && part.length > 1){
+                    let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
+                    
+                    part = await Promise.all(part.map(async (elem, index) => {
+                        if (index === 0){
+                            elem.aggiudicata = true;
+                            elem = await new ProxyPartecipazione().updatePartecipazione(elem);                     
+                        }
+                        return elem
+                        
+                    })
+                    .filter((elem, index) => index<1 ? true : false));               
+                    
+                    await new ProxyUtenti().updateCreditoUtente({"user_id": part[0].user_id, "addebito": -secondOffer}, true);
 
-                response = {"info": "Nessuna offerta fatta per questa asta!"}
+                    asta.stato = stato_asta.TERMINATA;
+                    await new ProxyAsta().updateAsta(asta);                
+                    response = {"asta_id": part[0].asta_id, "user_id": part[0].user_id, "aggiudicata": part[0].aggiudicata, "offerta": part[0].offerta, "addebito": secondOffer};
+                    
+                } 
+                else{
+                    //if(part.length === 1) Cancellare la prenotazione e chiudere l'asta.
+
+                    response = {"info": "Nessuna offerta fatta per questa asta!"}
+                }
+                
             }
             
-        }
-        
-        res.send(response);     
+            res.send(response);
 
-        
+        }
+        catch(err){
+            next(err);
+        }
+                
     }
 
     public async getMyClosedAste(req: any, res: any, next: any){
-        /*const date_obj_i = new Date(Number(req.query.date_i));
-        const date_obj_f = new Date(Number(req.query.date_f));*/
-        let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id);
-        part = part.sort((a, b) => { return a.asta_id - b.asta_id })
-                .filter((elem, index, array) => {
-                    if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
-                    (index > 0 && elem.asta_id === array[index-1].asta_id)){
-                        if((index < array.length-1 && elem.aggiudicata === array[index+1].aggiudicata) || 
-                        (elem.aggiudicata === false &&  array[index+1].aggiudicata === true) || 
-                        (elem.aggiudicata === false &&  array[index-1].aggiudicata === true)){
-                            return false;                        
-                        }               
-                    } 
-                    return true;
-                });                       
+        try{
+            /*const date_obj_i = new Date(Number(req.query.date_i));
+            const date_obj_f = new Date(Number(req.query.date_f));*/
+            let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id);
+            part = part.sort((a, b) => { return a.asta_id - b.asta_id })
+                    .filter((elem, index, array) => {
+                        if((index < array.length-1 && elem.asta_id === array[index+1].asta_id) || 
+                        (index > 0 && elem.asta_id === array[index-1].asta_id)){
+                            if((index < array.length-1 && elem.aggiudicata === array[index+1].aggiudicata) || 
+                            (elem.aggiudicata === false &&  array[index+1].aggiudicata === true) || 
+                            (elem.aggiudicata === false &&  array[index-1].aggiudicata === true)){
+                                return false;                        
+                            }               
+                        } 
+                        return true;
+                    });                       
 
-        res.send(part)
+            res.send(part);
+        }
+        catch(err){
+            next(err);
+        }
     }
 
     public async getMyAste(req: any, res: any, next: any){
-        let app = [];
-        let rilanci = [];
-        let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
-        part = part.sort((a, b) => { return b.part_id - a.part_id })
-        .filter((elem) => {
-            let obj = {"asta_id": elem.asta_id};
-            let exists = app.find(value => value.asta_id === obj.asta_id);
-            if (typeof exists==='undefined'){
-                app.push(obj);
-                rilanci.push({"asta_id": elem.asta_id, "offerta": [elem.offerta]});
-                return true;
-            }
-            else{
-                let obj2 = rilanci.find(value => value.asta_id === exists.asta_id);
-                obj2.offerta.push(elem.offerta);                
-                return false;
-            }
-        })
-        .map((elem, index) => {
-            return {
-                "asta_id": elem.asta_id,
-                "stato": elem.astum.stato === 2 ? stato_asta[2]:stato_asta[3],
-                "rilanci / offerta": rilanci[index].offerta
-            }
-        })
-        
-        res.send(part)
-    }
-
-    
+        try{
+            let app = [];
+            let rilanci = [];
+            let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
+            part = part.sort((a, b) => { return b.part_id - a.part_id })
+            .filter((elem) => {
+                let obj = {"asta_id": elem.asta_id};
+                let exists = app.find(value => value.asta_id === obj.asta_id);
+                if (typeof exists==='undefined'){
+                    app.push(obj);
+                    rilanci.push({"asta_id": elem.asta_id, "offerta": [elem.offerta]});
+                    return true;
+                }
+                else{
+                    let obj2 = rilanci.find(value => value.asta_id === exists.asta_id);
+                    obj2.offerta.push(elem.offerta);                
+                    return false;
+                }
+            })
+            .map((elem, index) => {
+                return {
+                    "asta_id": elem.asta_id,
+                    "stato": elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3],
+                    "rilanci / offerta": rilanci[index].offerta
+                }
+            })            
+            res.send(part);
+        }
+        catch(err){
+            next(err);
+        }        
+    }    
 }
 

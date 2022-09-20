@@ -1,4 +1,5 @@
 import { DB_Connection } from '../config/db_connection'
+import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { Asta, tipo_asta } from "../models/asta";
 import { Partecipazione } from '../models/partecipazione';
 import { Utenti } from '../models/utenti';
@@ -6,15 +7,25 @@ import { Utenti } from '../models/utenti';
 const __Handler = {
   get: (obj, prop) => { 
       if(prop === 'offerta' ){
-        if (!Number(obj[prop])) { //sbagliato perche mi sa che converte!!
-          throw new TypeError('The offerta is not a number');
+        if (Number.isNaN(obj[prop])) {
+          throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
         }
         if (obj[prop] < 1) {
-          throw new RangeError('The credito seems invalid. Choose a number > 0');
+          throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
         }
       
       return obj[prop];
     }
+    if(prop === 'user_id'){
+      if (!Number.isInteger(obj[prop])) {
+          throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+        }
+      if (obj[prop] < 1) {
+          throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+        }
+      
+      return obj[prop];
+  }      
 
 } 
 }
@@ -36,13 +47,17 @@ export class ProxyPartecipazione{
 
     public async getClosedAsteByUserID(user_id: number){
       //CHECK DATA
-      let partecipazioni = await this.modelPartecipazione.getClosedAsteByUserID(user_id);  
+      this.proxyPartValidator = new Proxy({"user_id": user_id}, __Handler);
+      const val_user_id: number = this.proxyPartValidator.user_id;
+      let partecipazioni = await this.modelPartecipazione.getClosedAsteByUserID(val_user_id);  
       return partecipazioni;
   
     }
     
     public async getAsteByUserID(user_id: number){
-      let partecipazioni = await this.modelPartecipazione.getAsteByUserID(user_id);
+      this.proxyPartValidator = new Proxy({"user_id": user_id}, __Handler);
+      const val_user_id: number = this.proxyPartValidator.user_id;
+      let partecipazioni = await this.modelPartecipazione.getAsteByUserID(val_user_id);
       return partecipazioni;
       
     }
@@ -68,12 +83,12 @@ export class ProxyPartecipazione{
 
       let offerYet = await this.getOffersByUserAstaID(user_id, asta.asta_id);
       if(asta.tipo !== tipo_asta.ASTA_APERTA && offerYet !== null){
-        throw new Error("ERROR: L'ASTA IN BUSTA CHIUSA PREVEDE SOLO UN'OFFERTA")
+        throw new ErrorFactory().getError(ErrEnum.OfferAlreadyExist);
       }
       else{
         let isExist = offerYet.filter(elem => elem.offerta === val_offerta || elem.offerta > val_offerta);
         if(isExist.length !== 0){
-          throw new Error("ERROR: OFFERTA GIA' FATTA");
+          throw new ErrorFactory().getError(ErrEnum.TooLowOfferOrCredit);
         }
 
       }
@@ -84,7 +99,7 @@ export class ProxyPartecipazione{
 
       }
       else{
-        throw new Error("ERROR: CREDITO O OFFERTA NON SUFFICIENTE!")
+        throw new ErrorFactory().getError(ErrEnum.TooLowOfferOrCredit);
       }
 
     }
@@ -94,15 +109,11 @@ export class ProxyPartecipazione{
       
     }
 
-
-
     public async checkIfValidOffer(user_id: number, base_asta: number, offerta: number){
       let credito = await this.modelUtenti.getCreditoByUserID(user_id).then(value => value.credito);
       return (credito - offerta >= 0 && offerta > base_asta) ? true : false;
 
-    }
-    
-    
+    }   
 
     public checkOfferExist(offers: any){
       return offers !== null? true : false;

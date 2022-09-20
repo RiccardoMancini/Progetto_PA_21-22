@@ -1,5 +1,6 @@
 import { DB_Connection } from '../config/db_connection'
 import { Asta } from "../models/asta";
+import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 
 const dateCheck = (date:String) => {
     var sData = date.split(' ',3);
@@ -23,10 +24,10 @@ const __Handler = {
     get: (obj, prop) => { 
         if(prop === 'asta_id'){
             if(!Number.isInteger(obj[prop])){
-                throw new TypeError("formato dell'asta non valido");
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
             }
             if(obj[prop] < 1){
-                throw new Error("ID asta non valido");
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
             }
 
             return obj[prop];
@@ -94,16 +95,24 @@ export class ProxyAsta{
         this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
         const val_asta_id = this.proxyAstaValidator.asta_id;
         const asta =  await this.modelAsta.getNotOpenAstaByID(val_asta_id);
-        return this.checkAsta(asta) === true ? asta : console.log("ERRORE: ASTA NON TROVATA"); 
-
+        if(this.checkAsta(asta)){
+            return asta;
+        }
+        else{
+            throw new ErrorFactory().getError(ErrEnum.AstaNotFound);
+        }
     }
-
 
     public async getOpenAstaByID(asta_id: number){
         this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
         const val_asta_id = this.proxyAstaValidator.asta_id;
         const asta =  await this.modelAsta.getOpenAstaByID(val_asta_id);
-        return this.checkAsta(asta) === true ? asta : console.log("ERRORE: ASTA NON TROVATA"); 
+        if(this.checkAsta(asta)){
+            return asta;
+        }
+        else{
+            throw new ErrorFactory().getError(ErrEnum.AstaNotFound);
+        }
     }
 
     public async getAste(){

@@ -15,7 +15,7 @@ export const checkHeader = (req: any, res: any, next: any) => {
     try{
         const aHeader = req.headers.authorization;
         if(aHeader) next();
-        else throw new ErrorFactory().getError(ErrEnum.BadRequest);
+        else throw new ErrorFactory().getError(ErrEnum.HeaderNotFound);
     }
     catch(err){
         next(err);
@@ -35,7 +35,23 @@ export const checkToken = (req: any, res: any, next: any) => {
             req.token = bearerToken;            
             next();
         }
-        else throw new ErrorFactory().getError(ErrEnum.BadRequest);
+        else throw new ErrorFactory().getError(ErrEnum.InvalidHeaderFormat);
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+export const checkAuthentication = (req: any, res: any, next: any) => {
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
+        if(decoded !== null){
+            if(decoded.role === 1 || decoded.role === 2 || decoded.role === 3){
+                req.user_id = decoded.id;                
+                next();
+            }
+            else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
+        }
     }
     catch(err){
         next(err);
@@ -81,8 +97,7 @@ export const isAdmin = (req: any, res: any, next: any) => {
 export const isBidParticipant = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-        if(decoded !== null && (decoded.role === role.BID_PARTICIPANT)) {
-            req.user_id = decoded.id;
+        if(decoded !== null && (decoded.role === role.BID_PARTICIPANT)){
             next();
         }
         else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
