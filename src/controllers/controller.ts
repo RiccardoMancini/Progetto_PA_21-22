@@ -6,6 +6,7 @@ import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 import crypto from 'crypto';
 import axios from 'axios';
 import { createWSS } from "../websockets/websocketserver";
+import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -33,57 +34,66 @@ export class Controller {
     constructor(){
     }
 
-    public async getListAste(req: any, res:any){
-        let aste = await new ProxyAsta().getAste();
+    public async getListAste(req: any, res:any, next: any){
+        try{
+            let aste = await new ProxyAsta().getAste();
+            if(Object.keys(req.query).length !== 0){
+                aste = aste.filter(asta => {
+                    let stato = Number(req.query.stato)
+                    if(!Number.isInteger(stato) || (stato < 1 || stato > 3)){
+                        throw new ErrorFactory().getError(ErrEnum.BadRequest)
+                    }
+                    return asta.stato === stato ? true : false
+                });
+            }
+            if(aste.length !== 0)
+            {
+                aste.map((value: any) => {
+                                switch (value.tipo){
+                                    case tipo_asta.ASTA_APERTA:
+                                        value.tipo = tipo_asta[1];
+                                        break;
+                                    case tipo_asta.ASTA_CHIUSA_1:
+                                        value.tipo = tipo_asta[2];
+                                        break;
+                                    case tipo_asta.ASTA_CHIUSA_2:
+                                        value.tipo = tipo_asta[3];
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                switch (value.stato) {
+                                    case stato_asta.NON_APERTA:
+                                        value.stato = stato_asta[1];
+                                        break;
+                                    case stato_asta.IN_ESECUZIONE:
+                                        value.stato = stato_asta[2];
+                                        break;
+                                    case stato_asta.TERMINATA:
+                                        value.stato = stato_asta[3];
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            });
+            }
+            else{
+                aste = {"info": 'Non esistono aste in questo stato!'};
+            }
 
-        if(Object.keys(req.query).length !== 0){
-            aste = aste.filter(asta => asta.stato === Number(req.query.stato));
+            res.send(aste);
+        }
+        catch(err){
+            next(err);
         }
 
-        if(aste.length !== 0)
-        {
-            aste.map((value: any) => {
-                            switch (value.tipo){
-
-                                case tipo_asta.ASTA_APERTA:
-                                    value.tipo = tipo_asta[1];
-                                    break;
-                                case tipo_asta.ASTA_CHIUSA_1:
-                                    value.tipo = tipo_asta[2];
-                                    break;
-                                case tipo_asta.ASTA_CHIUSA_2:
-                                    value.tipo = tipo_asta[3];
-                                    break;
-                                default:
-                                    break;
-                            }
-                            switch (value.stato) {
-                                case stato_asta.NON_APERTA:
-                                    value.stato = stato_asta[1];
-                                    break;
-                                case stato_asta.IN_ESECUZIONE:
-                                    value.stato = stato_asta[2];
-                                    break;
-                                case stato_asta.TERMINATA:
-                                    value.stato = stato_asta[3];
-                                    break;
-                                default:
-                                    break;
-                            }
-                        });
-}
-        else{
-             aste = {"info": 'Non esistono aste in questo stato!'};
-        }
-
-        res.send(aste);
     }
 
 
     /**
      * Creazione di una nuova asta
      */
-     public async createAsta( req:any, res:any){
+     public async createAsta(req:any, res:any, next: any){
         let newAsta: any;
         if(req.body.tipo !== tipo_asta.ASTA_APERTA){
             const randKey = getRandomKey(await new ProxyChiavi().getChiavi());
@@ -112,7 +122,7 @@ export class Controller {
     /**
      * Verifica del credito dell'utente
      */
-    public async getMyCredito(req: any, res: any){
+    public async getMyCredito(req: any, res: any, next: any){
         let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
         res.send({"credito": credito});
     }
@@ -121,7 +131,7 @@ export class Controller {
     /**
      * Aggiornamento del credito di un determinato utente
      */
-    public async updateCredito (req: any, res: any){
+    public async updateCredito (req: any, res: any, next: any){
         let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
         res.send({ "user_id": userByID.user_id, "new_credito": userByID.credito });
     }
@@ -130,7 +140,7 @@ export class Controller {
 
 
 
-    public async newOfferta(req: any, res: any){
+    public async newOfferta(req: any, res: any, next: any){
         let offerta: number;
         const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
         //if (checkDataAsta(asta.data_f)) console.log("ERROR: E' troppo tardi per fare un'offerta!"); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
@@ -170,7 +180,7 @@ export class Controller {
         }
     }
 
-    public async openAsta(req: any, res: any){
+    public async openAsta(req: any, res: any, next: any){
         const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
         //if (!checkDataAsta(asta.data_i)) console.log("ERROR: Non si può ancora chiudere l'asta!");  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
         asta.stato = stato_asta.IN_ESECUZIONE;
@@ -190,7 +200,7 @@ export class Controller {
      * scala l'offerta dal credito di quest'ultimo, rispettando i criteri dettati dal tipo di asta;
      * chiude definitivamente l'asta.
      */
-    public async setAuctionWon(req: any, res: any){
+    public async setAuctionWon(req: any, res: any, next: any){
         let response = {}
         const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
         if (!checkDataAsta(asta.data_f)) console.log("ERROR: Non si può ancora chiudere l'asta!");
@@ -246,7 +256,7 @@ export class Controller {
         
     }
 
-    public async getMyClosedAste(req: any, res: any){
+    public async getMyClosedAste(req: any, res: any, next: any){
         /*const date_obj_i = new Date(Number(req.query.date_i));
         const date_obj_f = new Date(Number(req.query.date_f));*/
         let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id);
@@ -266,7 +276,7 @@ export class Controller {
         res.send(part)
     }
 
-    public async getMyAste(req: any, res: any){
+    public async getMyAste(req: any, res: any, next: any){
         let app = [];
         let rilanci = [];
         let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);

@@ -1,6 +1,7 @@
 import express from "express";
 import { Controller } from "./src/controllers/controller";
 import { checkHeader, checkToken, isAdmin, isBidCreator, isBidParticipant} from "./src/middleware/middlewareAuth";
+import { errorLog, errorHandler } from "./src/middleware/middlewareErrors";
 import { createWSS } from "./src/websockets/websocketserver";
 
 
@@ -36,12 +37,12 @@ app.patch('/asta/:asta_id/open', controller.openAsta);
 
 app.use([checkHeader, checkToken]);
 
-app.post('/asta/new', isBidCreator, (req: any, res: any) => {
-  controller.createAsta(req, res);
+app.post('/asta/new', isBidCreator, (req: any, res: any, next: any) => {
+  controller.createAsta(req, res, next);
 });
 
-app.patch('/admin/accredito', isAdmin, (req: any, res: any) => { 
-  controller.updateCredito(req, res);
+app.patch('/admin/accredito', isAdmin, (req: any, res: any, next: any) => { 
+  controller.updateCredito(req, res, next);
 });
 
 app.use(isBidParticipant);
@@ -54,9 +55,7 @@ app.get('/storico/aste/closed', controller.getMyClosedAste);
 
 app.get('/storico/aste', controller.getMyAste);
 
-
-
-
+app.use([errorLog, errorHandler])
 
 
 

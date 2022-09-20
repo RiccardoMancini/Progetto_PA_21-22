@@ -1,4 +1,4 @@
-class HttpError extends Error{
+export class HttpError extends Error{
     message: string;
     status: number;
     
@@ -29,22 +29,15 @@ class CreditoInsufficiente extends HttpError{
     }
 }
 
-class UtenteNonAutorizzato extends HttpError{
+class Unauthorized extends HttpError{
     constructor(){
-        super('Non hai i permessi per accedere in questa sezione', ErrEnum.Unauthorized);
+        super('Non hai i permessi per accedere in questa sezione!', ErrEnum.Unauthorized);
     }
 }
 
 class BadRequest extends HttpError{
     constructor(){
-        super('Il token inserito non è valido', ErrEnum.BadRequest);
-    }
-    
-}
-
-class AssenzaHeader extends HttpError{
-    constructor(){
-        super('Header assente', ErrEnum.BadRequest);
+        super('Richiesta non valida!', ErrEnum.BadRequest);
     }
     
 }
@@ -57,7 +50,6 @@ class UtenteEsistente extends HttpError{
 }
 
 export enum ErrEnum {
-    None = 0,
     BadRequest = 400,
     Unauthorized=401,
     NotFound = 404,
@@ -73,7 +65,7 @@ export class ErrorFactory {
                 retval = new ElementNotFound();
                 break;    
             case ErrEnum.Unauthorized:
-                retval = new UtenteNonAutorizzato();
+                retval = new Unauthorized();
                 break;
             case ErrEnum.BadRequest:
                 retval = new BadRequest();

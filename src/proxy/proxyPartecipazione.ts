@@ -6,7 +6,7 @@ import { Utenti } from '../models/utenti';
 const __Handler = {
   get: (obj, prop) => { 
       if(prop === 'offerta' ){
-        if (!Number(obj[prop])) {
+        if (!Number(obj[prop])) { //sbagliato perche mi sa che converte!!
           throw new TypeError('The offerta is not a number');
         }
         if (obj[prop] < 1) {
