@@ -19,6 +19,7 @@ app.use(express.json());
  */
 
  app.post('/redirect/WSServer', (req: any, res: any) =>{
+  // dare un ritorno a questa funzione, cosi da poter checkare se è stato aperto o menoo
   createWSS(req.body);  
   res.send({"server_active": true})
 

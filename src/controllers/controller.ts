@@ -92,28 +92,31 @@ export class Controller {
      * Creazione di una nuova asta
      */
      public async createAsta(req:any, res:any, next: any){
-        let newAsta: any;
-        if(req.body.tipo !== tipo_asta.ASTA_APERTA){
-            const randKey = getRandomKey(await new ProxyChiavi().getChiavi());
-            newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
-                                                "p_min":req.body.p_min,
-                                                "stato":1,
-                                                "data_i":"2022-04-12",    
-                                                "data_f":"2022-12-12", 
-                                                "chiavi_id":randKey });
+        try{
+            let newAsta: any;
+            if(req.body.tipo !== tipo_asta.ASTA_APERTA){
+                const randKey = getRandomKey(await new ProxyChiavi().getChiavi());
+                newAsta = await new ProxyAsta().createAsta({"tipo": req.body.tipo,
+                                                            "p_min": req.body.p_min,
+                                                            "stato": 1,
+                                                            "data_i": req.body.data_i,    
+                                                            "data_f": req.body.data_f, 
+                                                            "chiavi_id": randKey });
 
+            }
+            else{
+                newAsta = await new ProxyAsta().createAsta({"tipo": req.body.tipo,
+                                                            "p_min": req.body.p_min,
+                                                            "stato": 1,
+                                                            "data_i": req.body.data_i,    
+                                                            "data_f": req.body.data_f });
+            }       
+            
+            res.send(newAsta);
         }
-        else{
-            newAsta = await new ProxyAsta().createAsta({"tipo":req.body.tipo,
-                                                "p_min":req.body.p_min,
-                                                "stato":1,
-                                                "data_i":"2022-04-12",    
-                                                "data_f":"2022-04-12"});
-
-        }       
-        
-        res.send(newAsta);
-
+        catch(err){
+            next(err);
+        }
      }
 
     /**
@@ -213,7 +216,7 @@ export class Controller {
         try{
             let response = {};
             const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
-            if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose);
+            //if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose);
             if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
                 let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
                 if(part !== false){
@@ -253,8 +256,12 @@ export class Controller {
                     
                 } 
                 else{
-                    //if(part.length === 1) Cancellare la prenotazione e chiudere l'asta.
+                    if(part.length === 1){
+                        part = new ProxyPartecipazione().deleteOffer(part[0].part_id);
+                        asta.stato = stato_asta.TERMINATA;
+                        await new ProxyAsta().updateAsta(asta);
 
+                    }
                     response = {"info": "Nessuna offerta fatta per questa asta!"}
                 }
                 

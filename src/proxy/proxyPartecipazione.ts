@@ -104,6 +104,10 @@ export class ProxyPartecipazione{
 
     }
 
+    public async deleteOffer(part_id: number){
+      return await this.modelPartecipazione.deleteOffer(part_id);
+    }
+
     public async getOffersByUserAstaID(user_id: number, asta_id:number){
       return await this.modelPartecipazione.getOffersByUserAstaID(user_id, asta_id);
       

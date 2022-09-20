@@ -48,6 +48,12 @@ class BadFormattedData extends HttpError{
     }
 }
 
+class InvalidDate extends HttpError{
+    constructor(){
+        super('Le date presenti nel body della richiesta non sono corrette', ErrEnum.BadRequest);
+    }
+}
+
 class BadCriptedData extends HttpError{
     constructor(){
         super('I dati criptati nel body della richiesta non sono corretti!', ErrEnum.BadRequest);
@@ -129,6 +135,7 @@ export enum ErrEnum {
     UserNotFound,
     AstaNotFound,
     BadFormattedData,
+    InvalidDate,
     BadCriptedData,
     BadDecodeKey,
     TooEarlyToOpen,
@@ -163,6 +170,9 @@ export class ErrorFactory {
                 break;
             case ErrEnum.BadFormattedData:
                 retval = new BadFormattedData();
+                break;
+            case ErrEnum.InvalidDate:
+                retval = new InvalidDate();
                 break;
             case ErrEnum.BadCriptedData:
                 retval = new BadCriptedData();

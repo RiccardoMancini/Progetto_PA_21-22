@@ -114,6 +114,12 @@ export class Partecipazione{
       
     }
 
+    public async deleteOffer(part_id: number){
+      return await this.partecipazione.destroy({
+        where: { part_id: part_id },
+      });
+    }
+
     public async getOffersByUserAstaID(user_id: number, asta_id:number){
       return await this.partecipazione.findAll({
         where: {user_id: user_id, asta_id: asta_id}
