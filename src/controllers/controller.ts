@@ -197,8 +197,8 @@ export class Controller {
                 if(!response.data.server_active) throw new Error('Errore interno nel reindirizzamento al WSS');
                 console.log(response.data.server_active);
             }
-            /*await new ProxyAsta().updateAsta(asta);
-            let response = {"asta_id": asta.asta_id, "stato": asta.stato};*/
+            await new ProxyAsta().updateAsta(asta);
+            let response = {"asta_id": asta.asta_id, "stato": asta.stato};
             
             res.send(asta);
         }

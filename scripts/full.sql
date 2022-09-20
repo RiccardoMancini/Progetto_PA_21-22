@@ -33,7 +33,7 @@ CREATE TABLE Partecipazione (
     user_id int NOT NULL,
     asta_id int NOT NULL,
     aggiudicata boolean NOT NULL,
-    offerta int NOT NULL,
+    offerta float8 NOT NULL,
     CONSTRAINT FK_Utenti FOREIGN KEY (user_id) REFERENCES Utenti(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT FK_Asta FOREIGN KEY (asta_id) REFERENCES Asta(asta_id) ON UPDATE CASCADE ON DELETE CASCADE
 );

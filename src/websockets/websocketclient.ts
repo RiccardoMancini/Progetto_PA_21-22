@@ -41,8 +41,9 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
   let user_id: number = decoded.id;
   let globalTimer: ReturnType<typeof setTimeout>;
   let actualCredito = credito;
+  let asta_id: number;
 
-  const subject = webSocket('ws://localhost:8081/websocket?user_id=' + user_id);
+  const subject = webSocket(`ws://localhost:8081/websocket?user_id=${user_id}&tok_id=${process.argv[2]}`);
 
   subject.subscribe({
     next: (data: any) => {
@@ -50,7 +51,8 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
       let msg : Message = data;
 
       if (msg.type === MessageCode.WELCOME){
-        console.log(`${msg.message} ${msg.asta_id}. La base d'asta è di: ${msg.base_asta}`);
+        asta_id = msg.asta_id;
+        console.log(`${msg.message} ${asta_id}. La base d'asta è di: ${msg.base_asta}`);
         subject.next(factoryMsg.getMessage(MessageCode.CLIENT_CHECK))
       }
 

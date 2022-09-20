@@ -22,7 +22,7 @@ export class Partecipazione{
             user_id: { type: DataTypes.INTEGER},
             asta_id: { type: DataTypes.INTEGER },
             aggiudicata: { type: DataTypes.BOOLEAN },
-            offerta: { type: DataTypes.BIGINT }
+            offerta: { type: DataTypes.FLOAT }
           }, {
             tableName: 'partecipazione',
             timestamps: false

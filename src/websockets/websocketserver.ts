@@ -2,6 +2,7 @@ import {WebSocket, WebSocketServer} from 'ws';
 import { MessageCode, Message, factoryMsg } from './message';
 import * as dotenv from "dotenv";
 import path from 'path';
+import axios from 'axios';
 dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 
 export function createWSS(asta: any){
@@ -13,6 +14,7 @@ export function createWSS(asta: any){
   let ws_userID = [];
   let semaphore = true;
   let bestOffer = base_asta;
+  let token: string;
 
   const wss = new WebSocketServer({ port: +process.env.WSSPORT, path: '/websocket' });
 
@@ -25,8 +27,10 @@ export function createWSS(asta: any){
 
 
   wss.on('connection', function connection(ws, req) {
-    ws_userID.push({"ws_id": req.headers['sec-websocket-key'], "user_id": Number(req.url.replace('/?user_id=', '')), "offerte": [], "ws": ws});
-
+    let app = req.url.split('?');
+    app = app[1].split('&');
+    ws_userID.push({"ws_id": req.headers['sec-websocket-key'], "user_id": Number(app[0].split('=')[1]), "offerte": [], "tok_id": Number(app[1].split('=')[1]), "ws": ws});
+    console.log(ws_userID)
     let count = wss.clients.size;
     if (count <= n_client){
       sendToAll(count);    
@@ -95,7 +99,7 @@ export function createWSS(asta: any){
       ws.close();
     })
 
-    ws.on("close", function(code: number){
+    ws.on("close", async function(code: number){
       //DA FINIRE DI GESTIRE CON TUTTE LE ECCEZIONI!
       let exit_client = ws_userID.find(item => item.ws_id === req.headers['sec-websocket-key']);
       if(code === 1000 || code === 1006){      
@@ -104,22 +108,61 @@ export function createWSS(asta: any){
         if(code === 1006){
           //DELETE OFFER
         }
+        switch (exit_client.tok_id){
+          case 1:
+            token = process.env.TOKEN1;
+            break;
+          case 2:
+            token = process.env.TOKEN2;
+            break;
+          default:
+            break;
+        }
+          
+
+        exit_client.offerte.sort((a, b) => a - b).map(async (value) => {
+          let response = await axios.post('http://localhost:8080/asta/offerta',{
+              "asta_id": asta.asta_id,
+              "offerta": value
+              }, { headers: { Authorization: `Bearer ${token}` }});
+
+        });
+        /**/
       }
       console.log(code)
 
       if(wss.clients.size === 1 && bestOffer !== base_asta){
         //the winner!
         let winner_client = ws_userID[0];
-        wss.clients.forEach((client) => {
-          client.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WINNER, winner_client.offerte[winner_client.offerte.length - 1])));
-          setTimeout(() => {client.close()}, 1000);     
+        switch (winner_client.tok_id){
+          case 1:
+            token = process.env.TOKEN1;
+            break;
+          case 2:
+            token = process.env.TOKEN2;
+            break;
+          default:
+            break;
+        };
+
+        console.log(`L'utente ${winner_client.user_id} si è aggiudicato l'asta!`);
+
+        winner_client.offerte.sort((a, b) => a - b).map(async (value) => {
+          let response = await axios.post('http://localhost:8080/asta/offerta',{
+              "asta_id": asta.asta_id,
+              "offerta": value
+              }, { headers: { Authorization: `Bearer ${token}` }});
 
         });
-        //setAuctionWon
-        
 
-        //WSS CLOSE
-        wss.close();
+        wss.clients.forEach((client) => {
+          client.send(JSON.stringify(factoryMsg.getMessage(MessageCode.WINNER, winner_client.offerte[winner_client.offerte.length - 1])));
+          setTimeout(() => {client.close()}, 1000);  
+
+        });
+        
+        let response = await axios.get(`http://localhost:8080/asta/${asta.asta_id}/close`);
+        if(response.status === 200) console.log('Asta conclusa!')
       }
       
       
