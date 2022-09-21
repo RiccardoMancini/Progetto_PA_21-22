@@ -1,6 +1,8 @@
 import { DB_Connection } from '../config/db_connection'
 import { Asta, tipo_asta } from "../models/asta";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
+import { ObjectBuilder } from '../controllers/builder/objectBuilder';
+import { Json } from 'sequelize/types/utils';
 
 function checkDate(date): boolean{
     //const re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
@@ -164,8 +166,9 @@ export class ProxyAsta{
         return await this.modelAsta.updateAsta(asta);
     }
 
-    public async createAsta(asta:any){
-        this.proxyAstaValidator = new Proxy(asta, __Handler);
+    public async createAsta(asta: string){
+        let astaJson = JSON.parse(asta);
+        this.proxyAstaValidator = new Proxy(astaJson, __Handler);
         let val_tipo: number = this.proxyAstaValidator.tipo;
         let val_p_min: number = this.proxyAstaValidator.p_min;
         //console.log(val_tipo, val_p_min);
@@ -176,19 +179,24 @@ export class ProxyAsta{
         /*let app = val_date_i.setTime(val_date_i.getTime() + 1000 * 60);
         console.log(new Date(app).toISOString());*/
         if(val_tipo !== tipo_asta.ASTA_APERTA){
-            return await this.modelAsta.createAsta({"tipo": val_tipo,
-                                                "p_min": val_p_min,
-                                                "stato": 1,
-                                                "data_i": val_date_i,    
-                                                "data_f": val_date_f, 
-                                                "chiavi_id": asta.chiavi_id });
+            return await this.modelAsta.createAsta(JSON.stringify(
+                                                    new ObjectBuilder().setTipo(val_tipo)
+                                                                        .setBaseAsta(val_p_min)
+                                                                        .setStato(1)
+                                                                        .setDataI(val_date_i)
+                                                                        .setDataF(val_date_f)
+                                                                        .setChiaviID(astaJson.chiavi_id)
+                                                                        .build()));
+                                                
         }
         else{
-            return await this.modelAsta.createAsta({"tipo": val_tipo,
-                                                "p_min": val_p_min,
-                                                "stato": 1,
-                                                "data_i": val_date_i,    
-                                                "data_f": val_date_f});
+            return await this.modelAsta.createAsta(JSON.stringify(
+                                                    new ObjectBuilder().setTipo(val_tipo)
+                                                                        .setBaseAsta(val_p_min)
+                                                                        .setStato(1)
+                                                                        .setDataI(val_date_i)
+                                                                        .setDataF(val_date_f)
+                                                                        .build()));
         }
         
     }

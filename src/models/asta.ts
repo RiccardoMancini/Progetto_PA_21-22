@@ -58,8 +58,9 @@ export class Asta{
         return await asta.save();
     }
 
-    public async createAsta(asta:any){
-        return await this.asta.create(asta);
+    public async createAsta(asta:string){
+        let astaJson = JSON.parse(asta);
+        return await this.asta.create(astaJson);
     }
 
 
