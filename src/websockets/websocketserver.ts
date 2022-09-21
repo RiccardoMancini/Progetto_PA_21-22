@@ -160,9 +160,9 @@ export function createWSS(asta: any){
           setTimeout(() => {client.close()}, 1000);  
 
         });
-        
-        let response = await axios.get(`http://localhost:8080/asta/${asta.asta_id}/close`);
-        if(response.status === 200) console.log('Asta conclusa!')
+        console.log('Asta conclusa! A breve verranno registrati i risultati.');
+        //let response = await axios.get(`http://localhost:8080/asta/${asta.asta_id}/close`);
+        //if(response.status === 200) 
       }
       
       
