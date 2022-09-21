@@ -4,10 +4,11 @@ import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from '../controllers/builder/objectBuilder';
 import { Json } from 'sequelize/types/utils';
 
-function checkDate(date): boolean{
+export function checkDate(date): Date | boolean{
     //const re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
-    const re1 = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-    const re2 = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+    const re1 = /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/;
+    const re2 = /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/;
+    //console.log(re1.test(date), re2.test(date))
     if((re1.test(date) || re2.test(date))){        
         //Test which seperator is used '/' or '-'
         let opera1 = date.split('/');
@@ -22,7 +23,7 @@ function checkDate(date): boolean{
         else if (lopera2>1){
             var pdate = date.split('-');
         }
-
+        //console.log(pdate)
         if(re1.test(date)){
             //console.log(pdate)
             var dd = parseInt(pdate[0]);
@@ -55,7 +56,7 @@ function checkDate(date): boolean{
                 return false;
             }
         }
-        return true;
+        return new Date(yy, mm-1, dd);
     }
     else{
         return false;
@@ -88,14 +89,14 @@ const __Handler = {
             return obj[prop];
         }
 
-        if(prop ==='data_i'){
+        if(prop ==='data_i'){            
+            const date_i = checkDate(obj[prop]);
+            const date_f = checkDate(obj['data_f']);
             //get local time
             var d = new Date();
             var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
             var nd = new Date(utc + (3600000 * 2));
-            if (typeof obj[prop] === 'string' && checkDate(obj[prop]) && checkDate(obj['data_f'])){
-                const date_i = new Date(obj[prop]);
-                const date_f = new Date(obj['data_f']);                
+            if (typeof obj[prop] === 'string' && typeof obj['data_f'] === 'string' && date_i && date_f){              
                 if((nd > date_i) || (date_i >= date_f)){                    
                     throw new ErrorFactory().getError(ErrEnum.InvalidDate);
                 }
@@ -108,7 +109,7 @@ const __Handler = {
             
         }
         if(prop === 'data_f'){
-            return new Date(obj[prop]);
+            return checkDate(obj['data_f']);
         }    
 
         if(prop ==='p_min'){

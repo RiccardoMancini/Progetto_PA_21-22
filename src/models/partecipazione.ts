@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import { Utenti } from './utenti'
 import { Asta } from './asta';
 
@@ -46,28 +46,37 @@ export class Partecipazione{
       return partecipazioni;
     }
 
-    public async getClosedAsteByUserID(user_id: number){
-      /*const date_i = String(date_obj_i.getFullYear())+'-'+String(date_obj_i.getMonth()+1)+'-'+String(date_obj_i.getDate())
-      const date_f = String(date_obj_f.getFullYear())+'-'+String(date_obj_f.getMonth()+1)+'-'+String(date_obj_f.getDate())
-      console.log(date_i, date_f)*/
-      let partecipazioni = await this.partecipazione.findAll({
-        include: [{
-        model: this.utenti.getModelUtenti(),
-        where: {
-          user_id: user_id
-        }}, 
-        {
-        model: this.asta.getModelAsta(),
-        where: {
-          stato: 3
-          /*from: {
-            $between: [date_i, date_f]
-        }*/}}]
-        
-    });
-
-    return partecipazioni;
-
+    public async getClosedAsteByUserID(user_id: number, date_i?: string | Date, date_f?: string | Date){
+      if(typeof date_i !== 'undefined' && typeof date_f !== 'undefined'){
+        return await this.partecipazione.findAll({
+          include: [{
+          model: this.utenti.getModelUtenti(),
+          where: {
+            user_id: user_id
+          }}, 
+          {
+          model: this.asta.getModelAsta(),
+          where: {
+            stato: 3,
+            data_f: {
+              [Op.between]: [date_i, date_f] 
+          }}}]        
+        });
+      }
+      else{
+        return await this.partecipazione.findAll({
+          include: [{
+          model: this.utenti.getModelUtenti(),
+          where: {
+            user_id: user_id
+          }}, 
+          {
+          model: this.asta.getModelAsta(),
+          where: {
+            stato: 3
+          }}]        
+        });
+      }
     }
   
     public async getAsteByUserID(user_id: number){

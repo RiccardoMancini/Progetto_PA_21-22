@@ -33,8 +33,7 @@ export class Controller {
     private static readonly headerPrivateKey: string = '-----BEGIN PRIVATE KEY-----\n';
     private static readonly footerPrivateKey: string = '\n-----END PRIVATE KEY-----';
 
-    constructor(){
-    }
+    constructor(){}
 
     public async getListAste(req: any, res:any, next: any){
         try{
@@ -158,7 +157,7 @@ export class Controller {
     public async updateCredito (req: any, res: any, next: any){
         try{
             let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
-            const response : ObjectBuilder = new ObjectBuilder().setUserID(userByID.user_id)
+            const response: ObjectBuilder = new ObjectBuilder().setUserID(userByID.user_id)
                                                                 .setNewCredito(userByID.credito)
                                                                 .build();
             res.status(200).json(response);
@@ -295,8 +294,7 @@ export class Controller {
 
                     response.setMessaggio('Nessuna offerta fatta per questa asta!')
                             .build();
-                }
-                
+                }                
             }
 
             asta.stato = stato_asta.TERMINATA;
@@ -313,15 +311,15 @@ export class Controller {
 
     public async getMyClosedAste(req: any, res: any, next: any){
         try{
-            /*const date_obj_i = new Date(Number(req.query.date_i));
-            const date_obj_f = new Date(Number(req.query.date_f));*/
-            let arr : Array<ObjectBuilder> = [];
-            let part = await new ProxyPartecipazione().getClosedAsteByUserID(2);
+            let arr : Array<ObjectBuilder> = new Array<ObjectBuilder>();
+            // GESTIRE SE NON CI SONO PARTECIPAZIONI
+            let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
             part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .map(elem =>{
                     if(arr.length === 0){                        
                         arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
                                                     .setUserID(elem.user_id)
+                                                    .initPartecipazioni()
                                                     .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
                                                                                             .setAggiudicata(elem.aggiudicata)
                                                                                             .build())
@@ -329,15 +327,11 @@ export class Controller {
                                                     .setDataI(elem.astum.data_i)
                                                     .setDataF(elem.astum.data_f)
                                                     .build())
-                        /*arr.push({"asta_id": elem.asta_id, 
-                                    "offerte": [{"part_id": elem.part_id, "aggiudicata": elem.aggiudicata}],
-                                    "aggiudicata": false});*/
                     }
                     else{
                         let app = arr.find(obj => obj.getAstaID() === elem.asta_id);                        
                         if(typeof app !== 'undefined')
                         {
-                            console.log(app.getPartecipazioni())
                             app.getPartecipazioni().push(new ObjectBuilder().setPartID(elem.part_id)
                                                                             .setAggiudicata(elem.aggiudicata)
                                                                             .build())
@@ -345,6 +339,7 @@ export class Controller {
                         else{
                             arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
                                                         .setUserID(elem.user_id)
+                                                        .initPartecipazioni()
                                                         .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
                                                                                             .setAggiudicata(elem.aggiudicata)
                                                                                             .build())
@@ -357,21 +352,19 @@ export class Controller {
                 });
 
             const response: Array<ObjectBuilder> = arr.map(elem => {
-                                    let app = elem.getPartecipazioni().find(obj => obj.aggiudicata === true);
+                                    let app = elem.getPartecipazioni().find(obj => obj.getAggiudicata() === true);
                                     if(typeof app !== 'undefined'){
                                         elem.setAggiudicata(true);
                                     }
                                     return new ObjectBuilder().setAstaID(elem.getAstaID())
-                                                              .setAstaID(elem.getUserID())
+                                                              .setUserID(elem.getUserID())
                                                               .setAggiudicata(elem.getAggiudicata())
                                                               .setDataI(elem.getDataI())
                                                               .setDataF(elem.getDataF())
                                                               .build();
-                                });
-            
-            
-            console.log(arr);                
-            res.send(response);
+            });
+
+            res.status(200).json(response);
             
         }
         catch(err){
@@ -383,6 +376,7 @@ export class Controller {
         try{
             let app = [];
             let rilanci = [];
+            //GESTIRE SE NON CI SONO  PARTECIPAZIONI
             let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
             part = part.sort((a, b) => { return b.part_id - a.part_id })
             .filter((elem) => {
@@ -398,15 +392,18 @@ export class Controller {
                     obj2.offerta.push(elem.offerta);                
                     return false;
                 }
-            })
-            .map((elem, index) => {
-                return {
-                    "asta_id": elem.asta_id,
-                    "stato": elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3],
-                    "rilanci / offerta": rilanci[index].offerta
-                }
-            })            
-            res.send(part);
+            });
+
+            const response: Array<ObjectBuilder> = part.map((elem, index) => {
+                                                            return new ObjectBuilder().setAstaID(elem.asta_id)
+                                                                                      .setUserID(elem.user_id)
+                                                                                      .setStato(elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3])
+                                                                                      .setDataI(elem.astum.data_i)
+                                                                                      .setDataF(elem.astum.data_f)
+                                                                                      .setRilanci_Offerta(rilanci[index].offerta)
+                                                                                      .build();
+                                                        });          
+            res.status(200).send(response);
         }
         catch(err){
             next(err);

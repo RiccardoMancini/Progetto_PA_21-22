@@ -15,15 +15,14 @@ export class ObjectBuilder{
     private addebito: number;
     private offerta_addebito: number;
     private aggiudicata: boolean;
-    private stato: number;
-    private tipo: number;
+    private stato: number | string;
+    private tipo: number | string;
     private data_i: string;
     private data_f: string;
     private messaggio: string;
     private partecipazioni: Array<ObjectBuilder>;
 
     constructor(){
-        this.partecipazioni = [];
     }
 
 
@@ -78,11 +77,11 @@ export class ObjectBuilder{
         return this.aggiudicata;
     }
 
-    getStato():number{
+    getStato():number|string{
         return this.stato;
     }
 
-    getTipo():number{
+    getTipo():number|string{
         return this.tipo;
     }
 
@@ -98,7 +97,7 @@ export class ObjectBuilder{
         return this.messaggio;
     }
 
-    getPartecipazioni(): Array<any>{
+    getPartecipazioni(): Array<ObjectBuilder>{
         return this.partecipazioni;
     }
 
@@ -150,10 +149,17 @@ export class ObjectBuilder{
         return this;
     }
 
+    initPartecipazioni(){
+        this.partecipazioni = new Array<ObjectBuilder>();
+        return this;
+    } 
+
     setPartecipazioni(objBuilded: ObjectBuilder){
         this.partecipazioni.push(objBuilded);
         return this;
     }
+
+    
 
     setRilanci_Offerta(rilanci_offerta: number){
         this.rilanci_offerta = rilanci_offerta;
@@ -175,12 +181,12 @@ export class ObjectBuilder{
         return this;
     }
 
-    setStato(stato: number){
+    setStato(stato: number | string){
         this.stato = stato;
         return this;
     }
 
-    setTipo(tipo: number){
+    setTipo(tipo: number | string){
         this.tipo = tipo;
         return this;
     }

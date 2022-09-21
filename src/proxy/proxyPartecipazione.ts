@@ -3,6 +3,7 @@ import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { Asta, tipo_asta } from "../models/asta";
 import { Partecipazione } from '../models/partecipazione';
 import { Utenti } from '../models/utenti';
+import { checkDate } from './proxyAsta';
 
 const __Handler = {
   get: (obj, prop) => { 
@@ -25,7 +26,25 @@ const __Handler = {
         }
       
       return obj[prop];
-  }      
+    }
+    if(prop ==='data_i'){
+      const date_i = checkDate(obj[prop]);
+      const date_f = checkDate(obj['data_f']);
+      
+      if (typeof obj[prop] === 'string' && typeof obj['data_f'] === 'string' && date_i && date_f){
+        //console.log(date_i, date_f)             
+        if(date_i >= date_f){                    
+            throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+        }
+        return date_i;
+      }
+      else{                
+          throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+      }      
+    }
+    if(prop === 'data_f'){
+        return checkDate(obj['data_f']);
+    }
 
 } 
 }
@@ -45,12 +64,22 @@ export class ProxyPartecipazione{
 
     }
 
-    public async getClosedAsteByUserID(user_id: number){
-      //CHECK DATA
-      this.proxyPartValidator = new Proxy({"user_id": user_id}, __Handler);
+    public async getClosedAsteByUserID(user_id: number, date_i?: string, date_f?: string){
+      this.proxyPartValidator = new Proxy({"user_id": user_id, "data_i": date_i, "data_f": date_f}, __Handler);
       const val_user_id: number = this.proxyPartValidator.user_id;
-      let partecipazioni = await this.modelPartecipazione.getClosedAsteByUserID(val_user_id);  
-      return partecipazioni;
+      if((typeof date_i !== 'undefined' && typeof date_f === 'undefined') || 
+         (typeof date_i === 'undefined' && typeof date_f !== 'undefined')) throw new ErrorFactory().getError(ErrEnum.BadRequest);
+      
+      if(typeof date_i !== 'undefined' && typeof date_f !== 'undefined'){
+        const val_data_i: Date = this.proxyPartValidator.data_i;
+        const val_data_f: Date = this.proxyPartValidator.data_f;
+        return await this.modelPartecipazione.getClosedAsteByUserID(val_user_id, val_data_i, val_data_f);
+      }
+      else{
+        return await this.modelPartecipazione.getClosedAsteByUserID(val_user_id);
+      }
+      //
+      
   
     }
     
