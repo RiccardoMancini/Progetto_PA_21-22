@@ -8,7 +8,6 @@ import { ObjectBuilder } from './builder/objectBuilder';
 import { ObjectConstr } from './builder/object';
 import crypto from 'crypto';
 import axios from 'axios';
-import { arrayBuffer } from 'stream/consumers';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
