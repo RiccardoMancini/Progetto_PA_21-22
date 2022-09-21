@@ -1,5 +1,5 @@
 import {WebSocket, WebSocketServer} from 'ws';
-import { MessageCode, Message, factoryMsg } from './message';
+import { MessageCode, Message, factoryMsg } from '../factory/messageFactory';
 import * as dotenv from "dotenv";
 import path from 'path';
 import axios from 'axios';
@@ -161,8 +161,6 @@ export function createWSS(asta: any){
 
         });
         console.log('Asta conclusa! A breve verranno registrati i risultati.');
-        //let response = await axios.get(`http://localhost:8080/asta/${asta.asta_id}/close`);
-        //if(response.status === 200) 
       }
       
       

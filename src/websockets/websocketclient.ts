@@ -1,11 +1,10 @@
-import { MessageCode, Message, factoryMsg } from './message';
+import { MessageCode, Message, factoryMsg } from '../factory/messageFactory';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 Object.assign(global, { WebSocket: require('ws') });
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import * as dotenv from "dotenv";
 import path from 'path';
-import { argv } from 'process';
 dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 
 (async () => {
