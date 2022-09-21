@@ -50,7 +50,7 @@ class BadFormattedData extends HttpError{
 
 class InvalidDate extends HttpError{
     constructor(){
-        super('Le date presenti nella richiesta non sono corrette!', ErrEnum.BadRequest);
+        super('Le date presenti nella richiesta non sono corrette!', ErrEnum.UnprocessableContent);
     }
 }
 
