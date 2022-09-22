@@ -9,8 +9,12 @@ enum role{
 }
 
 /**
- * Check della presenza del parametro di autorizzazione
- */
+* Check che verifica l'effettiva presenza del parametro di autorizzazione
+* nell'header della richiesta
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
 export const checkHeader = (req: any, res: any, next: any) => {
     try{
         const aHeader = req.headers.authorization;
@@ -25,8 +29,11 @@ export const checkHeader = (req: any, res: any, next: any) => {
 };
 
 /**
- * Funzione che fa il check della bearerHeader
- */
+* Check del bearer header affinchè sia corretto
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
 export const checkToken = (req: any, res: any, next: any) => {
     try{
         const bearerHeader = req.headers.authorization;
@@ -42,6 +49,12 @@ export const checkToken = (req: any, res: any, next: any) => {
     }
 };
 
+/**
+* Check dell'effettiva autenticazione dell'utente
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
 export const checkAuthentication = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
@@ -59,8 +72,11 @@ export const checkAuthentication = (req: any, res: any, next: any) => {
 };
 
 /**
- * Funzione che verifica l'admin
- */
+* Check dei privilegi di Admin dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
 export const isAdmin = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
@@ -75,8 +91,11 @@ export const isAdmin = (req: any, res: any, next: any) => {
 }
 
 /**
- * Funzione che verifica il BidCreator
- */
+* Check dei privilegi di BidCreator dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
  export const isBidCreator = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
@@ -92,8 +111,11 @@ export const isAdmin = (req: any, res: any, next: any) => {
     
 
 /**
- * Funzione che verifica BidParticipant 
- */
+* Check dei privilegi di BidParticipant dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
 export const isBidParticipant = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    

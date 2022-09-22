@@ -34,10 +34,17 @@ export class Controller {
 
     constructor(){}
 
+    /**
+     * Metodo che restituisce l'elenco delle aste. E' possibile filtrarle 
+     * per il loro stato, specificandolo tramite query string della richiesta
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
+     */
     public async getListAste(req: any, res:any, next: any){
         try{
-            let response: Array<ObjectBuilder> = [];
-            let aste = await new ProxyAsta().getAste();
+            let response: Array<ObjectBuilder> = new Array<ObjectBuilder>();
+            let aste: Array<any> = await new ProxyAsta().getAste();
             if(Object.keys(req.query).length !== 0){
                 aste = aste.filter(asta => {
                     let stato = Number(req.query.stato)
@@ -100,7 +107,11 @@ export class Controller {
 
 
     /**
-     * Creazione di una nuova asta
+     * Metodo che permette la creazione di una nuova asta utilizzando
+     * i parametri passati nel body della richiesta 
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
      */
      public async createAsta(req:any, res:any, next: any){
         try{
@@ -133,7 +144,10 @@ export class Controller {
      }
 
     /**
-     * Verifica del credito dell'utente
+     * Metodo che restituisce l'attuale credito dell'utente autenticato
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
      */
     public async getMyCredito(req: any, res: any, next: any){
         try{
@@ -148,7 +162,11 @@ export class Controller {
 
 
     /**
-     * Aggiornamento del credito di un determinato utente
+     * Metodo che permette di accreditare un certo credito ad un certo utente,
+     * entrambi specificati nel body della richiesta
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
      */
     public async updateCredito (req: any, res: any, next: any){
         try{
@@ -165,16 +183,22 @@ export class Controller {
     }
 
 
-
+    /**
+     * Metodo che crea una nuova offerta, per una certa asta,
+     * estraendo tale valore dal body della richiesta.
+     * Nel caso di aste in busta chiusa l'offerta viene prima decodificata
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
+     */
     public async newOfferta(req: any, res: any, next: any){
         try{
             const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
             //if (checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.ToLateToOffer); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
             if (asta.tipo !== tipo_asta.ASTA_APERTA){
-                //decriptazione 
-                let codedOfferta = req.body.offerta;
-                if(!checkCode64Offer(codedOfferta)) throw new ErrorFactory().getError(ErrEnum.BadCriptedData);            
-                
+                //fase di decodifica dell'offerta
+                let codedOfferta = req.body.offerta;                
+                if(!checkCode64Offer(codedOfferta)) throw new ErrorFactory().getError(ErrEnum.BadCriptedData);  //check del formato base64              
                 const decryptedData = Controller.decriptData(codedOfferta, asta.chiavi.private_key)
                 let offertaOBJ = JSON.parse(decryptedData.toString());
                 req.body.offerta = offertaOBJ.offerta;
@@ -189,6 +213,12 @@ export class Controller {
         }
     }
 
+    /**
+     * Metodo statico che si occupa della decodifica di una stringa in 
+     * attraverso la rispettiva chiave privata
+     * @param codedData dati codificati con una certa chiave pubblica
+     * @param private_key chiave privata necessaria per la decodifica
+     */
     private static decriptData(codedData: string, private_key: string){
         try{
             return crypto.privateDecrypt(
@@ -204,6 +234,14 @@ export class Controller {
         }
     }
 
+    /**
+     * Metodo che va ad aprire una determinata asta cambiandone il proprio stato,
+     * così da poter permettere di effettuare offerte da parte degli utenti.
+     * Nel caso di un asta aperta, si va a fare una richiesta per la messa in ascolto di un WSS
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
+     */
     public async openAsta(req: any, res: any, next: any){
         try{
             const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
@@ -231,9 +269,12 @@ export class Controller {
     }
 
     /**
-     * Metodo che determina il vincitore di una determinata asta; 
-     * scala l'offerta dal credito di quest'ultimo, rispettando i criteri dettati dal tipo di asta;
-     * chiude definitivamente l'asta.
+     * Metodo che determina il vincitore di una determinata asta,
+     * scalandone l'offerta dal suo credito, rispettando i criteri dettati dal tipo di asta.
+     * Infine viene modificato lo stato attuale dell'asta
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
      */
     public async setAuctionWon(req: any, res: any, next: any){
         try{
@@ -382,20 +423,6 @@ export class Controller {
                                     if(typeof app !== 'undefined'){
                                         elem.setAggiudicata(true);
                                     }
-                                    /*let tipo: string;
-                                    switch(elem.astum.tipo){
-                                        case tipo_asta.ASTA_APERTA:
-                                            tipo = tipo_asta[1];
-                                            break;
-                                        case tipo_asta.ASTA_CHIUSA_1:
-                                            tipo = tipo_asta[2];
-                                            break;
-                                        case tipo_asta.ASTA_CHIUSA_2:
-                                            tipo = tipo_asta[3];
-                                            break;
-                                        default:
-                                            break;
-                                    }*/
                                     return new ObjectBuilder().setAstaID(elem.getAstaID())
                                                               .setUserID(elem.getUserID())
                                                               .setTipo(elem.getTipo())

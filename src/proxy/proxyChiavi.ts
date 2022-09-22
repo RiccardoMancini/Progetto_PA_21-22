@@ -1,8 +1,9 @@
 import { DB_Connection } from '../config/db_connection';
 import { Chiavi} from '../models/chiavi'; 
+import { ChiaviInterface } from '../models/interface/chiaviInterface';
 
 
-export class ProxyChiavi{
+export class ProxyChiavi implements ChiaviInterface{
 
     modelChiavi: Chiavi;
 

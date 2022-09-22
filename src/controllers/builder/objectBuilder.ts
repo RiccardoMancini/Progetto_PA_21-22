@@ -1,6 +1,7 @@
 /**
- * Classe  che contiene le chiavi necessarie a comporre 
- * gli oggetti da passare ai metodi delle classi oppure come risposta
+ * Classe  che contiene le chiavi necessarie a costruire 
+ * gli oggetti da passare ai metodi delle classi, come parametri,
+ * oppure come risposta del sistema
  */
 export class ObjectBuilder{
     private asta_id: number;
@@ -22,8 +23,7 @@ export class ObjectBuilder{
     private messaggio: string;
     private partecipazioni: Array<ObjectBuilder>;
 
-    constructor(){
-    }
+    constructor(){}
 
 
 
