@@ -97,10 +97,13 @@ Il model, che, consente attraverso i suoi metodi specifici di accedere ai dati a
 -	Partecipazione: modello che serve per tenere traccia degli utenti che possono interagire direttamente con il modello dell’asta  
 -	Chiavi : modello che permette la decriptazione delle offerte delle aste in busta chiusa e ciascuna, è identificata da un parametro univoco
 -	Asta: modello che va a definire quello che sono le variabili di stato che definisce ogni tipo di asta in maniera univoca(asta_id, tipo di asta, prezzo minimo di acquisto, data di inizio, data di fine, identificazione delle chiavi)  
+
 Per quanto riguarda il modulo View, questo viene rappresentato dal framework Postman [Link ].
+
 Il controller invece, permette, attraverso il View, di riceve le istruzioni da parte dell’utente e individuare le risorse nel model necessarie per completare la richiesta.
 
 #### Proxy
+Il Proxy è un design pattern, la cui classe condivide la stessa interfaccia dell'oggetto originale e di fatto gliele manda fornendo, con uno strato di astrazione in più, un livello tutto suo per validare i dati presenti nella medesima richiesta.
 Un oggetto Proxy racchiude un altro oggetto e ne intercetta le operazioni e ha una sintassi del tipo
 
 `let proxy = new Proxy(target, handler)`
@@ -130,18 +133,24 @@ Le operazioni che esegue il proxyUtente sono le seguenti:
 -	Verifica che lo user_id sia di tipo numerico intero e che  sia maggiore uguale di 1
 Esempio parametri inseriti correttamente
 #### Chain of responsibility
-È un tipo di pattern che in questo progetto è stato usato per verificare la presenza e la correttezza di  token, l’identificazione del admin, del bid-creator e  del bid-participant. 
-Entrando nello specifico, questo tipo di pattern è costituito da due middleware: uno  incaricato di quanto detto all’ inizio di questo paragrafo, e un secondo per la gestione delle risposte del sistema nel caso in cui si verifichi un’eccezione.
-I middleware saranno agganciati direttamente controller, e questo viene fatto per garantire che quest’ultimo lavori con datai, passati da parte dell’utente e da eventuali altri moduli, strutturati in maniera corretta.
-Esempio di token admin corretto 
+Il Chain of responsability è un pattern comportamentale che permette di passare le richieste lungo una catena di handler (middleware), ognuno dei quali decide se processarla e passarla all'handler successivo (tramite next()), oppure sollevare un errore.
+In questo progetto è stato usato:
+- verificare la presenza e la correttezza dei token JWT; 
+- autenticare gli utenti;
+- gestire gli errori;
+I middleware saranno agganciati direttamente alle rotte, e questo viene fatto per garantire che il controller processi delle richieste fatte da utenti con i giusti privilegi ed in caso sollevando le opportune eccezioni.
 
 #### Singleton
 Il singleton è un design pattern creazionale che ha lo scopo di garantire che di una determinata classe venga creata una e una sola istanza, e di fornire un punto di accesso globale a tale istanza.
 Data la definizione appena fornita, il Singleton è stato utilizzato per la creazione di una e una sola connessione al data base.
+
 #### Factory
 Il Factory è un design pattern creazionale, che ha lo scopo di creare oggetti senza che ne venga specifica la classe esatta.
-Nel presente progetto, il factory viene utilizzato, a seconda del tipo di codice di stato una serie di messaggi che vengono salvati mediante una variabile di tipo enumerativa ed eseguiti mediante il rispettivo throw error.
-Per quanto riguarda invece la selezione del tipo di errore questa viene gestita mediante uno switch case, che prenderà il tipo di errore come selettore.
+Nel presente progetto, il factory viene utilizzato nel contesto degli errori, quando essi vengono sollevati nel sistema. 
+Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  clients e server tramite websocket.
+
+#### Builder
+Il builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
 
 ## Avvio del servizio
 - spiegazone su come avviare il progetto
