@@ -8,6 +8,7 @@ import { ObjectBuilder } from './builder/objectBuilder';
 import { ObjectConstr } from './builder/object';
 import crypto from 'crypto';
 import axios from 'axios';
+import { traceDeprecation } from 'process';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -83,7 +84,6 @@ export class Controller {
                                        .setStato(value.stato)
                                        .setDataI(value.data_i)
                                        .setDataF(value.data_f)
-                                       .setChiaviID(value.chiavi_id)
                                        .build()
                                 response.push(objAsta);
                             });
@@ -141,7 +141,7 @@ export class Controller {
     public async getMyCredito(req: any, res: any, next: any){
         try{
             let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
-            const response : ObjectBuilder = new ObjectBuilder().setCredito(credito).build();
+            const response : ObjectBuilder = new ObjectBuilder().setCredito(Number(credito).toFixed(3)).build();
             res.status(200).json(response);
         }
         catch(err){
@@ -157,7 +157,7 @@ export class Controller {
         try{
             let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
             const response: ObjectBuilder = new ObjectBuilder().setUserID(userByID.user_id)
-                                                                .setNewCredito(userByID.credito)
+                                                                .setNewCredito(Number(userByID.credito).toFixed(3))
                                                                 .build();
             res.status(200).json(response);
         }
@@ -315,13 +315,28 @@ export class Controller {
             let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
             part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .map(elem =>{
-                    if(arr.length === 0){                        
+                    if(arr.length === 0){ 
+                        let tipo: string;
+                        switch(elem.astum.tipo){
+                            case tipo_asta.ASTA_APERTA:
+                                tipo = tipo_asta[1];
+                                break;
+                            case tipo_asta.ASTA_CHIUSA_1:
+                                tipo = tipo_asta[2];
+                                break;
+                            case tipo_asta.ASTA_CHIUSA_2:
+                                tipo = tipo_asta[3];
+                                break;
+                            default:
+                                break;
+                        }      
                         arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
                                                     .setUserID(elem.user_id)
                                                     .initPartecipazioni()
                                                     .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
                                                                                             .setAggiudicata(elem.aggiudicata)
                                                                                             .build())
+                                                    .setTipo(tipo)
                                                     .setAggiudicata(false)
                                                     .setDataI(elem.astum.data_i)
                                                     .setDataF(elem.astum.data_f)
@@ -336,6 +351,20 @@ export class Controller {
                                                                             .build())
                         }
                         else{
+                            let tipo: string;
+                            switch(elem.astum.tipo){
+                                case tipo_asta.ASTA_APERTA:
+                                    tipo = tipo_asta[1];
+                                    break;
+                                case tipo_asta.ASTA_CHIUSA_1:
+                                    tipo = tipo_asta[2];
+                                    break;
+                                case tipo_asta.ASTA_CHIUSA_2:
+                                    tipo = tipo_asta[3];
+                                    break;
+                                default:
+                                    break;
+                            }   
                             arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
                                                         .setUserID(elem.user_id)
                                                         .initPartecipazioni()
@@ -343,6 +372,7 @@ export class Controller {
                                                                                             .setAggiudicata(elem.aggiudicata)
                                                                                             .build())
                                                         .setAggiudicata(false)
+                                                        .setTipo(tipo)
                                                         .setDataI(elem.astum.data_i)
                                                         .setDataF(elem.astum.data_f)
                                                         .build())
@@ -355,8 +385,23 @@ export class Controller {
                                     if(typeof app !== 'undefined'){
                                         elem.setAggiudicata(true);
                                     }
+                                    /*let tipo: string;
+                                    switch(elem.astum.tipo){
+                                        case tipo_asta.ASTA_APERTA:
+                                            tipo = tipo_asta[1];
+                                            break;
+                                        case tipo_asta.ASTA_CHIUSA_1:
+                                            tipo = tipo_asta[2];
+                                            break;
+                                        case tipo_asta.ASTA_CHIUSA_2:
+                                            tipo = tipo_asta[3];
+                                            break;
+                                        default:
+                                            break;
+                                    }*/
                                     return new ObjectBuilder().setAstaID(elem.getAstaID())
                                                               .setUserID(elem.getUserID())
+                                                              .setTipo(elem.getTipo())
                                                               .setAggiudicata(elem.getAggiudicata())
                                                               .setDataI(elem.getDataI())
                                                               .setDataF(elem.getDataF())
@@ -394,8 +439,23 @@ export class Controller {
             });
 
             const response: Array<ObjectBuilder> = part.map((elem, index) => {
+                                                            let tipo: string;
+                                                            switch(elem.astum.tipo){
+                                                                case tipo_asta.ASTA_APERTA:
+                                                                    tipo = tipo_asta[1];
+                                                                    break;
+                                                                case tipo_asta.ASTA_CHIUSA_1:
+                                                                    tipo = tipo_asta[2];
+                                                                    break;
+                                                                case tipo_asta.ASTA_CHIUSA_2:
+                                                                    tipo = tipo_asta[3];
+                                                                    break;
+                                                                default:
+                                                                    break;
+                                                            }
                                                             return new ObjectBuilder().setAstaID(elem.asta_id)
                                                                                       .setUserID(elem.user_id)
+                                                                                      .setTipo(tipo)
                                                                                       .setStato(elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3])
                                                                                       .setDataI(elem.astum.data_i)
                                                                                       .setDataF(elem.astum.data_f)

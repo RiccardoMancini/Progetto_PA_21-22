@@ -8,8 +8,8 @@ export class ObjectBuilder{
     private part_id: number;
     private chiavi_id: number;
     private p_min: number;
-    private credito: number;
-    private new_credito: number;
+    private credito: number | string;
+    private new_credito: number | string;
     private offerta: number;
     private rilanci_offerta: number;
     private addebito: number;
@@ -49,11 +49,11 @@ export class ObjectBuilder{
         return this.p_min;
     }
 
-    getCredito():number{
+    getCredito():number | string{
         return this.credito;
     }
 
-    getNewCredito():number{
+    getNewCredito():number | string{
         return this.new_credito;
     }
 
@@ -134,12 +134,12 @@ export class ObjectBuilder{
         return this;
     }
 
-    setCredito(credito: number){
+    setCredito(credito: number | string){
         this.credito = credito;
         return this;
     }
 
-    setNewCredito(new_credito: number){
+    setNewCredito(new_credito: number | string){
         this.new_credito = new_credito;
         return this;
     }

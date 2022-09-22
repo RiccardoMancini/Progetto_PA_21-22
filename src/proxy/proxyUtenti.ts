@@ -61,9 +61,9 @@ export class ProxyUtenti{
             val_credito = payload.addebito;
         }
 
-        console.log(val_user_id, val_credito);
+        console.log(val_user_id, Number(val_credito.toFixed(3)));
 
-        let userByID = await this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
+        let userByID = await this.modelUtenti.updateCreditoUtente(val_user_id, Number(val_credito.toFixed(3)));            
     
         return userByID;    
     }
