@@ -114,8 +114,6 @@ export class Controller {
                                                                               .setDataF(req.body.data_f)
                                                                               .setChiaviID(randKey)
                                                                               .build()));
-                                                            
-
             }
             else{
                 await new ProxyAsta().createAsta(JSON.stringify(astaObj.setTipo(req.body.tipo)

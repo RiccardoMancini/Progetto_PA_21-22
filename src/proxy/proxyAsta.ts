@@ -3,8 +3,26 @@ import { Asta, tipo_asta } from "../models/asta";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from '../controllers/builder/objectBuilder';
 import { Json } from 'sequelize/types/utils';
+import { time } from 'console';
 
-export function checkDate(date): Date | boolean{
+function checkTime(time: string): Array<string> | boolean{
+    const re = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
+    if(re.test(time) && time.includes(':')){
+        return time.split(':');
+    }
+    else{
+        return false;
+    }
+
+}
+
+function datesAreOnSameDay(first, second){
+    return (first.getFullYear() === second.getFullYear() &&
+    first.getMonth() === second.getMonth() &&
+    first.getDate() === second.getDate());
+}
+
+export function checkDate(date: string): Date | boolean{
     //const re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
     const re1 = /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/;
     const re2 = /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/;
@@ -89,14 +107,42 @@ const __Handler = {
             return obj[prop];
         }
 
-        if(prop ==='data_i'){            
-            const date_i = checkDate(obj[prop]);
-            const date_f = checkDate(obj['data_f']);
-            //get local time
+        if(prop ==='data_i'){
+            if (typeof obj[prop] === 'undefined' || typeof obj['data_f'] === 'undefined' || typeof obj[prop] !== 'string' || typeof obj['data_f'] !== 'string'){              
+                throw new ErrorFactory().getError(ErrEnum.BadRequest);
+            }
+            
+            const split_datetime_i = obj[prop].trim().split(/\s+/);
+            let date_i: any = split_datetime_i[0];
+            let time_i: string = split_datetime_i[1];
+            date_i = checkDate(date_i);
+            const split_datetime_f = obj['data_f'].trim().split(/\s+/);
+            let date_f: any = split_datetime_f[0];
+            let time_f: string = split_datetime_f[1];
+            
+            date_f = checkDate(date_f);
+            if(typeof time_i !== 'undefined'){
+                if(date_i !== false && checkTime(time_i)){             
+                    date_i.setHours(Number(checkTime(time_i)[0]), Number(checkTime(time_i)[1]), 0);
+                }
+                else{
+                    throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+                }
+            }
+            if(typeof time_f !== 'undefined'){
+                if(date_f !== false && checkTime(time_f)){               
+                    date_f.setHours(Number(checkTime(time_f)[0]), Number(checkTime(time_f)[1]), 0);
+                }
+                else{
+                    throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+                }       
+            }
+
+            //console.log(date_i, date_f, date_i>date_f);
             var d = new Date();
             var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
             var nd = new Date(utc + (3600000 * 2));
-            if (typeof obj[prop] === 'string' && typeof obj['data_f'] === 'string' && date_i && date_f){              
+            if (date_i && date_f){              
                 if((nd > date_i) || (date_i >= date_f)){                    
                     throw new ErrorFactory().getError(ErrEnum.InvalidDate);
                 }
@@ -109,7 +155,38 @@ const __Handler = {
             
         }
         if(prop === 'data_f'){
-            return checkDate(obj['data_f']);
+            const split_datetime_i = obj['data_i'].trim().split(/\s+/);
+            let date_i: any = split_datetime_i[0];
+            let time_i: string = split_datetime_i[1];
+            date_i = checkDate(date_i);
+            const split_datetime_f = obj[prop].trim().split(/\s+/);
+            let date_f: any = split_datetime_f[0];
+            let time_f: string = split_datetime_f[1];
+            
+            date_f = checkDate(date_f);
+            if(typeof time_i !== 'undefined'){
+                if(date_i !== false && checkTime(time_i)){             
+                    date_i.setHours(Number(checkTime(time_i)[0]), Number(checkTime(time_i)[1]), 0);
+                }
+                else{
+                    throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+                }
+            }
+            if(typeof time_f !== 'undefined'){
+                if(date_f !== false && checkTime(time_f)){               
+                    date_f.setHours(Number(checkTime(time_f)[0]), Number(checkTime(time_f)[1]), 0);
+                }
+                else{
+                    throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+                }       
+            }
+            if(obj['tipo'] === 1)
+            {
+                //console.log(datesAreOnSameDay(date_i, date_f))
+                if(!datesAreOnSameDay(date_i, date_f)) throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+            }
+
+            return date_f
         }    
 
         if(prop ==='p_min'){
@@ -172,7 +249,6 @@ export class ProxyAsta{
         this.proxyAstaValidator = new Proxy(astaJson, __Handler);
         let val_tipo: number = this.proxyAstaValidator.tipo;
         let val_p_min: number = this.proxyAstaValidator.p_min;
-        //console.log(val_tipo, val_p_min);
         let val_date_i = this.proxyAstaValidator.data_i;
         let val_date_f = this.proxyAstaValidator.data_f;
         //console.log(val_date_i, val_date_f)
@@ -199,7 +275,6 @@ export class ProxyAsta{
                                                                         .setDataF(val_date_f)
                                                                         .build()));
         }
-        
     }
 
     public checkAsta(asta: any){

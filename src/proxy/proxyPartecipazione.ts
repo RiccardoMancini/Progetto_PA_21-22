@@ -28,11 +28,13 @@ const __Handler = {
       return obj[prop];
     }
     if(prop ==='data_i'){
-      const date_i = checkDate(obj[prop]);
-      const date_f = checkDate(obj['data_f']);
+      if (typeof obj[prop] !== 'string' || typeof obj['data_f'] !== 'string'){              
+        throw new ErrorFactory().getError(ErrEnum.InvalidDate);
+      }
+      const date_i: any = checkDate(obj[prop]);
+      const date_f: any = checkDate(obj['data_f']);
       
-      if (typeof obj[prop] === 'string' && typeof obj['data_f'] === 'string' && date_i && date_f){
-        //console.log(date_i, date_f)             
+      if (date_i && date_f){        
         if(date_i >= date_f){                    
             throw new ErrorFactory().getError(ErrEnum.InvalidDate);
         }
@@ -77,9 +79,7 @@ export class ProxyPartecipazione{
       }
       else{
         return await this.modelPartecipazione.getClosedAsteByUserID(val_user_id);
-      }
-      //
-      
+      }      
   
     }
     
