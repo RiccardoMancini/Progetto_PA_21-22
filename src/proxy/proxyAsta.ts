@@ -3,7 +3,6 @@ import { Asta, tipo_asta } from "../models/asta";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from '../controllers/builder/objectBuilder';
 import { AstaInterface } from '../models/interface/astaInterface';
-import { Model } from 'sequelize';
 
 function checkTime(time: string): Array<string> | boolean{
     const re = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
@@ -203,7 +202,7 @@ const proxyAstaHandler = {
 
 
 export class ProxyAsta implements AstaInterface{
-    modelAsta: any;
+    modelAsta: Asta;
     proxyAstaValidator: any;
 
     constructor(){
@@ -251,10 +250,6 @@ export class ProxyAsta implements AstaInterface{
         let val_p_min: number = this.proxyAstaValidator.p_min;
         let val_date_i = this.proxyAstaValidator.data_i;
         let val_date_f = this.proxyAstaValidator.data_f;
-        //console.log(val_date_i, val_date_f)
-        //console.log(checkDate(asta.data_i));
-        /*let app = val_date_i.setTime(val_date_i.getTime() + 1000 * 60);
-        console.log(new Date(app).toISOString());*/
         if(val_tipo !== tipo_asta.ASTA_APERTA){
             return await this.modelAsta.createAsta(JSON.stringify(
                                                     new ObjectBuilder().setTipo(val_tipo)

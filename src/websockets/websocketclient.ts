@@ -29,6 +29,8 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
     case "2":
       token = process.env.TOKEN2;
       break;
+    case "3":
+    token = process.env.TOKEN3;
     default:
       break;
   }

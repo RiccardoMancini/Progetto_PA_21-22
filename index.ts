@@ -1,5 +1,6 @@
 import express from "express";
 import { Controller } from "./src/controllers/controller";
+import { ErrEnum, ErrorFactory } from "./src/factory/errorFactory";
 import { checkHeader, checkToken, checkAuthentication, isAdmin, isBidCreator, isBidParticipant} from "./src/middleware/middlewareAuth";
 import { errorLog, errorHandler } from "./src/middleware/middlewareErrors";
 import { createWSS } from "./src/websockets/websocketserver";
@@ -18,18 +19,15 @@ app.use(express.json());
  * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
  */
 
+
+
  app.post('/redirect/WSServer', (req: any, res: any) =>{
-  // dare un ritorno a questa funzione, cosi da poter checkare se è stato aperto o menoo
-  createWSS(req.body);  
+  createWSS(req.body);
+  // mettere stato 200, cosi nel controller può checkare questo!
   res.send({"server_active": true})
 
 });
 
-/**
- * il filtraggo delle aste avviene tramite query string. 
- * es1: localhost:8080/aste  <-- mostra tutte le aste
- * es2: localhost:8080/aste?stato=2  <-- mostra le aste filtrate con stato
- */
 app.get('/aste', controller.getListAste);
 
 app.get('/asta/:asta_id/close', controller.setAuctionWon);
@@ -46,15 +44,30 @@ app.patch('/admin/accredito', isAdmin, (req: any, res: any, next: any) => {
   controller.updateCredito(req, res, next);
 });
 
-app.use(isBidParticipant);
+app.get('/credito', isBidParticipant, (req: any, res: any, next: any) => {
+   controller.getMyCredito(req, res, next);
+});
 
-app.get('/credito', controller.getMyCredito);
+app.post('/asta/offerta', isBidParticipant, (req: any, res: any, next: any) => { 
+  controller.newOfferta(req, res, next);
+});
 
-app.post('/asta/offerta', controller.newOfferta);
+app.get('/storico/aste/closed', isBidParticipant, (req: any, res: any, next: any) => {
+  controller.getMyClosedAste(req, res, next);
+});
+app.get('/storico/aste', isBidParticipant, (req: any, res: any, next: any) => {
+  controller.getMyAste(req, res, next);
+});
 
-app.get('/storico/aste/closed', controller.getMyClosedAste);
-
-app.get('/storico/aste', controller.getMyAste);
+// Rotte non gestite
+app.all('*', function (req, res, next) {
+  try{
+    throw new ErrorFactory().getError(ErrEnum.BadRequest)
+  }
+  catch(err){
+    next(err);
+  }
+})
 
 app.use([errorLog, errorHandler])
 

@@ -1,10 +1,11 @@
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import { Utenti } from './utenti'
 import { Asta } from './asta';
+import { PartecipazioneInterface } from './interface/partecipazioneInterface';
 
 
-export class Partecipazione{
-    partecipazione: any;
+export class Partecipazione implements PartecipazioneInterface{
+    part: any;
     utenti: any;
     asta: any;
 
@@ -13,7 +14,7 @@ export class Partecipazione{
         this.utenti = new Utenti(sequelize);
         this.asta = new Asta(sequelize);
 
-        this.partecipazione = sequelize.define("partecipazione", {
+        this.part = sequelize.define("partecipazione", {
             part_id: {
               type: DataTypes.INTEGER,
               autoIncrement: true,
@@ -29,26 +30,17 @@ export class Partecipazione{
           });
 
         // Associazioni tra le entità
-        this.utenti.getModelUtenti().hasMany(this.partecipazione, { foreignKey: 'user_id'});
-        this.partecipazione.belongsTo(this.utenti.getModelUtenti(), { foreignKey: 'user_id'});
-        this.asta.getModelAsta().hasMany(this.partecipazione, { foreignKey: 'asta_id'});
-        this.partecipazione.belongsTo(this.asta.getModelAsta(), { foreignKey: 'asta_id'});
+        this.utenti.getModelUtenti().hasMany(this.part, { foreignKey: 'user_id'});
+        this.part.belongsTo(this.utenti.getModelUtenti(), { foreignKey: 'user_id'});
+        this.asta.getModelAsta().hasMany(this.part, { foreignKey: 'asta_id'});
+        this.part.belongsTo(this.asta.getModelAsta(), { foreignKey: 'asta_id'});
 
 
     }
 
-    public async getPartecipazioni(): Promise<Object>{        
-      let partecipazioni = await this.partecipazione.findAll({
-          include: [this.asta.getModelAsta(), this.utenti.getModelUtenti()],
-          
-      });
-
-      return partecipazioni;
-    }
-
-    public async getClosedAsteByUserID(user_id: number, date_i?: string | Date, date_f?: string | Date){
+    public async getClosedAsteByUserID(user_id: number, date_i?: string | Date, date_f?: string | Date): Promise<Array<any>>{
       if(typeof date_i !== 'undefined' && typeof date_f !== 'undefined'){
-        return await this.partecipazione.findAll({
+        return await this.part.findAll({
           include: [{
           model: this.utenti.getModelUtenti(),
           where: {
@@ -64,7 +56,7 @@ export class Partecipazione{
         });
       }
       else{
-        return await this.partecipazione.findAll({
+        return await this.part.findAll({
           include: [{
           model: this.utenti.getModelUtenti(),
           where: {
@@ -79,8 +71,8 @@ export class Partecipazione{
       }
     }
   
-    public async getAsteByUserID(user_id: number){
-      let partecipazioni = await this.partecipazione.findAll({
+    public async getAsteByUserID(user_id: number): Promise<Array<any>>{
+      return await this.part.findAll({
         include: {
         model: this.asta.getModelAsta(),
         where: {
@@ -90,12 +82,11 @@ export class Partecipazione{
           user_id: user_id
         }
         
-    });
-    return partecipazioni
+      });
     }
 
-    public async getFirstOfferByAstaID(asta_id: number){
-      return await this.partecipazione.findOne({
+    public async getFirstOfferByAstaID(asta_id: number): Promise<any|null>{
+      return await this.part.findOne({
           where: { 
             asta_id: asta_id
           },
@@ -103,8 +94,8 @@ export class Partecipazione{
         })
     }
 
-    public async getOffersByAstaID(asta_id: number){
-      return await this.partecipazione.findAll({
+    public async getOffersByAstaID(asta_id: number): Promise<any>{
+      return await this.part.findAll({
           limit: 2,
           where: { 
             asta_id: asta_id
@@ -113,32 +104,31 @@ export class Partecipazione{
         })
     }
 
-    public async updatePartecipazione(part: any){
+    public async updatePartecipazione(part: any): Promise<any>{
       return await part.save();
 
     }
 
-    public async setOffer(part: any){
-      return await this.partecipazione.create(part);
+    public async setOffer(part: string): Promise<any>{
+      let partJson = JSON.parse(part);
+      return await this.part.create(partJson);
       
     }
 
-    public async deleteOffer(part_id: number){
-      return await this.partecipazione.destroy({
+    public async deleteOffer(part_id: number): Promise<any>{
+      return await this.part.destroy({
         where: { part_id: part_id },
       });
     }
 
-    public async getOffersByUserAstaID(user_id: number, asta_id:number){
-      return await this.partecipazione.findAll({
+    public async getOffersByUserAstaID(user_id: number, asta_id:number): Promise<Array<any>>{
+      return await this.part.findAll({
         where: {user_id: user_id, asta_id: asta_id}
-      })
-      
+      })      
     }
-
     
-    public getModelPartecipazione(){
-        return this.partecipazione;
+    public getModelpart(): any{
+        return this.part;
     }
 
 }

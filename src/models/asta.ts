@@ -37,6 +37,7 @@ export class Asta implements AstaInterface{
             timestamps: false
           });
         
+        // Associazioni tra le entità
         this.chiavi.getModelChiavi().hasMany(this.asta, { foreignKey: 'chiavi_id'});
         this.asta.belongsTo(this.chiavi.getModelChiavi(), { foreignKey: 'chiavi_id'});
     }
@@ -64,7 +65,7 @@ export class Asta implements AstaInterface{
     }
 
 
-    public getModelAsta(): Object{
+    public getModelAsta(): any{
         return this.asta;
     }
 

@@ -4,8 +4,7 @@ import { Chiavi} from '../models/chiavi';
 
 export class ProxyChiavi{
 
-    modelChiavi: any;
-    proxyChiaviValidator: any
+    modelChiavi: Chiavi;
 
     constructor(){
 
@@ -13,7 +12,7 @@ export class ProxyChiavi{
 
     }
 
-    public async getChiavi(){
+    public async getChiavi(): Promise<Array<any>>{
         return await this.modelChiavi.getChiavi();
         
     }

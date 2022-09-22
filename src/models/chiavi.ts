@@ -20,12 +20,12 @@ export class Chiavi{
     }
 
 
-    public async getChiavi(){
+    public async getChiavi(): Promise<Array<any>>{
       return await this.chiavi.findAll();
     }
 
     
-    public getModelChiavi(){
+    public getModelChiavi(): any{
       return this.chiavi;
     }
 

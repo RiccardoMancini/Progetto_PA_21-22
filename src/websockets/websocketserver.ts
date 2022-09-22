@@ -10,7 +10,8 @@ export function createWSS(asta: any){
   let base_asta = asta.p_min;
   console.log(`Stanza dedicata all'asta con ${asta.asta_id}, in ascolto sulla porta: ${process.env.WSSPORT}. Si parte da una base d'asta di ${base_asta}!`);
 
-  let n_client = +process.env.N_CLIENTS;
+  const n_client = +process.env.N_CLIENTS;
+  console.log(n_client)
   let ws_userID = [];
   let semaphore = true;
   let bestOffer = base_asta;
@@ -30,7 +31,7 @@ export function createWSS(asta: any){
     let app = req.url.split('?');
     app = app[1].split('&');
     ws_userID.push({"ws_id": req.headers['sec-websocket-key'], "user_id": Number(app[0].split('=')[1]), "offerte": [], "tok_id": Number(app[1].split('=')[1]), "ws": ws});
-    console.log(ws_userID)
+    //console.log(ws_userID)
     let count = wss.clients.size;
     if (count <= n_client){
       sendToAll(count);    
@@ -115,6 +116,8 @@ export function createWSS(asta: any){
           case 2:
             token = process.env.TOKEN2;
             break;
+          case 3:
+            token = process.env.TOKEN3;
           default:
             break;
         }
@@ -127,7 +130,6 @@ export function createWSS(asta: any){
               }, { headers: { Authorization: `Bearer ${token}` }});
 
         });
-        /**/
       }
       console.log(code)
 

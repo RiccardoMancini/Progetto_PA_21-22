@@ -39,7 +39,7 @@ CREATE TABLE Partecipazione (
 );
 
 INSERT INTO Utenti (username, nome, cognome, ruolo, credito) VALUES
-('richymanci', 'Riccardo', 'Mancini', 3, 999), 
+('richymanci', 'Riccardo', 'Mancini', 3, 360), 
 ('marti_pa', 'Martina', 'Paoletti', 3, 500),
 ('arme_peliv', 'Arment', 'Pelivani', 2, 999),
 ('admin', 'AD', 'MIN', 1, 999),

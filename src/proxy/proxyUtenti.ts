@@ -5,7 +5,7 @@ import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 const checkBodyHandler = {
     get: (obj, prop) => {                
         if(prop === 'credito'){
-            if (Number.isNaN(obj[prop])) {
+            if (isNaN(obj[prop])) {
                 throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
               }
             if (obj[prop] < 1) {
@@ -29,7 +29,7 @@ const checkBodyHandler = {
 
 
 export class ProxyUtenti{
-    modelUtenti: any;
+    modelUtenti: Utenti;
     proxyUtenteValidator: any;
 
     constructor(){
@@ -38,21 +38,23 @@ export class ProxyUtenti{
 
     }
 
-    public async getUserByID(user_id: number){
+    public async getUserByID(user_id: number): Promise<any|null>{
         return await this.modelUtenti.getUserByID(user_id);
     }
 
-    public async getCreditoByUserID(user_id: number){
+    public async getCreditoByUserID(user_id: number): Promise<any|null>{
         await this.checkUserExists(user_id);
         return await this.getUserByID(user_id).then(value => value.credito);            
     }
 
-    public async updateCreditoUtente(payload: any, afterOffer: boolean = false){
+    public async updateCreditoUtente(payload: any, afterOffer: boolean = false): Promise<any>{
         let val_credito: number;
         let val_user_id: number;
         if( afterOffer === false){
             this.proxyUtenteValidator = new Proxy(payload, checkBodyHandler);
+            
             val_credito = this.proxyUtenteValidator.credito;
+            console.log(val_credito)
             val_user_id = this.proxyUtenteValidator.user_id;
             await this.checkUserExists(val_user_id);
         }

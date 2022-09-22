@@ -1,12 +1,8 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
+import { UtentiInterface } from './interface/utentiInterface';
 
-export class Utenti{
-    /*user_id: number;
-    username: string;
-    nome: string;
-    cognome: string;
-    ruolo: string;
-    credito: string;*/
+export class Utenti implements UtentiInterface{
+
     utenti: any;
 
     constructor(sequelize: Sequelize)
@@ -30,15 +26,11 @@ export class Utenti{
 
     }
 
-    public async getUtenti(){
-        return await this.utenti.findAll();
-    }
-
-    public async getUserByID(user_id: number){
+    public async getUserByID(user_id: number): Promise<any|null>{
       return await this.utenti.findByPk(user_id);
     }
 
-    public async getCreditoByUserID(user_id: number){
+    public async getCreditoByUserID(user_id: number): Promise<any|null>{
       return await this.utenti.findOne({
         attributes: ['credito'],
         where: {
@@ -48,14 +40,14 @@ export class Utenti{
     }
 
     
-    public async updateCreditoUtente(user_id: number, credito: number){
+    public async updateCreditoUtente(user_id: number, credito: number): Promise<any>{
       let userByID = await this.getUserByID(user_id);
       userByID.credito = userByID.credito + credito;
       await userByID.save();
       return userByID;
     }
 
-    public getModelUtenti(){
+    public getModelUtenti(): any{
         return this.utenti;
     }
 

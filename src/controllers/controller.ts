@@ -8,6 +8,7 @@ import { ObjectBuilder } from './builder/objectBuilder';
 import { ObjectConstr } from './builder/object';
 import crypto from 'crypto';
 import axios from 'axios';
+import { Utenti } from '../models/utenti';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -31,6 +32,7 @@ export class Controller {
 
     private static readonly headerPrivateKey: string = '-----BEGIN PRIVATE KEY-----\n';
     private static readonly footerPrivateKey: string = '\n-----END PRIVATE KEY-----';
+    private proxyUtenti: Utenti;
 
     constructor(){}
 
@@ -261,7 +263,7 @@ export class Controller {
             }
             else{
                 let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
-                if(part !== false && part.length > 1){
+                if(part !== null && part.length > 1){
                     let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
                     
                     part = await Promise.all(part.map(async (elem, index) => {
@@ -423,14 +425,15 @@ export class Controller {
             .filter((elem) => {
                 let obj = {"asta_id": elem.asta_id};
                 let exists = app.find(value => value.asta_id === obj.asta_id);
-                if (typeof exists==='undefined'){
+                if (typeof exists === 'undefined'){
                     app.push(obj);
                     rilanci.push({"asta_id": elem.asta_id, "offerta": [elem.offerta]});
                     return true;
                 }
                 else{
                     let obj2 = rilanci.find(value => value.asta_id === exists.asta_id);
-                    obj2.offerta.push(elem.offerta);                
+                    obj2.offerta.push(elem.offerta);
+                    obj2.offerta.sort((a, b) => { return b - a })                
                     return false;
                 }
             });
@@ -458,7 +461,7 @@ export class Controller {
                                                                                       .setDataF(elem.astum.data_f)
                                                                                       .setRilanci_Offerta(rilanci[index].offerta)
                                                                                       .build();
-                                                        });          
+                                                    });          
             res.status(200).send(response);
         }
         catch(err){

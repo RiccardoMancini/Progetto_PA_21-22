@@ -21,15 +21,6 @@ class InvalidHeaderFormat extends HttpError{
     }
 }
 
-
-
-class AstaNotCreate extends HttpError{
-    constructor(){
-        super('Creazione asta non riuscita', ErrEnum.BadRequest);
-    }
-    
-}
-
 class UserNotFound extends HttpError{
     constructor(){
         super('Utente non trovato!', ErrEnum.NotFound);
