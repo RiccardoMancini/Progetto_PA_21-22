@@ -5,10 +5,8 @@ import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from './builder/objectBuilder';
-import { ObjectConstr } from './builder/object';
 import crypto from 'crypto';
 import axios from 'axios';
-import { Utenti } from '../models/utenti';
 
 function getRandomKey(rawKeys: any){    
     const arrKey = rawKeys.map(elem => elem.chiavi_id)
@@ -32,9 +30,10 @@ export class Controller {
 
     private static readonly headerPrivateKey: string = '-----BEGIN PRIVATE KEY-----\n';
     private static readonly footerPrivateKey: string = '\n-----END PRIVATE KEY-----';
-    private proxyUtenti: Utenti;
+    
 
-    constructor(){}
+    constructor(){
+    }
 
     public async getListAste(req: any, res:any, next: any){
         try{
