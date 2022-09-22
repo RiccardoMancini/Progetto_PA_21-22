@@ -32,8 +32,7 @@ export class Controller {
     private static readonly footerPrivateKey: string = '\n-----END PRIVATE KEY-----';
     
 
-    constructor(){
-    }
+    constructor(){}
 
     public async getListAste(req: any, res:any, next: any){
         try{
