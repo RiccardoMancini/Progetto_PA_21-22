@@ -2,8 +2,8 @@ import { DB_Connection } from '../config/db_connection'
 import { Asta, tipo_asta } from "../models/asta";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from '../controllers/builder/objectBuilder';
-import { Json } from 'sequelize/types/utils';
-import { time } from 'console';
+import { AstaInterface } from '../models/interface/astaInterface';
+import { Model } from 'sequelize';
 
 function checkTime(time: string): Array<string> | boolean{
     const re = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
@@ -82,7 +82,7 @@ export function checkDate(date: string): Date | boolean{
 
 }
 
-const __Handler = {
+const proxyAstaHandler = {
     get: (obj, prop) => { 
         if(prop === 'asta_id'){
             if(!Number.isInteger(obj[prop])){
@@ -202,7 +202,7 @@ const __Handler = {
 }
 
 
-export class ProxyAsta{
+export class ProxyAsta implements AstaInterface{
     modelAsta: any;
     proxyAstaValidator: any;
 
@@ -212,8 +212,8 @@ export class ProxyAsta{
 
     }
 
-    public async getNotOpenAstaByID(asta_id: number){
-        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
+    public async getNotOpenAstaByID(asta_id: number): Promise<any|null>{
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler)
         const val_asta_id = this.proxyAstaValidator.asta_id;
         const asta =  await this.modelAsta.getNotOpenAstaByID(val_asta_id);
         if(this.checkAsta(asta)){
@@ -224,8 +224,8 @@ export class ProxyAsta{
         }
     }
 
-    public async getOpenAstaByID(asta_id: number){
-        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, __Handler)
+    public async getOpenAstaByID(asta_id: number): Promise<any|null>{
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler)
         const val_asta_id = this.proxyAstaValidator.asta_id;
         const asta =  await this.modelAsta.getOpenAstaByID(val_asta_id);
         if(this.checkAsta(asta)){
@@ -236,17 +236,17 @@ export class ProxyAsta{
         }
     }
 
-    public async getAste(){
+    public async getAste(): Promise<Array<any>>{
         return this.modelAsta.getAste();
     }
 
-    public async updateAsta(asta: any){
+    public async updateAsta(asta: any): Promise<any>{
         return await this.modelAsta.updateAsta(asta);
     }
 
-    public async createAsta(asta: string){
+    public async createAsta(asta: string): Promise<any>{
         let astaJson = JSON.parse(asta);
-        this.proxyAstaValidator = new Proxy(astaJson, __Handler);
+        this.proxyAstaValidator = new Proxy(astaJson, proxyAstaHandler);
         let val_tipo: number = this.proxyAstaValidator.tipo;
         let val_p_min: number = this.proxyAstaValidator.p_min;
         let val_date_i = this.proxyAstaValidator.data_i;
@@ -277,7 +277,7 @@ export class ProxyAsta{
         }
     }
 
-    public checkAsta(asta: any){
+    public checkAsta(asta: any): boolean{
         return asta !== null? true : false;
     }
 
