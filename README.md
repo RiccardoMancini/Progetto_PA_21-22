@@ -32,15 +32,20 @@ Il sistema deve prevedere la possibilità di:
 •	Docker
 •	Postman
 ## Tipologie di richieste  possibili al sistema 
-Tipologia | Rotta | Utente | Token JWT |
---------- |-------|--------|-----------|
-    Get   |/aste|-|-| 
-    Get   |/asta/new|bid_creator|si|
-    Get   |/asta/asta_id/closed|||
-    Get   |/storico/aste/chiuse|bid_partecipant|si|
-    Get   |/storico/aste|bid_partecipant|si|
-    Get   |/credito|bid_partecipant|si|
-    Patch  |/admin/credito|admin|si|
+Tipologia | Rotta | Utente | Token JWT 
+--- | --- | --- | --- 
+    Get   | /aste | - | - 
+    Get   |/asta/new|bid_creator|si
+    Get   |/asta/asta_id/closed|--|--
+    Get   |/storico/aste/chiuse|bid_partecipant|si
+    Get   |/storico/aste|bid_partecipant|si
+    Get   |/credito|bid_partecipant|si
+    Patch  |/admin/credito|admin|si
+    
+Tipologia | Rotta | Utente | Token JWT
+--- | --- | --- | --- 
+Get | /aste | - | -
+Get | /aste | - | -
 
 ## Descrizione delle singole rotte
 #### /aste
