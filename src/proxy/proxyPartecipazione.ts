@@ -132,8 +132,6 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
                                                           .setAggiudicata(false)
                                                           .setOfferta(val_offerta)
                                                           .build()));
-          //{"user_id": user_id, "asta_id": payload.asta_id, "aggiudicata": false, "offerta": val_offerta}
-
       }
       else{
         throw new ErrorFactory().getError(ErrEnum.TooLowOfferOrCredit);

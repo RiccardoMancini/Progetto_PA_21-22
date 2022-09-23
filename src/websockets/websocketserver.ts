@@ -129,7 +129,7 @@ export function createWSS(asta: any): void{
 
         // Registrazione nel db dei rilanci effettuati dal concorrente che è appena uscito
         exit_client.offerte.sort((a, b) => a - b).map(async (value) => {
-          await axios.post('http://localhost:8080/asta/offerta', {"asta_id": asta.asta_id,"offerta": value},
+          await axios.post('http://localhost:8080/api/v1.0.0/asta/offerta', {"asta_id": asta.asta_id,"offerta": value},
           { headers: { Authorization: `Bearer ${token}` }}).catch(err => console.log(err.stack));
         });
       }
@@ -144,7 +144,7 @@ export function createWSS(asta: any): void{
 
         // Registrazione nel db dei rilanci effettuati dal concorrente vincitore
         winner_client.offerte.sort((a, b) => a - b).map(async (value) => {
-          await axios.post('http://localhost:8080/asta/offerta', {"asta_id": asta.asta_id, "offerta": value},
+          await axios.post('http://localhost:8080/api/v1.0.0/asta/offerta', {"asta_id": asta.asta_id, "offerta": value},
           { headers: { Authorization: `Bearer ${token}` }}).catch(err => console.log(err.stack));
         });
 

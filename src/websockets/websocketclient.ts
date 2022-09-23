@@ -25,7 +25,7 @@ import { tokenToReturn } from './websocketserver'
 
   let token: string = tokenToReturn(Number(process.argv[2]));
   
-  let credito = await axios.get('http://localhost:8080/credito',{ headers: { Authorization: `Bearer ${token}` }})
+  let credito = await axios.get('http://localhost:8080/api/v1.0.0/credito',{ headers: { Authorization: `Bearer ${token}` }})
                            .then(value => value.data.credito).catch(err => console.log(err.stack));
   console.log(credito);
   const decoded = jwt.verify(token, process.env.SECRET_KEY);

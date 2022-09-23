@@ -14,9 +14,7 @@ export class Utenti implements UtentiInterface{
               autoIncrement: true,
               primaryKey: true
             },
-            username: { type: DataTypes.STRING },
             nome: { type: DataTypes.STRING },
-            cognome: { type: DataTypes.STRING },
             ruolo: { type: DataTypes.SMALLINT },
             credito: { type: DataTypes.FLOAT }
           }, {

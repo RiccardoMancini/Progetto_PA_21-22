@@ -2,7 +2,7 @@
     "name": "Progetto_PA_21/22",
     "version": "1.0.0",
     "description": "Esame PA",
-    "author": "First Last <first.last@example.com>",
+    "author": "Riccardo & Arment",
     "main": "index.js",
     "scripts": {
         "dev": "nodemon -L index.ts",

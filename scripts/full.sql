@@ -3,9 +3,7 @@ CREATE DATABASE pa;
 
 CREATE TABLE Utenti(
     user_id SERIAL PRIMARY KEY,
-    username VARCHAR(30) NOT NULL,
     nome VARCHAR(30) NOT NULL,
-    cognome VARCHAR(30) NOT NULL,
     ruolo int NOT NULL,
     credito float8 NOT NULL
 );
@@ -38,13 +36,13 @@ CREATE TABLE Partecipazione (
     CONSTRAINT FK_Asta FOREIGN KEY (asta_id) REFERENCES Asta(asta_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO Utenti (username, nome, cognome, ruolo, credito) VALUES
-('richymanci', 'Riccardo', 'Mancini', 3, 360), 
-('marti_pa', 'Martina', 'Paoletti', 3, 500),
-('arme_peliv', 'Arment', 'Pelivani', 2, 999),
-('admin', 'AD', 'MIN', 1, 999),
-('pippo', 'Pippo', 'Pallino', 3, 360),
-('prova', 'Pippo', 'Pallino', 3, 560);
+INSERT INTO Utenti (nome, ruolo, credito) VALUES
+('Riccardo', 3, 360), 
+('Martina', 3, 500),
+('Arment', 2, 999),
+('admin', 1, 999),
+('Pippo', 3, 360),
+('Pluto', 3, 560);
 
 INSERT INTO Chiavi (public_key, private_key) VALUES
 ('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjf2ba7J5z/7Lytk+N9GZcmVj/AbMxR/UO7VF+2v42QtlgUZKsrXzcv9a3QeWOnCBbMOxYyHs0WB9vFzjwC2tIRc7Ms5Bj8+DB5d2t7TOZStpuhti1UgP7JVUmf+YRqRTKRG6L/cB1tJzyPY3t3biL8J9rTmsWOgS0Zl1FAC661wIDAQAB', 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKN/ZtrsnnP/svK2T430ZlyZWP8BszFH9Q7tUX7a/jZC2WBRkqytfNy/1rdB5Y6cIFsw7FjIezRYH28XOPALa0hFzsyzkGPz4MHl3a3tM5lK2m6G2LVSA/slVSZ/5hGpFMpEbov9wHW0nPI9je3duIvwn2tOaxY6BLRmXUUALrrXAgMBAAECgYEAltRSY8aECwkp4aT0UUXVJLnHE0FTOTRjy4h9dSS7/fy/oo6+XBSUKuXDRD5DcsNvShEhCGqy1kAxh3+J5FD0fzbQPd7nd5GPwUAxPOpvd89BzvdpkF9uSk3Gk8WtCb9egBJm68iZaiybThPpXscuHRMr63BaPga/T/YjcRGhLMkCQQDZhRMwYxX6fRwdRm10OF70CO3FJRpRkxqDEIE3QZZIOEYkb6hg4vVnZjFTECs9XRIaLd0BMDK5ijutKeBeaETzAkEAwGvMmH2qNZHSufNsTqMRurgfLDD7tms0ZWAkBM1Age0ApIhgDk4KakNhq1bh6T8gWoGikwD2UsFZry5F4eB7jQJAVi97Fe38tF5D+HmCPs1jGhA7naSA1BeUJqAwgqNTF1Rsvl0beyASGiEMpBvA9jRdStAnRCRDxO43jPoNs3pe7wJBALDUoDHnEjumpfQzKu5dV5azTBptbXTnskATiSZMhaKg7f1GQpgCyfl7sM8nyfZzB8WE6qWTtcq5WzTtHlWE2aUCQHUemtAEgRP7wbRgJa0r6+qWcjRoRppfcCp31gWgSKPi1XGtQyxNw5zd2aEqrivfiKddj8mEBDhKOS5f+x8JGNQ='),

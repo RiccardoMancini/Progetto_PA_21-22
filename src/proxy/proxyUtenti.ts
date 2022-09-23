@@ -1,6 +1,7 @@
 import { DB_Connection } from '../config/db_connection';
 import { Utenti } from "../models/utenti";
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
+import { UtentiInterface } from '../models/interface/utentiInterface';
 
 const checkBodyHandler = {
     get: (obj, prop) => {                
@@ -28,7 +29,7 @@ const checkBodyHandler = {
 }
 
 
-export class ProxyUtenti{
+export class ProxyUtenti implements UtentiInterface{
     modelUtenti: Utenti;
     proxyUtenteValidator: any;
 
