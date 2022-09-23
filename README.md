@@ -1,7 +1,10 @@
 # Sviluppo di un back-end per la gestione di varie tipologie di aste
 
 ## Obiettivi
-Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperte, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto.
+Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperta, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto. Gli utenti che potranno utilizzare il back-end e, che di conseguenza potranno interagire con le aste prima elencate, saranno: 
+- Bid participant, ossia utenti che possono partecipare, effettuando offerte a tutte le tipologie di asta, e che potranno direttamente interagire con il loro "credito" e lo storico delle loro partecipazioni e offerte;
+- Bid creator, ossia gli utenti che si occupano di fatto di creare nuove aste;
+- Admin, ossia è l'utente che in questo contesto si occupa solamente di ricaricare gli altri utenti;
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
 -	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di uno coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
@@ -17,16 +20,17 @@ Il sistema deve prevedere la possibilità di:
 -	consentire ad un utente admin di ricaricare il credito un dato utente
 -	Visualizzare lo storico delle aste alle quali si è partecipato distinguendo per quelle che sono state aggiudicate e non.
 ## Strumenti, framework e librerie utilizzate
--	Node.JS
--	Express
--	Sequelize
--	Postgres
--	Websocket con RxJS
--	Libreria crypto
-- Axios
--	Visual studio code
--	Docker
--	Postman
+-	[Node.JS](https://nodejs.org/en/docs/)
+-	[Express](https://expressjs.com/it/4x/api.html)
+-	[Sequelize](https://sequelize.org/api/v6/identifiers)
+-	[PostgreSQL](https://www.postgresql.org/docs/)
+-	[Websocket con RxJS](https://rxjs.dev/api/webSocket/webSocket)
+-	[Libreria crypto](https://nodejs.org/api/crypto.html)
+- [Axios](https://axios-http.com/docs/intro)
+-	[Visual Studio Code](https://code.visualstudio.com/)
+-	[Docker](https://www.docker.com/)
+-	[Postman](https://www.postman.com/)
+
 ## Tipologie di richieste  possibili al sistema 
 
 Tipologia | Rotta | Utente | Token JWT
@@ -109,22 +113,12 @@ In questo progetto  si sono sviluppati 4 Proxy specifici.
 -	ProxyPartecipazione 
 
 ##### ProxyAsta
-Il proxy asta viene utilizzato per effettuare la validazione dei parametri che vengono passati mediante le richieste, per poterle poi inoltrare al modello asta. Tra le operazioni che vengono richieste a quest'ultimo modello, la creazione di una nuova asta è di sicuro la mia complessa da validare.
-Nello specifico, oltre a verificare la correttezza dei tipi di dati passati, verifica anche la loro coerenza con gli altri parametri che devono essere analizzati, come ad esempio, la relazione che intercorre tra la data di inizio asta con la data di fine asta, e come queste due vadano verificate in modo differente a seconda del tipo di asta.
-Le operazioni che esegue il proxy aste sono le seguenti:
--	Verifica la seguente relazione tra, la data di inizio asta, fine asta e data corrente per le aste inglesi dataCorrente ≤ dataIniziale < data finale. Se questo non è verificato viene lanciato un throw error
-
--	Per le altre tipologie di aste invece viene verificato che i parametri delle data rispettino la relazione dataCorrente ≤ dataIniziale ≤ data finale
-
--	Inoltre viene verificato che le date siano dei number di tipo intero e che la base d’asta sia un intero positivo.
-Esempio parametri inseriti correttamente
+Il proxy asta viene utilizzato per effettuare la validazione dei parametri che vengono passati mediante le richieste, per poterle poi inoltrare al modello asta. Tra le operazioni che vengono richieste a quest'ultimo modello, la creazione di una nuova asta è di sicuro la più complessa da validare.
+Nello specifico, oltre a verificare la correttezza dei vari dati passati, verifica anche la loro coerenza con gli altri parametri che devono essere analizzati, come ad esempio, la relazione che intercorre tra la data di inizio asta con la data di fine asta, e come queste due vadano verificate in modo differente a seconda del tipo di asta.
 
 ##### ProxyUtente
-Il proxyUtente, analogamente a quello asta,  viene utilizzato per effettuare la validazione dei parametri inseriti mediante body nella fase di creazione del bid-paricipant.
-Le operazioni che esegue il proxyUtente sono le seguenti:
--	Verifica che il credito del bid participant sia maggiore uguale di 1 e che sia di tipo numerico
--	Verifica che lo user_id sia di tipo numerico intero e che  sia maggiore uguale di 1
-Esempio parametri inseriti correttamente
+Il proxyUtente, analogamente a quello asta, andrà a validare i dati che vengono passati mediante le richieste, per poi passarle al modello utente.
+Le principali operazioni di validazioni sono fondamentalmente quelle sul check del credito passato dall'admin per ricaricare un altro utente e sull'effettiva esistenza di quest'ultimo.
 
 ##### ProxyPartecipazione
 
@@ -157,5 +151,5 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 - allegare la collection di postman con la demo
 
 ## Autori
-- Riccardo Mancini
-- Arment Pelivani
+- [Riccardo Mancini](https://github.com/RiccardoMancini)
+- [Arment Pelivani](https://github.com/armentpelivani)
