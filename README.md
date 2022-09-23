@@ -94,7 +94,7 @@ Il model, che, consente attraverso i suoi metodi specifici di accedere ai dati a
 -	Chiavi : modello che permette la decriptazione delle offerte delle aste in busta chiusa e ciascuna, è identificata da un parametro univoco
 -	Asta: modello che va a definire quello che sono le variabili di stato che definisce ogni tipo di asta in maniera univoca(asta_id, tipo di asta, prezzo minimo di acquisto, data di inizio, data di fine, identificazione delle chiavi)  
 
-Per quanto riguarda il modulo View, questo viene rappresentato dal framework Postman [Link ].
+Per quanto riguarda il modulo View, questo viene rappresentato dalla piattaforma [Postman](https://www.postman.com/).
 
 Il controller invece, permette, attraverso il View, di riceve le istruzioni da parte dell’utente e individuare le risorse nel model necessarie per completare la richiesta.
 
@@ -117,12 +117,15 @@ Il proxy asta viene utilizzato per effettuare la validazione dei parametri che v
 Nello specifico, oltre a verificare la correttezza dei vari dati passati, verifica anche la loro coerenza con gli altri parametri che devono essere analizzati, come ad esempio, la relazione che intercorre tra la data di inizio asta con la data di fine asta, e come queste due vadano verificate in modo differente a seconda del tipo di asta.
 
 ##### ProxyUtente
-Il proxyUtente, analogamente a quello asta, andrà a validare i dati che vengono passati mediante le richieste, per poi passarle al modello utente.
+Il proxy utente, analogamente a quello asta, andrà a validare i dati che vengono passati mediante le richieste, per poi passarle al modello utente.
 Le principali operazioni di validazioni sono fondamentalmente quelle sul check del credito passato dall'admin per ricaricare un altro utente e sull'effettiva esistenza di quest'ultimo.
 
 ##### ProxyPartecipazione
+Il proxy partecipazione va a validare le richieste che gli arrivano e le inoltre direttamente al modello partecipazione.
+Anch'esso si preoccuperà di verificare la correttezza dei parametri passati come le date e le nuove offerte effettuate da parte dei bid participant.
 
 ##### ProxyChiavi
+Il proxy chiavi, non ha alcun compito di validazione, in quanto nel presente contesto le chiavi pubbliche e private sono già presenti all'interno del database. Per questo motivo si occuperà solamente di richiedere l'elenco delle chiavi al suo omonimo modello per poi poterle restituire al controllor qualora venissero richieste.
 
 #### Chain of responsibility
 Il Chain of responsability è un pattern comportamentale che permette di passare le richieste lungo una catena di handler (middleware), ognuno dei quali decide se processarla e passarla all'handler successivo (tramite next()), oppure sollevare un errore.
