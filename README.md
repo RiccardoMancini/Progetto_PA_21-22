@@ -6,9 +6,9 @@ Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-e
 ## Specifiche di progetto
 - Le aste in busta aperta vengono implementate mediante websocket. I concorrenti sono in una stanza associati all'asta e si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superatada un altro compratore 
 -	Per le aste in busta chiusa si prevede un meccanismo di protezione basato sulla generazione di almeno 5 coppie di chiavi pubbliche / private da usare nel seeding del DB. La cifratura avviene mediante la chiave pubblica.
--	Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta
--	Un utente può fare solo una puntata per l’asta specifica
--	(capire come scrivere la questione crypto)
+Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta
+Un utente può fare solo una puntata per l’asta specifica
+- (capire come scrivere la questione crypto)
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
 -	Creare una nuova tipologia di asta 
