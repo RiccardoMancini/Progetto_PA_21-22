@@ -19,14 +19,16 @@ app.use(express.json());
  * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
  */
 
-
 // Rotta che simula la chiamata di un servizio esterno che fornisce un WSS in ascolto
 // per una determinata asta
- app.post('/redirect/WSServer', (req: any, res: any) =>{
-  createWSS(req.body);
-  // mettere stato 200, cosi nel controller può checkare questo!
-  res.send({"server_active": true})
-
+app.post('/redirect/WSServer', (req: any, res: any, next: any) =>{
+  try{
+    createWSS(req.body);
+    res.status(200).json({"server_activated": true})
+  }
+  catch(err){
+    next(err);
+  }
 });
 
 // Rotta che restituisce l'elenco di aste esistenti (filtro per stato)
@@ -72,6 +74,9 @@ app.get('/storico/aste', isBidParticipant, (req: any, res: any, next: any) => {
   controller.getMyAste(req, res, next);
 });
 
+
+
+
 // Rotte non gestite dal sistema
 app.all('*', function (req, res, next) {
   try{
@@ -83,9 +88,6 @@ app.all('*', function (req, res, next) {
 })
 
 app.use([errorLog, errorHandler])
-
-
-
 
 const server = app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

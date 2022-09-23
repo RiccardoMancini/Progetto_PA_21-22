@@ -2,10 +2,12 @@ import { MessageCode, Message, factoryMsg } from '../factory/messageFactory';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 Object.assign(global, { WebSocket: require('ws') });
 import jwt from 'jsonwebtoken';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as dotenv from "dotenv";
 import path from 'path';
+import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 dotenv.config({ path: path.join(__dirname, '../..', './.env') });
+import { tokenToReturn } from './websocketserver'
 
 (async () => {
 
@@ -21,49 +23,40 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
     }
   }
 
-  let token: string;
-  switch (process.argv[2]) {
-    case "1":
-      token = process.env.TOKEN1;
-      break;
-    case "2":
-      token = process.env.TOKEN2;
-      break;
-    case "3":
-    token = process.env.TOKEN3;
-    default:
-      break;
-  }
-
-  let credito = await axios.get('http://localhost:8080/credito',{
-    headers: { Authorization: `Bearer ${token}` }}).then(value => value.data.credito)
+  let token: string = tokenToReturn(Number(process.argv[2]));
+  
+  let credito = await axios.get('http://localhost:8080/credito',{ headers: { Authorization: `Bearer ${token}` }})
+                           .then(value => value.data.credito).catch(err => console.log(err.stack));
   console.log(credito);
-  let decoded = jwt.verify(token, process.env.SECRET_KEY);
-  let user_id: number = decoded.id;
+  const decoded = jwt.verify(token, process.env.SECRET_KEY);
+  const user_id: number = decoded.id;
+  const user_name: string = decoded.name;
   let globalTimer: ReturnType<typeof setTimeout>;
-  let actualCredito = credito;
+  let actualCredito: number = credito;
   let asta_id: number;
 
+  // Connessione alla stanza dedicata all'asta con passaggio di parametri necessari
   const subject = webSocket(`ws://localhost:8081/websocket?user_id=${user_id}&tok_id=${process.argv[2]}`);
 
   subject.subscribe({
     next: (data: any) => {
 
       let msg : Message = data;
-
+      // Messaggio di benvenuto da parte del server
       if (msg.type === MessageCode.WELCOME){
         asta_id = msg.asta_id;
         console.log(`${msg.message} ${asta_id}. La base d'asta è di: ${msg.base_asta}`);
         subject.next(factoryMsg.getMessage(MessageCode.CLIENT_CHECK))
       }
 
-
+      // Si sta per iniziare...
       else if (msg.type === MessageCode.PRE_START){
         console.log(msg.message)
-        console.log(`Prepara la tua offerta ${user_id}!`);      
+        console.log(`Prepara la tua offerta ${user_name}!`);      
       }
 
-
+      // Il rilancio dell'offerta da parte dei client avviene in maniera asincrona
+      // per simulare gli istanti in cui un concorrente formula una decisione
       else if (msg.type === MessageCode.START){
         globalTimer = setTimeout(() => {
           console.log('Rilancia!')
@@ -78,12 +71,14 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 
       }
 
+      // Messaggio di wait da parte del server, in quanto un altro client
+      // sta già rialzando l'attuale base d'asta
       else if (msg.type === MessageCode.WAIT)
       {      
         clearTimeout(globalTimer);
         console.log(msg.message)
       }
-
+      
       else if(msg.type === MessageCode.TOO_LATE || msg.type === MessageCode.CLOSE){
         console.log(msg.message);
       }
@@ -97,10 +92,8 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
     },
     
     error: err => {
-      //CHECK THIS ERRORS!!!!
       console.log({"error-code": err.code, "reason": 'Abnormal Function!'});
     },
     complete: () => console.log('Arrivederci!')
   });
-
 })();

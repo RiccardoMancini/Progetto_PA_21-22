@@ -77,7 +77,7 @@ class OfferAlreadyExist extends HttpError{
 
 class TooLowOfferOrCredit extends HttpError{
     constructor(){
-        super("Credito non suffiiciente o offerta troppo bassa!", ErrEnum.UnprocessableContent);
+        super("Credito non sufficiente o offerta troppo bassa!", ErrEnum.UnprocessableContent);
     }
 }
 
@@ -117,7 +117,11 @@ class InternalServerError extends HttpError{
     }    
 }
 
-
+class WSSError extends HttpError{
+    constructor(){
+        super('Errore nella richiesta di apertura del WSS!', ErrEnum.InternalServerError);
+    }
+}
 
 
 export enum ErrEnum {
@@ -134,6 +138,7 @@ export enum ErrEnum {
     OfferAlreadyExist,
     TooLowOfferOrCredit,
     TooLateToOffer,
+    WSSError,
     BadRequest = 400,
     Unauthorized = 401,
     Forbidden = 403,
@@ -186,6 +191,8 @@ export class ErrorFactory {
             case ErrEnum.TooLateToOffer:
                 retval = new TooLateToOffer();
                 break;
+            case ErrEnum.WSSError:
+                retval = new WSSError();
             case ErrEnum.Unauthorized:
                 retval = new Unauthorized();
                 break;

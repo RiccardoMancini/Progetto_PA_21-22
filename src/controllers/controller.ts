@@ -248,9 +248,8 @@ export class Controller {
             //if (!checkDataAsta(asta.data_i)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToOpen);  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
             asta.stato = stato_asta.IN_ESECUZIONE;
             if(asta.tipo === tipo_asta.ASTA_APERTA){
-                let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues);
-                if(!response.data.server_active) throw new Error('Errore interno nel reindirizzamento al WSS');
-                console.log(response.data.server_active);
+                let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues).catch(err => next(err));
+                if(response.status !== 200) throw new ErrorFactory().getError(ErrEnum.WSSError);
             }
             await new ProxyAsta().updateAsta(asta);
             const response: ObjectBuilder = new ObjectBuilder().setAstaID(asta.asta_id)
@@ -353,7 +352,42 @@ export class Controller {
             let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
             part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .map(elem =>{
-                    if(arr.length === 0){ 
+                if(arr.length === 0){ 
+                    let tipo: string;
+                    switch(elem.astum.tipo){
+                        case tipo_asta.ASTA_APERTA:
+                            tipo = tipo_asta[1];
+                            break;
+                        case tipo_asta.ASTA_CHIUSA_1:
+                            tipo = tipo_asta[2];
+                            break;
+                        case tipo_asta.ASTA_CHIUSA_2:
+                            tipo = tipo_asta[3];
+                            break;
+                        default:
+                            break;
+                    }      
+                    arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
+                                                .setUserID(elem.user_id)
+                                                .initPartecipazioni()
+                                                .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
+                                                                                        .setAggiudicata(elem.aggiudicata)
+                                                                                        .build())
+                                                .setTipo(tipo)
+                                                .setAggiudicata(false)
+                                                .setDataI(elem.astum.data_i)
+                                                .setDataF(elem.astum.data_f)
+                                                .build())
+                }
+                else{
+                    let app = arr.find(obj => obj.getAstaID() === elem.asta_id);                        
+                    if(typeof app !== 'undefined')
+                    {
+                        app.getPartecipazioni().push(new ObjectBuilder().setPartID(elem.part_id)
+                                                                        .setAggiudicata(elem.aggiudicata)
+                                                                        .build())
+                    }
+                    else{
                         let tipo: string;
                         switch(elem.astum.tipo){
                             case tipo_asta.ASTA_APERTA:
@@ -367,55 +401,20 @@ export class Controller {
                                 break;
                             default:
                                 break;
-                        }      
+                        }   
                         arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
                                                     .setUserID(elem.user_id)
                                                     .initPartecipazioni()
                                                     .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
-                                                                                            .setAggiudicata(elem.aggiudicata)
-                                                                                            .build())
-                                                    .setTipo(tipo)
+                                                                                        .setAggiudicata(elem.aggiudicata)
+                                                                                        .build())
                                                     .setAggiudicata(false)
+                                                    .setTipo(tipo)
                                                     .setDataI(elem.astum.data_i)
                                                     .setDataF(elem.astum.data_f)
                                                     .build())
                     }
-                    else{
-                        let app = arr.find(obj => obj.getAstaID() === elem.asta_id);                        
-                        if(typeof app !== 'undefined')
-                        {
-                            app.getPartecipazioni().push(new ObjectBuilder().setPartID(elem.part_id)
-                                                                            .setAggiudicata(elem.aggiudicata)
-                                                                            .build())
-                        }
-                        else{
-                            let tipo: string;
-                            switch(elem.astum.tipo){
-                                case tipo_asta.ASTA_APERTA:
-                                    tipo = tipo_asta[1];
-                                    break;
-                                case tipo_asta.ASTA_CHIUSA_1:
-                                    tipo = tipo_asta[2];
-                                    break;
-                                case tipo_asta.ASTA_CHIUSA_2:
-                                    tipo = tipo_asta[3];
-                                    break;
-                                default:
-                                    break;
-                            }   
-                            arr.push(new ObjectBuilder().setAstaID(elem.asta_id)
-                                                        .setUserID(elem.user_id)
-                                                        .initPartecipazioni()
-                                                        .setPartecipazioni(new ObjectBuilder().setPartID(elem.part_id)
-                                                                                            .setAggiudicata(elem.aggiudicata)
-                                                                                            .build())
-                                                        .setAggiudicata(false)
-                                                        .setTipo(tipo)
-                                                        .setDataI(elem.astum.data_i)
-                                                        .setDataF(elem.astum.data_f)
-                                                        .build())
-                        }
-                    }
+                }
                 });
 
             const response: Array<ObjectBuilder> = arr.map(elem => {
@@ -464,29 +463,30 @@ export class Controller {
             });
 
             const response: Array<ObjectBuilder> = part.map((elem, index) => {
-                                                            let tipo: string;
-                                                            switch(elem.astum.tipo){
-                                                                case tipo_asta.ASTA_APERTA:
-                                                                    tipo = tipo_asta[1];
-                                                                    break;
-                                                                case tipo_asta.ASTA_CHIUSA_1:
-                                                                    tipo = tipo_asta[2];
-                                                                    break;
-                                                                case tipo_asta.ASTA_CHIUSA_2:
-                                                                    tipo = tipo_asta[3];
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                            }
-                                                            return new ObjectBuilder().setAstaID(elem.asta_id)
-                                                                                      .setUserID(elem.user_id)
-                                                                                      .setTipo(tipo)
-                                                                                      .setStato(elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3])
-                                                                                      .setDataI(elem.astum.data_i)
-                                                                                      .setDataF(elem.astum.data_f)
-                                                                                      .setRilanci_Offerta(rilanci[index].offerta)
-                                                                                      .build();
-                                                    });          
+                let tipo: string;
+                switch(elem.astum.tipo){
+                    case tipo_asta.ASTA_APERTA:
+                        tipo = tipo_asta[1];
+                        break;
+                    case tipo_asta.ASTA_CHIUSA_1:
+                        tipo = tipo_asta[2];
+                        break;
+                    case tipo_asta.ASTA_CHIUSA_2:
+                        tipo = tipo_asta[3];
+                        break;
+                    default:
+                        break;
+                }
+                return new ObjectBuilder().setAstaID(elem.asta_id)
+                                            .setUserID(elem.user_id)
+                                            .setTipo(tipo)
+                                            .setStato(elem.astum.stato === 2 ? stato_asta[2] : stato_asta[3])
+                                            .setDataI(elem.astum.data_i)
+                                            .setDataF(elem.astum.data_f)
+                                            .setRilanci_Offerta(rilanci[index].offerta)
+                                            .build();
+                });     
+
             res.status(200).send(response);
         }
         catch(err){
