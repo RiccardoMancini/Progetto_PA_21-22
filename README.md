@@ -8,6 +8,7 @@ Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-e
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
 -	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di una coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
+ESEMPIO DI COPPIA DI CHIAVI
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
 -	Creare una nuova tipologia di asta 
@@ -68,7 +69,12 @@ Di seguito un esempio di risposta:
         "data_f": "2022-09-24T18:02:00.000Z"
     }
 ```
-
+Nel caso in cui non esistessero aste fitrate per un determinato stato, verrebbe resituita la seguente risposa:
+```
+{
+        "messaggio": "Non esistono aste in questo stato!"
+}
+```
 #### 2) Elenco aste alla quale si è partecipato / si sta partecipando con rilanci/offerte (/api/v1.0.0/storico/aste)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
@@ -105,7 +111,13 @@ Di seguito un esempio di risposta:
         ]
  }
  ```
-CASO IN CUI NON CI FOSSERO ASTE!
+Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente risposta:
+```
+{
+    "messaggio": "Nessuna asta alla quale si è ancora partecipato!"
+}
+```
+
 
 #### 3) Elenco aste, aggiudicate e non, alle quali si è partecipato (/api/v1.0.0/storico/aste/closed)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
@@ -113,11 +125,11 @@ Rotta accessibile solo al bid_participant e che necessita di una autenticazione 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
 ```
 Tale rotta restituisce tutte le aste alle quali l'utente autenticato ha partecipato specificando quali sono state aggiudicate e quali no.
-Inoltre questo risultato può essere filtrato specificando il range temporale tramite query string, ne seguente modo: `date_i=12/2/2021&date_f=2022/02/22`.
+Inoltre questo risultato può essere filtrato specificando il range temporale tramite query string, ne seguente modo: `?date_i=12/2/2021&date_f=2022/02/22`.
 Le data di inizio e di fine devono rispettare i seguenti formati: `dd/mm/yyyy` o `yyyy/mm/dd`; (il separatore della data può essere sia "/" che "-").
 
 Di seguito un esempio di risposta:
- ```
+```
     {
         "asta_id": 7,
         "user_id": 1,
@@ -134,9 +146,13 @@ Di seguito un esempio di risposta:
         "data_i": "2022-09-24T00:00:00.000Z",
         "data_f": "2022-09-24T18:00:00.000Z"
     }
- ```
-CASO IN CUI NON CI FOSSERO ASTE!
-
+```
+Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente risposta:
+```
+{
+    "messaggio": "Nessuna asta alla quale si è ancora partecipato!"
+}
+```
 #### 4) Credito attuale (/api/v1.0.0/credito)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
@@ -194,7 +210,7 @@ Di seguito un esempio di come dovrebbe essere il body della richiesta:
     "data_f": "2022/09/24 18:00"
 }
 ```
-La risposta, nel caso in cui passassero tutti i controlli, sarebbe:
+La risposta, nel caso in cui passassero tutti i controlli e venisse registrata correttamente la nuova asta, sarebbe:
 ```
 {
     "messaggio": "Asta creata!"
@@ -233,7 +249,10 @@ La risposta, nel caso in cui venissero passati tutti i controlli, sarebbe:
     "messaggio": "Offerta creata!"
 }
 ```
-DA FINIRE CON L'ASTA IN BUSTA CHIUSA
+Per quando riguarda le offerte relative alle aste in busta chiusa, il body di tali richieste conterrà l'offerta codificata tramite la chiave pubblica associata all'asta. Di conseguenza, dopo aver validato opportunamente tale offerta, il sistema dovrà decodificarla attraverso la relativa chiave primaria, grazie all'ausilio della [libreria crypto](https://nodejs.org/api/crypto.html), prima di poterla inserire nel database.
+Un esempio di body di tale richiesta potrebbe essere il seguente:
+
+ESEMPIO BODY OFFERTA ASTE CHIUSE
 
 
 #### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
@@ -267,8 +286,13 @@ Di seguito un esempio di risposta:
     "messaggio": "Offerta vincente!"
 }
 ```
-
-CASO IN CUI NON CI FOSSERO OFFERTE!
+Se non dovessero esserci offerte al momento dell'aggiudicazione di una certa asta, verrebbe mostrato il seguente messaggio:
+```
+{
+    "messaggio": "Nessuna offerta fatta per questa asta!"
+}
+```
+Nota: Se all'atto di aggiudicazione di un'asta in busta chiusa e pagamento al secondo prezzo più alto, esistesse solamente un'offerta effettuata, tale offerta verrebbe eliminata e l'asta chiusa in qualsiasi caso.
 
 ## Pattern
 
