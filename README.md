@@ -21,31 +21,27 @@ Il sistema deve prevedere la possibilità di:
 -	consentire ad un utente admin di ricaricare il credito un dato utente
 -	Visualizzare lo storico delle aste alle quali si è partecipato distinguendo per quelle che sono state aggiudicate e non.
 ## Strumenti, framework e librerie utilizzate
-•	Node.JS
-•	Express
-•	Sequelize
-•	Postgres
-•	Websocket con RxJS
-•	Libreria crypto
-•   Axios
-•	Visual studio code
-•	Docker
-•	Postman
+-	Node.JS
+-	Express
+-	Sequelize
+-	Postgres
+-	Websocket con RxJS
+-	Libreria crypto
+-   Axios
+-	Visual studio code
+-	Docker
+-	Postman
 ## Tipologie di richieste  possibili al sistema 
-Tipologia | Rotta | Utente | Token JWT 
---- | --- | --- | --- 
-    Get   | /aste | - | - 
-    Get   |/asta/new|bid_creator|si
-    Get   |/asta/asta_id/closed|--|--
-    Get   |/storico/aste/chiuse|bid_partecipant|si
-    Get   |/storico/aste|bid_partecipant|si
-    Get   |/credito|bid_partecipant|si
-    Patch  |/admin/credito|admin|si
-    
+
 Tipologia | Rotta | Utente | Token JWT
 --- | --- | --- | --- 
 Get | /aste | - | -
-Get | /aste | - | -
+Get | /asta/new|bid_creator| bid_creator | si
+Get | /asta/asta_id/closed| - | -
+Get | /storico/aste/chiuse| bid_partecipant | si
+Get | /credito| bid_partecipant | si
+Get | /storico/aste/chiuse| bid_partecipant | si
+Patch | /admin/credito | admin | si
 
 ## Descrizione delle singole rotte
 #### /aste
