@@ -35,41 +35,91 @@ Il sistema deve prevedere la possibilità di:
 
 Tipologia | Rotta | Utente | Token JWT
 --- | --- | --- | --- 
-Get | /aste | - | -
-Get | /asta/new|bid_creator| bid_creator | si
-Get | /asta/asta_id/closed| - | -
-Get | /storico/aste/chiuse| bid_partecipant | si
-Get | /credito| bid_partecipant | si
-Get | /storico/aste/chiuse| bid_partecipant | si
-Patch | /admin/credito | admin | si
+Get | /api/v1.0.0/aste | - | no
+Get | /api/v1.0.0/storico/aste | bid_participant | si
+Get | /api/v1.0.0/storico/aste/closed | bid_participant | si
+Get | /api/v1.0.0/credito | bid_participant | si
+Patch | /api/v1.0.0/admin/accredito | admin | si
+Post | /api/v1.0.0/asta | bid_creator | si
+Post | /api/v1.0.0/asta/offerta | bid_participant | si
+Get | /asta/:asta_id/closed| - | -
 
 ## Descrizione delle singole rotte
-#### /aste
+#### 1) Elenco aste (/api/v1.0.0/aste)
 Questo tipo di rotta è accessibile da qualsiasi utente e non richiede autorizzazioni. 
-In questa rotta è possibile vedere l'elenco delle aste, e filtrare in base a se è aperta, in esecuzione oppure terminata.
-[Esempi output]
+In questa rotta è possibile vedere l'elenco delle aste, e filtrarle in base al loro stato (1:"NON APERTA", 2:"IN ESECUZIONE" e 3:"TERMINATA").
+L'operazione di filtraggio viene attuata tramite query string, nel seguente modo: `?stato=1`
 
-#### /asta/new
-Rotta che è accessibile solo al bid_creator e che necessiata di una autenticazione JWT.
-Il bid_creator in questa rotta va creare una nuova asta mediandte una operazione di post, inizializzando quelle che sono le variabili di stato dell' asta, ovvero il tipo d'asta, la base d' asta, data di inizio e la data di fine.
+#### 2) Elenco aste alla quale si è partecipato / si sta partecipando con rilanci/offerte (/api/v1.0.0/storico/aste)
+Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
+
+
+#### 3) /api/v1.0.0/storico/aste/closed
+#### 4) /api/v1.0.0/credito
+#### 5) /api/v1.0.0/aste
+#### /api/v1.0.0/asta
+Rotta accessibile solo al bid_creator e che necessita di una autenticazione JWT (di seguito un esempio valido).
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IkFybWVudCIsInJvbGUiOjJ9.TxhP0-moJwH2uZRx15bAKEC24ctdEyp5-M1hYbsljlA
+```
+Il bid_creator in questa rotta va creare una nuova asta mediante una operazione di post, inizializzando quelli che sono i parametri principali dell'asta, ovvero il tipo d'asta, la base d'asta, data di inizio e la data di fine.
 Il tipo di asta è identificato mediante un codice numerico come riportato nella seguente tabella.
 ```
 [1]  Asta inglese aperta   
 [2]  Asta in busta chiusa e pagamento del prezzo più alto 
 [3]  Asta in busta chiusa e pagamento del secondo prezzo più alto 
 ```
-Le date inserite da parte del bid_creator sono sottoposte a diverse tipologie di controllo a seconda del tipo di asta in qunato devono essere coerenti con quest'ultima e con la data di creazione dell'asta stessa.
-##### Controllo nella asta inglese aperta
-- La base d'asta deve essere un tipo di dato numerico e strettamente maggiore di 0
-- le data di inizio e di fine deve essere di tipo numerico e intere 
-- le date di inizio e di fine devono soddisfareq la seguente relazione 
-`data attuale ≤ data inizio asta < data fine asta`
+Le date inserite da parte del bid_creator sono sottoposte a diverse tipologie di controllo e validazione a seconda del tipo di asta, in quanto devono essere coerenti con quest'ultima e con la data di creazione dell'asta stessa.
 
-##### Controllo nelle altre tipologie di aste
+Di seguito un esempio di come dovrebbe essere il body della richiesta:
+```
+{
+    "tipo": 1,
+    "p_min": 200,
+    "data_i": "2022/09/24 15:00",
+    "data_f": "2022/09/24 18:00"
+}
+```
+La risposta, nel caso in cui passassero tutti i controlli, sarebbe:
+```
+{
+    "messaggio": "Asta creata!"
+}
+```
+
+
+##### Controllo date nella creazione dell'asta
 - La base d'asta deve essere un tipo di dato numerico e strettamente maggiore di 0
-- le data di inizio e di fine deve essere di tipo numerico e intere 
-- le date di inizio e di fine devono soddisfare la seguente relazione 
-`data attuale ≤ data inizio asta ≤ data fine asta`
+- le data di inizio e di fine deve essere di tipo stringa e devono rispettare il seguente formato: `dd/mm/yyyy hh:tt` e `yyyy/mm/dd hh:tt`; (il separatore della data può essere sia "/" che "-", mentre il separatore del tempo deve essere ":")
+- le date di inizio e di fine devono soddisfare la seguente relazione :
+`data attuale ≤ data inizio asta < data fine asta`
+- inoltre nell'asta inglese aperta il giorno, il mese e l'anno della data iniziale deve coincidere con quella finale.
+
+
+#### /api/v1.0.0/asta/offerta
+Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
+```
+Il bid_participant in questa rotta va creare una nuova offerta per una certa asta mediante una operazione di post, specificando l'id dell'asta e l'offerta.
+L'id dell'asta viene validato verificando che sia di tipo numerico e successivamente che esista effettivamente quell'asta nello stato "IN ESECUZIONE".
+Invece l'offerta viene controllata affinchè rispetti la seguente relazione:
+`0 < base asta < offerta ≤ credito utente`
+
+Di seguito un esempio di come dovrebbe essere il body della richiesta:
+```
+{
+    "asta_id": 15,
+    "offerta": 200
+}
+```
+La risposta, nel caso in cui passassero tutti i controlli, sarebbe:
+```
+{
+    "messaggio": "Offerta creata!"
+}
+```
+DA FINIRE CON L'ASTA IN BUSTA CHIUSA
 
 #### /storico/aste
 A questa rotta vi accedono i bid_partecipant con autenticazione JWT per vedere lo storico delle aste a cui si sta partecipando e a cui si è partecipato. inoltre permette di vedere tutti i rilanci effettuati.
