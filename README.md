@@ -1,14 +1,10 @@
-# Titolo: Sviluppo di un servizio back-end per la gestione di varie tipologie di aste 
-Riccardo Mancini, Arment Pelivani.
+# Sviluppo di un back-end per la gestione di varie tipologie di aste
 
 ## Obiettivi
 Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperte, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto.
 ## Specifiche di progetto
-- Le aste in busta aperta vengono implementate mediante websocket. I concorrenti sono in una stanza associati all'asta e si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superatada un altro compratore 
--	Per le aste in busta chiusa si prevede un meccanismo di protezione basato sulla generazione di almeno 5 coppie di chiavi pubbliche / private da usare nel seeding del DB. La cifratura avviene mediante la chiave pubblica.
-Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta
-Un utente può fare solo una puntata per l’asta specifica
-- (capire come scrivere la questione crypto)
+- Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
+-	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di uno coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
 -	Creare una nuova tipologia di asta 
@@ -27,7 +23,7 @@ Il sistema deve prevedere la possibilità di:
 -	Postgres
 -	Websocket con RxJS
 -	Libreria crypto
--   Axios
+- Axios
 -	Visual studio code
 -	Docker
 -	Postman
@@ -107,14 +103,15 @@ Un oggetto Proxy racchiude un altro oggetto e ne intercetta le operazioni e ha u
 •	target – è l’oggetto da racchiudere; può essere qualsiasi cosa, anche una funzione.
 •	handler – configurazione del proxy: un oggetto con “trappole”, metodi che intercettano operazioni. Ad esempio una “trappola” get per la lettura di una proprietà di target, set per la scrittura di una proprietà di target, e così via.
 In questo progetto  si sono sviluppati 4 Proxy specifici.
--	proxyAsta
--	proxyChiavi
--	proxyUtenti
--	proxyPartecipazione 
-#### ProxyAsta
-Il proxy aste viene utilizzato per effettuare la validazione dei parametri che vengono inseriti mediante body nella fase di creazione dell’asta.
-Nello specifico, oltre a verificare la correttezza del tipo di dato, verifica anche la sua coerenza con gli altri parametri che devono essere analizzati, come ad esempio, la relazione che intercorre tra la data di inizio asta con la data di fine asta, e come queste due vadano verificate in modo differente a seconda del tipo di asta.
-Le operazioni che esegue il proxyAste sono le seguenti:
+-	ProxyAsta
+-	ProxyChiavi
+-	ProxyUtenti
+-	ProxyPartecipazione 
+
+##### ProxyAsta
+Il proxy asta viene utilizzato per effettuare la validazione dei parametri che vengono passati mediante le richieste, per poterle poi inoltrare al modello asta. Tra le operazioni che vengono richieste a quest'ultimo modello, la creazione di una nuova asta è di sicuro la mia complessa da validare.
+Nello specifico, oltre a verificare la correttezza dei tipi di dati passati, verifica anche la loro coerenza con gli altri parametri che devono essere analizzati, come ad esempio, la relazione che intercorre tra la data di inizio asta con la data di fine asta, e come queste due vadano verificate in modo differente a seconda del tipo di asta.
+Le operazioni che esegue il proxy aste sono le seguenti:
 -	Verifica la seguente relazione tra, la data di inizio asta, fine asta e data corrente per le aste inglesi dataCorrente ≤ dataIniziale < data finale. Se questo non è verificato viene lanciato un throw error
 
 -	Per le altre tipologie di aste invece viene verificato che i parametri delle data rispettino la relazione dataCorrente ≤ dataIniziale ≤ data finale
@@ -122,12 +119,17 @@ Le operazioni che esegue il proxyAste sono le seguenti:
 -	Inoltre viene verificato che le date siano dei number di tipo intero e che la base d’asta sia un intero positivo.
 Esempio parametri inseriti correttamente
 
-#### ProxyUtente
-Il proxyUtente, analogamente a quello asta,  viene utilizzato per effettuare la validazione dei parametri  inseriti mediante body nella fase di creazione del bid-paricipant.
+##### ProxyUtente
+Il proxyUtente, analogamente a quello asta,  viene utilizzato per effettuare la validazione dei parametri inseriti mediante body nella fase di creazione del bid-paricipant.
 Le operazioni che esegue il proxyUtente sono le seguenti:
 -	Verifica che il credito del bid participant sia maggiore uguale di 1 e che sia di tipo numerico
 -	Verifica che lo user_id sia di tipo numerico intero e che  sia maggiore uguale di 1
 Esempio parametri inseriti correttamente
+
+##### ProxyPartecipazione
+
+##### ProxyChiavi
+
 #### Chain of responsibility
 Il Chain of responsability è un pattern comportamentale che permette di passare le richieste lungo una catena di handler (middleware), ognuno dei quali decide se processarla e passarla all'handler successivo (tramite next()), oppure sollevare un errore.
 In questo progetto è stato usato:
@@ -155,3 +157,5 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 - allegare la collection di postman con la demo
 
 ## Autori
+- Riccardo Mancini
+- Arment Pelivani
