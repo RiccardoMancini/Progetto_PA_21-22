@@ -6,14 +6,9 @@ import { createWSS } from "./src/websockets/websocketserver";
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
-
-
 const app = express();
 app.use(express.json());
 
-/**
- * davanti ad ogni rotta metterei: /api/String(process.env.npm_package_version)/..
- */
 
 // Rotta che simula la chiamata di un servizio esterno che fornisce un WSS in ascolto
 // per una determinata asta

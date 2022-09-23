@@ -4,6 +4,13 @@ import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from '../controllers/builder/objectBuilder';
 import { AstaInterface } from '../models/interface/astaInterface';
 
+/**
+ * Funzione che permette di verificare se una stringa definisce
+ * ora e minuti nel formato hh:tt
+ * @param time stringa da validare
+ * @returns se corretta, array costituito dall'elemento ora e dall'elemento minuti
+ * altrimenti false
+ */
 function checkTime(time: string): Array<string> | boolean{
     const re = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
     if(re.test(time) && time.includes(':')){
@@ -12,49 +19,53 @@ function checkTime(time: string): Array<string> | boolean{
     else{
         return false;
     }
-
 }
 
-function datesAreOnSameDay(first, second){
+/**
+ * Funzione che verifica se due date sono lo stesso giorno
+ * @param first prima data
+ * @param second seconda data
+ * @returns true se corrispondo, false altrimenti
+ */
+function datesAreOnSameDay(first: Date, second: Date): boolean{
     return (first.getFullYear() === second.getFullYear() &&
     first.getMonth() === second.getMonth() &&
     first.getDate() === second.getDate());
 }
 
+/**
+ * Funzione necessaria per validare una data
+ * @param date data da validare passata come stringa
+ * @returns se è valida restituisce la data come oggetto Date,
+ * false altrimenti
+ */
 export function checkDate(date: string): Date | boolean{
-    //const re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
     const re1 = /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/;
     const re2 = /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/;
-    //console.log(re1.test(date), re2.test(date))
     if((re1.test(date) || re2.test(date))){        
-        //Test which seperator is used '/' or '-'
+        //Verifica del separatore utilizzato
         let opera1 = date.split('/');
         let opera2 = date.split('-');
         let lopera1 = opera1.length;
         let lopera2 = opera2.length;
-        //console.log(lopera1, lopera2)
-        // Extract the string into month, date and year
         if (lopera1>1){
             var pdate = date.split('/');
         }
         else if (lopera2>1){
             var pdate = date.split('-');
         }
-        //console.log(pdate)
+        // Assegnazione giorno, mese ed anno dalla stringa
         if(re1.test(date)){
-            //console.log(pdate)
             var dd = parseInt(pdate[0]);
             var yy = parseInt(pdate[2]);
         }
         else{
-            //console.log(pdate)
             var dd = parseInt(pdate[2]);
             var yy = parseInt(pdate[0]);
         }
         
         var mm  = parseInt(pdate[1]);
         
-        // Create list of days of a month [assume there is no leap year by default]
         var ListofDays = [31,28,31,30,31,30,31,31,30,31,30,31];
         if (mm === 1 || mm > 2){
             if (dd > ListofDays[mm - 1]){
@@ -63,6 +74,7 @@ export function checkDate(date: string): Date | boolean{
         }
         if (mm == 2){
         var lyear = false;
+            // verifica anno bisestile
             if ( (!(yy % 4) && yy % 100) || !(yy % 400)){
                 lyear = true;
             }
@@ -80,7 +92,7 @@ export function checkDate(date: string): Date | boolean{
     }
 
 }
-
+// Oggetto che viene passato come handler dell'oggetto proxy
 const proxyAstaHandler = {
     get: (obj, prop) => { 
         if(prop === 'asta_id'){
@@ -189,32 +201,33 @@ const proxyAstaHandler = {
         }    
 
         if(prop ==='p_min'){
-            if ((!Number(obj[prop])) && obj[prop]<=0) {
+            if (isNaN(obj[prop]) || obj[prop]<=0) {
                 throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
             }
-
             return obj[prop];
-
         }
-
     }              
 }
 
-
+// Classe proxy corrispondente al modello Asta
 export class ProxyAsta implements AstaInterface{
     modelAsta: Asta;
     proxyAstaValidator: any;
 
     constructor(){
-
         this.modelAsta = new Asta(DB_Connection.getInstance().getConnection());
-
     }
 
+    /**
+     * Metodo che ricerca un'asta non aperta
+     * @param asta_id id dell'asta da cercare
+     * @returns l'oggetto rappresentante l'asta estratta
+     */
     public async getNotOpenAstaByID(asta_id: number): Promise<any|null>{
-        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler)
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler);
+        // validazione id asta e check della sua esistenza
         const val_asta_id = this.proxyAstaValidator.asta_id;
-        const asta =  await this.modelAsta.getNotOpenAstaByID(val_asta_id);
+        const asta: any =  await this.modelAsta.getNotOpenAstaByID(val_asta_id);
         if(this.checkAsta(asta)){
             return asta;
         }
@@ -223,8 +236,14 @@ export class ProxyAsta implements AstaInterface{
         }
     }
 
+    /**
+     * Metodo che ricerca un'asta aperta
+     * @param asta_id id dell'asta da cercare
+     * @returns l'oggetto rappresentante l'asta estratta
+     */
     public async getOpenAstaByID(asta_id: number): Promise<any|null>{
-        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler)
+        this.proxyAstaValidator = new Proxy({"asta_id": asta_id}, proxyAstaHandler);
+        // validazione id asta e check della sua esistenza
         const val_asta_id = this.proxyAstaValidator.asta_id;
         const asta =  await this.modelAsta.getOpenAstaByID(val_asta_id);
         if(this.checkAsta(asta)){
@@ -235,17 +254,32 @@ export class ProxyAsta implements AstaInterface{
         }
     }
 
+    /**
+     * Metodo che seleziona tutte le aste esistenti nel db
+     * @returns un'array di oggetti rappresentanti le aste
+     */
     public async getAste(): Promise<Array<any>>{
         return this.modelAsta.getAste();
     }
 
+    /**
+     * Metodo che permette l'update di un'asta
+     * @param asta oggetto asta da aggiornare nel db
+     * @returns l'asta aggiornata
+     */
     public async updateAsta(asta: any): Promise<any>{
         return await this.modelAsta.updateAsta(asta);
     }
 
+    /**
+     * Metodo che crea una nuova asta
+     * @param asta stringa che costituisce l'asta da creare
+     * @returns l'asta creata
+     */
     public async createAsta(asta: string): Promise<any>{
         let astaJson = JSON.parse(asta);
         this.proxyAstaValidator = new Proxy(astaJson, proxyAstaHandler);
+        // validazione dei parametri dell'asta
         let val_tipo: number = this.proxyAstaValidator.tipo;
         let val_p_min: number = this.proxyAstaValidator.p_min;
         let val_date_i = this.proxyAstaValidator.data_i;
@@ -271,7 +305,10 @@ export class ProxyAsta implements AstaInterface{
                                                                         .build()));
         }
     }
-
+    /**
+     * @param asta 
+     * @returns 
+     */
     public checkAsta(asta: any): boolean{
         return asta !== null? true : false;
     }

@@ -10,12 +10,19 @@ dotenv.config({ path: path.join(__dirname, '../..', './.env') });
 import { tokenToReturn } from './websocketserver'
 
 (async () => {
-
+  /**
+   * Funzione che simula il rilancio da parte di un concorrente
+   * @param base_asta valore attuale della base d'asta
+   * @param myCredito credito di un certo utente
+   * @returns 0 se il credito non è sufficiente, altrimenti l'offerta fatta
+   */
   function rilancio(base_asta: number, myCredito: number){
-    console.log("Credito: ", myCredito);
+    //console.log("Credito: ", myCredito);
     let offerta: number;
     if(base_asta > myCredito) return 0;
     else{
+      // si è scelto di rialzare la base d'asta con un'offerta pari
+      // al 10% della differenza tra il credito attuale e la base d'asta attuale
       offerta = base_asta + ((myCredito - base_asta)*10/100);
       console.log(`Base d'asta attuale: ${Number(base_asta)} - Offerta: ${Number(offerta)}`)
       return Number(offerta.toFixed(3));

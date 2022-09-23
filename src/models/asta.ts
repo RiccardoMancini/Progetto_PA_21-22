@@ -59,7 +59,7 @@ export class Asta implements AstaInterface{
     }
 
     /**
-     * Metodo che ricerca un'asta non aperta
+     * Metodo che ricerca un'asta aperta
      * @param asta_id id dell'asta da cercare
      * @returns l'oggetto rappresentante l'asta estratta
      */
@@ -86,7 +86,7 @@ export class Asta implements AstaInterface{
     }
 
     /**
-     * Metodo che crea una nuova asta nel db
+     * Metodo che crea una nuova asta
      * @param asta stringa che costituisce l'asta da inserire nel db
      * @returns l'asta inserita
      */

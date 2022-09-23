@@ -7,6 +7,7 @@ import { Partecipazione } from '../models/partecipazione';
 import { Utenti } from '../models/utenti';
 import { checkDate } from './proxyAsta';
 
+// Oggetto che viene passato come handler dell'oggetto proxy
 const proxyPartHandler = {
   get: (obj, prop) => { 
       if(prop === 'offerta' ){
@@ -53,7 +54,7 @@ const proxyPartHandler = {
 } 
 }
 
-
+// Classe proxy corrispondente al modello partecipazione
 export class ProxyPartecipazione implements PartecipazioneInterface{
     modelPart: Partecipazione;
     modelAsta: Asta;
@@ -68,12 +69,20 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
 
     }
 
+    /**
+     * Metodo che estrae l'elenco di aste chiuse alle quali 
+     * ha partecipato un certo utente
+     * @param user_id id dell'utente da considerare nella selezione
+     * @param date_i data inizio dell'intervallo
+     * @param date_f data fine dell'intervallo
+     * @returns array di oggetti che costituiscono le aste
+     */
     public async getClosedAsteByUserID(user_id: number, date_i?: string, date_f?: string): Promise<Array<any>>{
       this.proxyPartValidator = new Proxy({"user_id": user_id, "data_i": date_i, "data_f": date_f}, proxyPartHandler);
       const val_user_id: number = this.proxyPartValidator.user_id;
       if((typeof date_i !== 'undefined' && typeof date_f === 'undefined') || 
          (typeof date_i === 'undefined' && typeof date_f !== 'undefined')) throw new ErrorFactory().getError(ErrEnum.BadRequest);
-      
+      // validazione delle date passate come intervallos
       if(typeof date_i !== 'undefined' && typeof date_f !== 'undefined'){
         const val_data_i: Date = this.proxyPartValidator.data_i;
         const val_data_f: Date = this.proxyPartValidator.data_f;
@@ -85,6 +94,11 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
   
     }
     
+    /**
+     * Metodo che estrae le aste nelle quali è presente un certo utente
+     * @param user_id id utente da considerare
+     * @returns array di oggetti che costituiscono le aste
+     */
     public async getAsteByUserID(user_id: number): Promise<Array<any>>{
       this.proxyPartValidator = new Proxy({"user_id": user_id}, proxyPartHandler);
       const val_user_id: number = this.proxyPartValidator.user_id;
@@ -93,26 +107,50 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
       
     }
 
+    /**
+     * Metodo che restituisce l'offerta più alta di una certa asta
+     * @param asta_id id asta da considerare
+     * @returns oggetto che costituisce l'offerta, altrimenti false
+     */
     public async getFirstOfferByAstaID(asta_id: number): Promise<any|null>{
       const offer = await this.modelPart.getFirstOfferByAstaID(asta_id);
       return this.checkOfferExist(offer) === true ? offer : false; 
     }
 
+    /**
+     * Metodo che restituisce le prime due offerte di una certa asta
+     * @param asta_id id asta da considerare
+     * @returns oggetto che costituisce le due offerte
+     */
     public async getOffersByAstaID(asta_id: number): Promise<any>{
       return await this.modelPart.getOffersByAstaID(asta_id);
     }
 
+    /**
+     * Metodo per l'update di una certa partecipazione
+     * @param part oggetto che rappresenta la partecipazione
+     * @returns partecipazione aggiornata
+     */
     public async updatePartecipazione(part: any): Promise<any>{
       return await this.modelPart.updatePartecipazione(part);
 
     }
 
+    /**
+     * Metodo che permette di creare un'offerta per una certa 
+     * asta da parte di un utente
+     * @param user_id id utente che fa l'offerta
+     * @param asta oggetto asta di riferimento
+     * @param payload body della richiesta da validare
+     * @returns offerta creata
+     */
     public async setOffer(user_id: number, asta: any, payload: any): Promise<any>{
       let val_offerta: number;
       this.proxyPartValidator = new Proxy(payload, proxyPartHandler);
       val_offerta = this.proxyPartValidator.offerta;
 
-      let offerYet = await this.getOffersByUserAstaID(user_id, asta.asta_id);
+      // check se esiste già un'offerta dello stesso tipo
+      let offerYet: any = await this.getOffersByUserAstaID(user_id, asta.asta_id);
       if(asta.tipo !== tipo_asta.ASTA_APERTA && offerYet !== null){
         throw new ErrorFactory().getError(ErrEnum.OfferAlreadyExist);
       }
@@ -122,9 +160,9 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
         if(isExist.length !== 0){
           throw new ErrorFactory().getError(ErrEnum.TooLowOfferOrCredit);
         }
-
       }
-      
+      // check se l'offerta è superiore dell'base d'asta e se l'utente ha il 
+      // credito sufficiente
       if(await this.checkIfValidOffer(user_id, asta.p_min, val_offerta)){
 
         return this.modelPart.setOffer(JSON.stringify(new ObjectBuilder().setUserID(user_id)
@@ -139,15 +177,35 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
 
     }
 
+    /**
+     * Metodo per la rimozione di una determinata offerta
+     * @param part_id id part che contraddistingue l'offerta
+     * @returns 
+     */
     public async deleteOffer(part_id: number): Promise<any>{
       return await this.modelPart.deleteOffer(part_id);
     }
 
+    /**
+     * Metodo usato per estrarre tutte le offerte di un certo utente
+     * per una data asta
+     * @param user_id id utente dal considerare
+     * @param asta_id id asta da consderara
+     * @returns array di oggetti rappresentanti l'offerta
+     */
     public async getOffersByUserAstaID(user_id: number, asta_id:number): Promise<Array<any>>{
       return await this.modelPart.getOffersByUserAstaID(user_id, asta_id);
       
     }
 
+    /**
+     * Metodo che verifica se l'offerta di un certo utente è maggiore della base d'asta
+     * e minore del suo attuale credito
+     * @param user_id id utente da considerare
+     * @param base_asta base d'asta
+     * @param offerta offerta fatta dall'utente
+     * @returns true se l'offerta è valida, false altrimenti
+     */
     public async checkIfValidOffer(user_id: number, base_asta: number, offerta: number): Promise<boolean>{
       let credito = await this.modelUtenti.getCreditoByUserID(user_id).then(value => value.credito);
       return (credito - offerta >= 0 && offerta > base_asta) ? true : false;

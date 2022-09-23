@@ -38,7 +38,7 @@ export function createWSS(asta: any): void{
 
   console.log(`Stanza dedicata all'asta con ID: ${asta.asta_id}, in ascolto sulla porta: ${process.env.WSSPORT}. Si parte da una base d'asta di ${base_asta}!`);
 
-  const wss = new WebSocketServer({ port: +process.env.WSSPORT, path: '/websocket' });
+  const wss: WebSocketServer = new WebSocketServer({ port: +process.env.WSSPORT, path: '/websocket' });
 
   wss.on('connection', function connection(ws, req) {
     // Estrazione del'user_id dall'url della richiesta di connessione

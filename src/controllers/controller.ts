@@ -8,19 +8,37 @@ import { ObjectBuilder } from './builder/objectBuilder';
 import crypto from 'crypto';
 import axios from 'axios';
 
-function getRandomKey(rawKeys: any){    
-    const arrKey = rawKeys.map(elem => elem.chiavi_id)
-    let indice = Math.round(Math.random() * (arrKey.length - 1));
+/**
+ * Funzione che restituisce casualmente una coppia di chiavi
+ * tra quelle passate come parametro
+ * @param rawKeys elenco di coppie di chiavi pubbliche / private
+ * @returns una coppia di chiavi
+ */
+function getRandomKey(rawKeys: any): any{    
+    const arrKey: any = rawKeys.map(elem => elem.chiavi_id)
+    let indice: number = Math.round(Math.random() * (arrKey.length - 1));
     return arrKey[indice];
 }
 
-function checkDataAsta(data: Date){
-    const now = new Date(Date.now());
-    console.log(now.toISOString(), data, now > data)
+/**
+ * Funzione che verifica se la data passata come parametro
+ * è già trascorsa o meno rispetto ad ora
+ * @param data data da verificare
+ * @returns true se la data è già trascorsa, false altrimenti 
+ */
+function checkDataAsta(data: Date): boolean{
+    const now: Date = new Date(Date.now());
+    //console.log(now.toISOString(), data, now > data)
     return now > data ? true : false
 }
 
-function checkCode64Offer(offerCripted: string){
+/**
+ * Funzione che verifica se la stringa passata come parametro
+ * rispetta la codifica base64
+ * @param offerCripted stringa codificata
+ * @returns true se è correttamente codificata, false altrimenti
+ */
+function checkCode64Offer(offerCripted: string): boolean{
     const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
     return base64regex.test(offerCripted) ? true : false;
 
@@ -151,8 +169,8 @@ export class Controller {
      */
     public async getMyCredito(req: any, res: any, next: any){
         try{
-            let credito = await new ProxyUtenti().getCreditoByUserID(req.user_id);
-            const response : ObjectBuilder = new ObjectBuilder().setCredito(Number(credito).toFixed(3)).build();
+            let credito: number = await new ProxyUtenti().getCreditoByUserID(req.user_id);
+            const response: ObjectBuilder = new ObjectBuilder().setCredito(Number(credito).toFixed(3)).build();
             res.status(200).json(response);
         }
         catch(err){
@@ -170,7 +188,7 @@ export class Controller {
      */
     public async updateCredito (req: any, res: any, next: any){
         try{
-            let userByID = await new ProxyUtenti().updateCreditoUtente(req.body);
+            let userByID: any = await new ProxyUtenti().updateCreditoUtente(req.body);
             const response: ObjectBuilder = new ObjectBuilder().setUserID(userByID.user_id)
                                                                 .setNewCredito(Number(userByID.credito).toFixed(3))
                                                                 .build();
@@ -193,8 +211,8 @@ export class Controller {
      */
     public async newOfferta(req: any, res: any, next: any){
         try{
-            const asta = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
-            //if (checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.ToLateToOffer); QUESTO è CORRETTO, MA è SCOMODO PER TESTARE ORA
+            const asta: any = await new ProxyAsta().getOpenAstaByID(req.body.asta_id);
+            //if (checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.ToLateToOffer); E' STATO COMMENTATO PER COMODITA' NEI TEST
             if (asta.tipo !== tipo_asta.ASTA_APERTA){
                 //fase di decodifica dell'offerta
                 let codedOfferta = req.body.offerta;                
@@ -204,7 +222,7 @@ export class Controller {
                 req.body.offerta = offertaOBJ.offerta;
                 
             }
-            let resp = await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
+            await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
             const response: ObjectBuilder = new ObjectBuilder().setMessaggio('Offerta creata!').build();            
             res.status(201).json(response);
         }
@@ -244,8 +262,8 @@ export class Controller {
      */
     public async openAsta(req: any, res: any, next: any){
         try{
-            const asta = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
-            //if (!checkDataAsta(asta.data_i)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToOpen);  //CORRETTO, MA COMMENTATO PER TEST MIGLIORI DEL METODO
+            const asta: any = await new ProxyAsta().getNotOpenAstaByID(Number(req.params.asta_id));
+            //if (!checkDataAsta(asta.data_i)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToOpen);  // E' STATO COMMENTATO PER COMODITA' NEI TEST
             asta.stato = stato_asta.IN_ESECUZIONE;
             if(asta.tipo === tipo_asta.ASTA_APERTA){
                 let response = await axios.post('http://localhost:8080/redirect/WSServer', asta.dataValues).catch(err => next(err));
@@ -279,7 +297,7 @@ export class Controller {
         try{
             let response: ObjectBuilder = new ObjectBuilder();
             const asta: any = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
-            //if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose);
+            //if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose); E' STATO COMMENTATO PER COMODITA' NEI TEST
             if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
                 let part: any = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
                 if(part !== false){
@@ -300,7 +318,7 @@ export class Controller {
                 }
             }
             else{
-                let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
+                let part: any = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
                 if(part.length > 1){
                     let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
                     
@@ -345,11 +363,18 @@ export class Controller {
                 
     }
 
+    /**
+     * Metodo che resituisce la lista di aste, aggiudicate e non, 
+     * a cui si è partecipato e che ora sono chiuse
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
+     */
     public async getMyClosedAste(req: any, res: any, next: any){
         try{
             let response: Array<ObjectBuilder> | ObjectBuilder;
             let arr : Array<ObjectBuilder> = new Array<ObjectBuilder>();
-            let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
+            let part: Array<any> = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
             if(part.length !== 0){
                 part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .map(elem =>{
@@ -445,6 +470,13 @@ export class Controller {
         }
     }
 
+    /**
+     * Metodo che restituisce l'elenco di aste a qui si è partecipato
+     * e che si sta partecipando, tenendo traccia delle offerte/rilanci eseguiti
+     * @param req request di express
+     * @param res response di express
+     * @param next next di express
+     */
     public async getMyAste(req: any, res: any, next: any){
         try{
             let response: Array<ObjectBuilder> | ObjectBuilder;
