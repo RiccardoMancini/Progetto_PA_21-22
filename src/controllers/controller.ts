@@ -278,10 +278,10 @@ export class Controller {
     public async setAuctionWon(req: any, res: any, next: any){
         try{
             let response: ObjectBuilder = new ObjectBuilder();
-            const asta = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
+            const asta: any = await new ProxyAsta().getOpenAstaByID(Number(req.params.asta_id));
             //if (!checkDataAsta(asta.data_f)) throw new ErrorFactory().getError(ErrEnum.TooEarlyToClose);
             if (asta.tipo !== tipo_asta.ASTA_CHIUSA_2){
-                let part = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
+                let part: any = await new ProxyPartecipazione().getFirstOfferByAstaID(asta.asta_id);
                 if(part !== false){
                     part.aggiudicata = true;
                     part = await new ProxyPartecipazione().updatePartecipazione(part);
@@ -301,7 +301,7 @@ export class Controller {
             }
             else{
                 let part = await new ProxyPartecipazione().getOffersByAstaID(asta.asta_id);
-                if(part !== null && part.length > 1){
+                if(part.length > 1){
                     let secondOffer = part.map(elem => elem.offerta).filter((elem, index) => index < 1 ? false : true)[0];
                     
                     part = await Promise.all(part.map(async (elem, index) => {
@@ -347,10 +347,11 @@ export class Controller {
 
     public async getMyClosedAste(req: any, res: any, next: any){
         try{
+            let response: Array<ObjectBuilder> | ObjectBuilder;
             let arr : Array<ObjectBuilder> = new Array<ObjectBuilder>();
-            // GESTIRE SE NON CI SONO PARTECIPAZIONI
             let part = await new ProxyPartecipazione().getClosedAsteByUserID(req.user_id, req.query.date_i, req.query.date_f);
-            part.sort((a, b) => { return a.asta_id - b.asta_id })
+            if(part.length !== 0){
+                part.sort((a, b) => { return a.asta_id - b.asta_id })
                 .map(elem =>{
                 if(arr.length === 0){ 
                     let tipo: string;
@@ -417,19 +418,24 @@ export class Controller {
                 }
                 });
 
-            const response: Array<ObjectBuilder> = arr.map(elem => {
-                                    let app = elem.getPartecipazioni().find(obj => obj.getAggiudicata() === true);
-                                    if(typeof app !== 'undefined'){
-                                        elem.setAggiudicata(true);
-                                    }
-                                    return new ObjectBuilder().setAstaID(elem.getAstaID())
-                                                              .setUserID(elem.getUserID())
-                                                              .setTipo(elem.getTipo())
-                                                              .setAggiudicata(elem.getAggiudicata())
-                                                              .setDataI(elem.getDataI())
-                                                              .setDataF(elem.getDataF())
-                                                              .build();
-            });
+                response = arr.map(elem => {
+                            let app = elem.getPartecipazioni().find(obj => obj.getAggiudicata() === true);
+                            if(typeof app !== 'undefined'){
+                                elem.setAggiudicata(true);
+                            }
+                            return new ObjectBuilder().setAstaID(elem.getAstaID())
+                                                    .setUserID(elem.getUserID())
+                                                    .setTipo(elem.getTipo())
+                                                    .setAggiudicata(elem.getAggiudicata())
+                                                    .setDataI(elem.getDataI())
+                                                    .setDataF(elem.getDataF())
+                                                    .build();
+                });
+                
+            }
+            else{
+                response = new ObjectBuilder().setMessaggio('Nessuna asta alla quale si è ancora partecipato!').build();
+            }            
 
             res.status(200).json(response);
             
@@ -441,12 +447,13 @@ export class Controller {
 
     public async getMyAste(req: any, res: any, next: any){
         try{
-            let app = [];
-            let rilanci = [];
-            //GESTIRE SE NON CI SONO  PARTECIPAZIONI
+            let response: Array<ObjectBuilder> | ObjectBuilder;
+            let app: Array<any> = [];
+            let rilanci: Array<any> = [];
             let part = await new ProxyPartecipazione().getAsteByUserID(req.user_id);
-            part = part.sort((a, b) => { return b.part_id - a.part_id })
-            .filter((elem) => {
+            if(part.length !== 0){
+                part = part.sort((a, b) => { return b.part_id - a.part_id })
+                .filter((elem) => {
                 let obj = {"asta_id": elem.asta_id};
                 let exists = app.find(value => value.asta_id === obj.asta_id);
                 if (typeof exists === 'undefined'){
@@ -460,9 +467,9 @@ export class Controller {
                     obj2.offerta.sort((a, b) => { return b - a })                
                     return false;
                 }
-            });
+                });
 
-            const response: Array<ObjectBuilder> = part.map((elem, index) => {
+                response = part.map((elem, index) => {
                 let tipo: string;
                 switch(elem.astum.tipo){
                     case tipo_asta.ASTA_APERTA:
@@ -487,6 +494,10 @@ export class Controller {
                                             .build();
                 });     
 
+            }
+            else{
+                response = new ObjectBuilder().setMessaggio('Nessuna asta alla quale si è ancora partecipato!').build();
+            }
             res.status(200).send(response);
         }
         catch(err){
