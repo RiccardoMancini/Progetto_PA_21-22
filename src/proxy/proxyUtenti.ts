@@ -1,36 +1,37 @@
 import { DB_Connection } from '../config/db_connection';
 import { Utenti } from "../models/utenti";
+import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
+import { UtentiInterface } from '../models/interface/utentiInterface';
 
-//export function validateUser(){
-const checkBodyHandler = {
-        get: (obj, prop) => {                
-            if(prop === 'credito'){
-                if (!Number(obj[prop])) {
-                    throw new TypeError('The credito is not a number');
-                }
-                if (obj[prop] < 1) {
-                    throw new RangeError('The credito seems invalid. Choose a number > 0');
-                }
+// Oggetto che viene passato come handler dell'oggetto proxy
+const proxyUtentiHandler = {
+    get: (obj, prop) => {                
+        if(prop === 'credito'){
+            if (isNaN(obj[prop])) {
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+              }
+            if (obj[prop] < 1) {
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+              }
             
-                return obj[prop];
-            }
-            if(prop === 'user_id'){
-                if (!Number.isInteger(obj[prop])) {
-                    throw new TypeError('The user_id is not an integer');
-                }
-                if (obj[prop] < 1) {
-                    throw new RangeError('The user_id seems invalid. Choose a number > 0');
-                }
-                
-                return obj[prop];
-            }      
+            return obj[prop];
         }
+        if(prop === 'user_id'){
+            if (!Number.isInteger(obj[prop])) {
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+              }
+            if (obj[prop] < 1) {
+                throw new ErrorFactory().getError(ErrEnum.BadFormattedData);
+              }
+            
+            return obj[prop];
+        }      
     }
-//}
+}
 
-
-export class ProxyUtenti{
-    modelUtenti: any;
+// Classe proxy corrispondente al modello utenti
+export class ProxyUtenti implements UtentiInterface{
+    modelUtenti: Utenti;
     proxyUtenteValidator: any;
 
     constructor(){
@@ -38,46 +39,65 @@ export class ProxyUtenti{
         this.modelUtenti = new Utenti(DB_Connection.getInstance().getConnection());
 
     }
-    
-    /*public async getUtenti(){
-        return await this.modelUtenti.getUtenti();
-    }*/
 
-    public async getUserByID(user_id: number){
-      return await this.modelUtenti.getUserByID(user_id);
+    /**
+     * Metodo che restituisce i dati riguardanti un utente
+     * @param user_id id dell'utente che si vuole selezionare
+     * @returns oggetto rappresentante l'utente
+     */
+    public async getUserByID(user_id: number): Promise<any|null>{
+        return await this.modelUtenti.getUserByID(user_id);
     }
 
-    public async getCreditoByUserID(user_id: number){
-        try{
-            await this.checkUserExists(user_id);
-            return await this.getUserByID(user_id).then(value => value.credito);
-        }
-        catch(err){
-            console.log(err);
-        }          
+    /**
+     * Metodo che restituisce il credito di un certo utente
+     * @param user_id id dell'utente che si vuole selezionare
+     * @returns credito
+     */
+    public async getCreditoByUserID(user_id: number): Promise<any>{
+        // check dell'esistenza dell'utente
+        await this.checkUserExists(user_id);
+        return await this.getUserByID(user_id).then(value => value.credito);            
     }
 
-    public async updateCreditoUtente(payload: any){
-        try{
-            this.proxyUtenteValidator = new Proxy(payload, checkBodyHandler);
-            const val_credito = this.proxyUtenteValidator.credito;
-            const val_user_id = this.proxyUtenteValidator.user_id;
+    /**
+     * Metodo che aggiorna il credito di un certo utente
+     * @param payload body della richiesta
+     * @param afterOffer flag booleano
+     * @returns oggetto con il nuovo credito dell'utente
+     */
+    public async updateCreditoUtente(payload: any, afterOffer: boolean = false): Promise<any>{
+        let val_credito: number;
+        let val_user_id: number;
+        if( afterOffer === false){
+            // validazione del nuovo credito e dell'id passato
+            this.proxyUtenteValidator = new Proxy(payload, proxyUtentiHandler);            
+            val_credito = this.proxyUtenteValidator.credito;
+            //console.log(val_credito)
+            val_user_id = this.proxyUtenteValidator.user_id;
+            // check se l'utente esiste
             await this.checkUserExists(val_user_id);
-
-            let userByID = this.modelUtenti.updateCreditoUtente(val_user_id, val_credito);            
-        
-            return userByID;
-
         }
-        catch(err){
-            console.log(err);
-        }        
-  }
+        else{
+            val_user_id = payload.user_id;
+            val_credito = payload.addebito;
+        }
 
+        //console.log(val_user_id, Number(val_credito.toFixed(3)));
+
+        let userByID: any = await this.modelUtenti.updateCreditoUtente(val_user_id, Number(val_credito.toFixed(3)));            
+    
+        return userByID;    
+    }
+
+    /**
+     * Metodo utilizzato per la verifica dell'esistenza di un utente
+     * @param user_id id dell'utente che si vuole selezionare
+     */
     public async checkUserExists(user_id: number): Promise<void>{
         let userCheck = await this.modelUtenti.getModelUtenti().findByPk(user_id);
         if(userCheck === null){
-            throw new TypeError('Utente non trovato');
+            throw new ErrorFactory().getError(ErrEnum.UserNotFound);
         }
     }
 }

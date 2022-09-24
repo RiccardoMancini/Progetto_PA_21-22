@@ -1,85 +1,130 @@
 import jwt from 'jsonwebtoken';
+import { ErrorFactory, ErrEnum } from "../factory/errorFactory";
 require('dotenv').config();
 
+enum role{
+    ADMIN = 1,
+    BID_CREATOR = 2,
+    BID_PARTICIPANT = 3
+}
+
 /**
- * Check della presenza del parametro di autorizzazione
- */
-export const checkHeader = (req,res,next) => {
-    const aHeader = req.headers.authorization;
-    if (aHeader) next();
-    else res.status(400).send('Bad request');
+* Check che verifica l'effettiva presenza del parametro di autorizzazione
+* nell'header della richiesta
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+export const checkHeader = (req: any, res: any, next: any) => {
+    try{
+        const aHeader = req.headers.authorization;
+        if(aHeader) next();
+        else throw new ErrorFactory().getError(ErrEnum.HeaderNotFound);
+    }
+    catch(err){
+        next(err);
+    }
+    
 
 };
 
 /**
- * Funzione che fa il check della bearerHeader
- */
-export const checkToken = (req,res,next) => {
-
-    const bearerHeader = req.headers.authorization;
-        if(typeof bearerHeader!=='undefined'){
+* Check del bearer header affinchè sia corretto
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+export const checkToken = (req: any, res: any, next: any) => {
+    try{
+        const bearerHeader = req.headers.authorization;
+        if(typeof bearerHeader !== 'undefined'){
             const bearerToken = bearerHeader.split(' ')[1];
-            req.token = bearerToken;
-            
+            req.token = bearerToken;            
             next();
         }
-        else res.status(400).send('Bad request');
+        else throw new ErrorFactory().getError(ErrEnum.InvalidHeaderFormat);
+    }
+    catch(err){
+        next(err);
+    }
 };
 
-
-export const verifyAndAuthenticate = (req,res,next) => {
+/**
+* Check dell'effettiva autenticazione dell'utente
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+export const checkAuthentication = (req: any, res: any, next: any) => {
     try{
         let decoded = jwt.verify(req.token, process.env.SECRET_KEY);
         if(decoded !== null){
             if(decoded.role === 1 || decoded.role === 2 || decoded.role === 3){
                 req.user_id = decoded.id;                
                 next();
-            } else {
-                //DA GESTIRE CON L'ERROR HANDLER
-                res.status(500).send('No permessi')
             }
-        }else{
-            res.status(500).send('Errore di firma')
+            else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
         }
-    }catch(error){
-        console.log('Sono nel catch!')
+    }
+    catch(err){
+        next(err);
     }
 };
 
-
-
 /**
- * Funzione che verifica il BidCreator
- */
-export const isBidCreator = (req,res,next) => {
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 1)){
-        console.log(decoded)
-        next();
+* Check dei privilegi di Admin dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+export const isAdmin = (req: any, res: any, next: any) => {
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+        if(decoded !== null && (decoded.role === role.ADMIN)){
+            next();
+        }
+        else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
     }
-    else res.status(401).send("Unauthorized");
+    catch(err){
+        next(err);
+    }
 }
 
 /**
- * Funzione che verifica l'admin
- */
-export const isAdmin = (req,res,next) => {
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 2)){
-        console.log(decoded)
-        next();
+* Check dei privilegi di BidCreator dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+ export const isBidCreator = (req: any, res: any, next: any) => {
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+        if(decoded !== null && (decoded.role === role.BID_CREATOR)){
+            next();
+        }
+        else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
     }
-    else res.status(401).send("Unauthorized");
-}
+    catch(err){
+        next(err);
+    }
+ }
+    
 
 /**
- * Funzione che verifica BidParticipant 
- */
-export const isBidParticipant = (req,res,next) => {
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
-    if(decoded !== null && typeof decoded.username === "string" && (decoded.role === 3)) {
-        console.log(decoded)
-        next();
+* Check dei privilegi di BidParticipant dell'utente autenticato
+* @param req request di express
+* @param res response di express
+* @param next next di express
+*/
+export const isBidParticipant = (req: any, res: any, next: any) => {
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY);    
+        if(decoded !== null && (decoded.role === role.BID_PARTICIPANT)){
+            next();
+        }
+        else throw new ErrorFactory().getError(ErrEnum.Unauthorized);
     }
-    else res.status(401).send("Unauthorized");
+    catch(err){
+        next(err);
+    }
 }

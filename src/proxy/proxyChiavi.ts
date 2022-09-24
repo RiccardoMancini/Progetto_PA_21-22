@@ -1,25 +1,22 @@
 import { DB_Connection } from '../config/db_connection';
 import { Chiavi} from '../models/chiavi'; 
+import { ChiaviInterface } from '../models/interface/chiaviInterface';
 
-
-export class ProxyChiavi{
-
-    modelChiavi: any;
-    proxyChiaviValidator: any
+// Classe proxy corrispondente al modello chiavi
+export class ProxyChiavi implements ChiaviInterface{
+    modelChiavi: Chiavi;
 
     constructor(){
-
         this.modelChiavi = new Chiavi(DB_Connection.getInstance().getConnection());
-
     }
 
-    public async getChiavi(){
+    /**
+     * Metodo che selezione tutte le coppie di chiavi nel db
+     * @returns un'array di oggetti rappresentanti le chiavi
+     */
+    public async getChiavi(): Promise<Array<any>>{
         return await this.modelChiavi.getChiavi();
         
-    }
-
-    public async getChiaviById( chiavi_id: number){
-        return await this.modelChiavi.getUserByID(chiavi_id);
     }
 
 

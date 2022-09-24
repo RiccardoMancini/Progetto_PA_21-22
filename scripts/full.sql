@@ -3,9 +3,7 @@ CREATE DATABASE pa;
 
 CREATE TABLE Utenti(
     user_id SERIAL PRIMARY KEY,
-    username VARCHAR(30) NOT NULL,
     nome VARCHAR(30) NOT NULL,
-    cognome VARCHAR(30) NOT NULL,
     ruolo int NOT NULL,
     credito float8 NOT NULL
 );
@@ -33,18 +31,18 @@ CREATE TABLE Partecipazione (
     user_id int NOT NULL,
     asta_id int NOT NULL,
     aggiudicata boolean NOT NULL,
-    offerta int NOT NULL,
+    offerta float8 NOT NULL,
     CONSTRAINT FK_Utenti FOREIGN KEY (user_id) REFERENCES Utenti(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT FK_Asta FOREIGN KEY (asta_id) REFERENCES Asta(asta_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO Utenti (username, nome, cognome, ruolo, credito) VALUES
-('richymanci', 'Riccardo', 'Mancini', 2, 50), 
-('marti_pa', 'Martina', 'Paoletti', 3, 0),
-('arme_peliv', 'Arment', 'Pelivani', 2, 70),
-('admin', 'AD', 'MIN', 1, 999),
-('pippo', 'Pippo', 'Pallino', 3, 25),
-('prova', 'Pippo', 'Pallino', 3, 15);
+INSERT INTO Utenti (nome, ruolo, credito) VALUES
+('Riccardo', 3, 1400), 
+('Martina', 3, 500),
+('Arment', 2, 999),
+('admin', 1, 999),
+('Pippo', 3, 700),
+('Pluto', 3, 560);
 
 INSERT INTO Chiavi (public_key, private_key) VALUES
 ('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjf2ba7J5z/7Lytk+N9GZcmVj/AbMxR/UO7VF+2v42QtlgUZKsrXzcv9a3QeWOnCBbMOxYyHs0WB9vFzjwC2tIRc7Ms5Bj8+DB5d2t7TOZStpuhti1UgP7JVUmf+YRqRTKRG6L/cB1tJzyPY3t3biL8J9rTmsWOgS0Zl1FAC661wIDAQAB', 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKN/ZtrsnnP/svK2T430ZlyZWP8BszFH9Q7tUX7a/jZC2WBRkqytfNy/1rdB5Y6cIFsw7FjIezRYH28XOPALa0hFzsyzkGPz4MHl3a3tM5lK2m6G2LVSA/slVSZ/5hGpFMpEbov9wHW0nPI9je3duIvwn2tOaxY6BLRmXUUALrrXAgMBAAECgYEAltRSY8aECwkp4aT0UUXVJLnHE0FTOTRjy4h9dSS7/fy/oo6+XBSUKuXDRD5DcsNvShEhCGqy1kAxh3+J5FD0fzbQPd7nd5GPwUAxPOpvd89BzvdpkF9uSk3Gk8WtCb9egBJm68iZaiybThPpXscuHRMr63BaPga/T/YjcRGhLMkCQQDZhRMwYxX6fRwdRm10OF70CO3FJRpRkxqDEIE3QZZIOEYkb6hg4vVnZjFTECs9XRIaLd0BMDK5ijutKeBeaETzAkEAwGvMmH2qNZHSufNsTqMRurgfLDD7tms0ZWAkBM1Age0ApIhgDk4KakNhq1bh6T8gWoGikwD2UsFZry5F4eB7jQJAVi97Fe38tF5D+HmCPs1jGhA7naSA1BeUJqAwgqNTF1Rsvl0beyASGiEMpBvA9jRdStAnRCRDxO43jPoNs3pe7wJBALDUoDHnEjumpfQzKu5dV5azTBptbXTnskATiSZMhaKg7f1GQpgCyfl7sM8nyfZzB8WE6qWTtcq5WzTtHlWE2aUCQHUemtAEgRP7wbRgJa0r6+qWcjRoRppfcCp31gWgSKPi1XGtQyxNw5zd2aEqrivfiKddj8mEBDhKOS5f+x8JGNQ='),
@@ -54,18 +52,32 @@ INSERT INTO Chiavi (public_key, private_key) VALUES
 ('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqPlUSB4JnWTIzVO2iaHGotUxR39A/XUW/Z+/yS5UZB0134ooGO64HSXje45/WCvEX8SE8m/w2SqrS5D818oNLNv0ppGgwxp9sbL+o5iMaTI5t/2Q2bbrUEhFg9U4mY6TmpdgnQjyST6QEdkMM3PgfW9Pm7eWbj94ul6tRIyeDpwIDAQAB', 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKo+VRIHgmdZMjNU7aJocai1TFHf0D9dRb9n7/JLlRkHTXfiigY7rgdJeN7jn9YK8RfxITyb/DZKqtLkPzXyg0s2/SmkaDDGn2xsv6jmIxpMjm3/ZDZtutQSEWD1TiZjpOal2CdCPJJPpAR2Qwzc+B9b0+bt5ZuP3i6Xq1EjJ4OnAgMBAAECgYBJvMnYD0yaOvYVabmr2JUyP6SY6donN90X9IrnZXlk59bUEFk8LelI2rfxwqHeccrPVe/RcrahRWIMCjSexzW6S+9xYY97LBv7+VcoLRo51xg+eAj/m4qYy4OU4jonG6FjDQiqtM5121v5VQUIqNS0NwXq2Ld0aHjG8j27f1afgQJBAP42PuRsPLidEa/gwW0Eo3Am/Zcsu9qyu1iCBubkmTBXtOZt4iHopLUUvNrkYT4H4TB7I60U2lC7Cpouq4Qyx0cCQQCrcOLprZf/TG6RDGqCkRlvYyZz35sABxn8hzamudcsHkq1C93L9T7hX+0bJBthNA2B/t3/Fe9U/MyOLJCUflChAkBQvE2xIicOwuOxJgKIaya1Icz8TDrFNGqHq5QhlIyKa/CKFm/xMP/Oeu2X31x65OnCCfnEqJDFfwHZAeV7MN1VAkEAje7iXVWzXc/4RauCzl+0MAxk/E9l8oruj6udqkB3DHZzoRmW4VFDYrDZCrxE0p+Wg0Xuok2Vm8XCz/3DILzGoQJBAKn3PxmlRRhhaM9ydNBSoV3FZhdIJ/89X6DLRftPRyenL/EAkhCcKrkd2m+g2S/sgx/uGZZFO22M3mc4y79ppvE=');
 
 INSERT INTO Asta (tipo, p_min, stato, data_i, data_f, chiavi_id) VALUES
-(2, 15, 3, '2020-12-15', '2020-12-17', 2),
-(3, 10, 3, '2021-11-13', '2021-12-13', 4),
-(2, 50, 1, '2022-06-27', '2022-12-17', 5),
-(1, 10, 3, '2021-11-14', '2021-12-15', 4),
-(1, 10, 3, '2021-11-11', '2021-12-15', 1);
+(2, 150, 2, '2020-12-15', '2020-12-17', 2),
+(3, 100, 2, '2021-11-13', '2021-12-13', 4),
+(2, 500, 1, '2022-06-27', '2022-12-17', 5),
+(1, 200, 2, '2021-11-14', '2021-12-15', null),
+(1, 200, 3, '2021-11-11', '2021-12-15', 1),
+(3, 150, 2, '2021-09-27', '2021-09-29', 1),
+(2, 250, 2, '2022-10-18', '2022-10-22', 3);
 
 INSERT INTO Partecipazione (user_id, asta_id, aggiudicata, offerta) VALUES
 (2, 5, FALSE, 40),
-(5, 1, TRUE, 20),
-(1, 2, FALSE, 15),
-(6, 2, FALSE, 15),
-(2, 4, TRUE, 40),
+(5, 1, FALSE, 155),
+(1, 2, FALSE, 150),
+(6, 2, FALSE, 140),
+(5, 4, FALSE, 205),
 (2, 5, TRUE, 20),
-(2, 1, TRUE, 15),
-(2, 4, FALSE, 15);
+(2, 1, FALSE, 160),
+(1, 4, FALSE, 210),
+(1, 4, FALSE, 240),
+(1, 4, FALSE, 260),
+(1, 4, FALSE, 350),
+(2, 4, FALSE, 220),
+(2, 4, FALSE, 230),
+(1, 1, FALSE, 220),
+(6, 1, FALSE, 180),
+(2, 4, FALSE, 250),
+(6, 4, FALSE, 280),
+(2, 4, FALSE, 320),
+(2, 2, FALSE, 105),
+(5, 2, FALSE, 160);

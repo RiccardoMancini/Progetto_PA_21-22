@@ -1,26 +1,26 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
+import { UtentiInterface } from './interface/utentiInterface';
 
-export class Utenti{
-    /*user_id: number;
-    username: string;
-    nome: string;
-    cognome: string;
-    ruolo: string;
-    credito: string;*/
+/**
+ * Classe che definisce il modello Utenti che permette di interfacciarsi
+ * alla rispettiva tabella 'utenti' nel database
+ */
+export class Utenti implements UtentiInterface{
     utenti: any;
 
+    /**
+     * Interazione con i dati tramite l'ORM Sequelize
+     * che va a definire il modello utenti durante la costruzione dell'oggetto
+     */
     constructor(sequelize: Sequelize)
     {
-
         this.utenti = sequelize.define("utenti", {
             user_id: {
               type: DataTypes.INTEGER,
               autoIncrement: true,
               primaryKey: true
             },
-            username: { type: DataTypes.STRING },
             nome: { type: DataTypes.STRING },
-            cognome: { type: DataTypes.STRING },
             ruolo: { type: DataTypes.SMALLINT },
             credito: { type: DataTypes.FLOAT }
           }, {
@@ -30,15 +30,21 @@ export class Utenti{
 
     }
 
-    public async getUtenti(){
-        return await this.utenti.findAll();
-    }
-
-    public async getUserByID(user_id: number){
+    /**
+     * Metodo che restituisce i dati riguardanti un utente
+     * @param user_id id dell'utente che si vuole selezionare
+     * @returns oggetto rappresentante l'utente
+     */
+    public async getUserByID(user_id: number): Promise<any|null>{
       return await this.utenti.findByPk(user_id);
     }
 
-    public async getCreditoByUserID(user_id: number){
+    /**
+     * Metodo che restituisce il credito di un certo utente
+     * @param user_id id dell'utente che si vuole selezionare
+     * @returns credito
+     */
+    public async getCreditoByUserID(user_id: number): Promise<any>{
       return await this.utenti.findOne({
         attributes: ['credito'],
         where: {
@@ -47,15 +53,23 @@ export class Utenti{
       })
     }
 
-    
-    public async updateCreditoUtente(user_id: number, credito: number){
+    /**
+     * Metodo che aggiorna il credito di un certo utente
+     * @param payload body della richiesta
+     * @param afterOffer flag booleano
+     * @returns oggetto con il nuovo credito dell'utente
+     */
+    public async updateCreditoUtente(user_id: number, credito: number): Promise<any>{
       let userByID = await this.getUserByID(user_id);
       userByID.credito = userByID.credito + credito;
       await userByID.save();
       return userByID;
     }
 
-    public getModelUtenti(){
+    /**
+     * @returns modello utenti
+     */
+    public getModelUtenti(): any{
         return this.utenti;
     }
 
