@@ -8,12 +8,16 @@ Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-e
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
 -	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di una coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
-Di seguito un esempio di chiave privata presente nel database, con cifratura del tipo "PKCS1Padding:
+Di seguito un esempio di coppia di chiavi pubbliche / private presenti nel database, con cifratura del tipo "PKCS1Padding:
+
+*Chiave pubblica*
+```
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjf2ba7J5z/7Lytk+N9GZcmVj/AbMxR/UO7VF+2v42QtlgUZKsrXzcv9a3QeWOnCBbMOxYyHs0WB9vFzjwC2tIRc7Ms5Bj8+DB5d2t7TOZStpuhti1UgP7JVUmf+YRqRTKRG6L/cB1tJzyPY3t3biL8J9rTmsWOgS0Zl1FAC661wIDAQAB
+```
+*Chiave privata*
 ```
 MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKN/ZtrsnnP/svK2T430ZlyZWP8BszFH9Q7tUX7a/jZC2WBRkqytfNy/1rdB5Y6cIFsw7FjIezRYH28XOPALa0hFzsyzkGPz4MHl3a3tM5lK2m6G2LVSA/slVSZ/5hGpFMpEbov9wHW0nPI9je3duIvwn2tOaxY6BLRmXUUALrrXAgMBAAECgYEAltRSY8aECwkp4aT0UUXVJLnHE0FTOTRjy4h9dSS7/fy/oo6+XBSUKuXDRD5DcsNvShEhCGqy1kAxh3+J5FD0fzbQPd7nd5GPwUAxPOpvd89BzvdpkF9uSk3Gk8WtCb9egBJm68iZaiybThPpXscuHRMr63BaPga/T/YjcRGhLMkCQQDZhRMwYxX6fRwdRm10OF70CO3FJRpRkxqDEIE3QZZIOEYkb6hg4vVnZjFTECs9XRIaLd0BMDK5ijutKeBeaETzAkEAwGvMmH2qNZHSufNsTqMRurgfLDD7tms0ZWAkBM1Age0ApIhgDk4KakNhq1bh6T8gWoGikwD2UsFZry5F4eB7jQJAVi97Fe38tF5D+HmCPs1jGhA7naSA1BeUJqAwgqNTF1Rsvl0beyASGiEMpBvA9jRdStAnRCRDxO43jPoNs3pe7wJBALDUoDHnEjumpfQzKu5dV5azTBptbXTnskATiSZMhaKg7f1GQpgCyfl7sM8nyfZzB8WE6qWTtcq5WzTtHlWE2aUCQHUemtAEgRP7wbRgJa0r6+qWcjRoRppfcCp31gWgSKPi1XGtQyxNw5zd2aEqrivfiKddj8mEBDhKOS5f+x8JGNQ=
 ```
-
-ESEMPIO DI COPPIA DI CHIAVI
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
 -	Creare una nuova tipologia di asta 
@@ -48,8 +52,8 @@ Get | /api/v1.0.0/credito | bid_participant | si
 Patch | /api/v1.0.0/admin/accredito | admin | si
 Post | /api/v1.0.0/asta | bid_creator | si
 Post | /api/v1.0.0/asta/offerta | bid_participant | si
-Get | /api/v1.0.0/asta/:asta_id/open| (System) | no
-Get | /api/v1.0.0/asta/:asta_id/close| (System) | no
+Get | /api/v1.0.0/asta/:asta_id/open| (system) | no
+Get | /api/v1.0.0/asta/:asta_id/close| (system) | no
 
 ## Descrizione delle singole rotte
 #### 1) Elenco aste (/api/v1.0.0/aste)
@@ -81,7 +85,7 @@ Nel caso in cui non esistessero aste fitrate per un determinato stato, verrebbe 
         "messaggio": "Non esistono aste in questo stato!"
 }
 ```
-#### 2) Elenco aste alla quale si è partecipato / si sta partecipando con rilanci/offerte (/api/v1.0.0/storico/aste)
+#### 2) Storico aste con offerte e rilanci (/api/v1.0.0/storico/aste)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
@@ -125,7 +129,7 @@ Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente r
 ```
 
 
-#### 3) Elenco aste, aggiudicate e non, alle quali si è partecipato (/api/v1.0.0/storico/aste/closed)
+#### 3) Storico aste aggiudicate e non (/api/v1.0.0/storico/aste/closed)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
@@ -224,12 +228,11 @@ La risposta, nel caso in cui passassero tutti i controlli e venisse registrata c
 ```
 
 
-##### Controllo date nella creazione dell'asta
-- La base d'asta deve essere un tipo di dato numerico e strettamente maggiore di 0
-- le data di inizio e di fine deve essere di tipo stringa e devono rispettare i seguenti formati: `dd/mm/yyyy hh:tt` o `yyyy/mm/dd hh:tt`; (il separatore della data può essere sia "/" che "-", mentre il separatore del tempo deve essere ":")
+##### Controllo date nella creazione dell'aste
+- le data di inizio e di fine deve essere di tipo stringa e devono rispettare i seguenti formati: `dd/mm/yyyy hh:tt` o `yyyy/mm/dd hh:tt`; (il separatore della data può essere sia "/" che "-", mentre il separatore del tempo deve essere ":"; il tempo può anche essere omesso)
 - le date di inizio e di fine devono soddisfare la seguente relazione :
 `data attuale ≤ data inizio asta < data fine asta`
-- inoltre nell'asta inglese aperta il giorno, il mese e l'anno della data iniziale deve coincidere con quella finale.
+- inoltre nell'asta inglese aperta il giorno, il mese e l'anno della data iniziale deve coincidere con quella finale. Di conseguenza il tempo deve essere per forza specificato, altrimenti le date di inizio e di fine corrisponderebbero, e non verrebbe rispettato il secondo punto.
 
 
 #### 7) Nuova offerta (/api/v1.0.0/asta/offerta)
@@ -372,9 +375,29 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 ## Test
 Per la fase di test, è stata allegata con tale progetto una collection di Postman, nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
 Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunge delle richieste in grado di simulare nel modo corretto il workflow delle aste.
-Nello specifico, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie offerte (codificate manualmente con la chiave pubblica corretta) per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
 
-Invece, per quanto riguarda la cartella riferita all'asta inglese aperta,..
+- Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (LINK CONTROLLO DATE). Una volta creata l'asta, è possibile cambiarle stato e rendere in ascolto il Wss con la richiesta successiva, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (LINK ROTTA ELENCO DATE), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata.
+Una volta che la stanza è aperta verra loggato in console un messaggio di questo tipo:
+`Stanza dedicata all'asta con ID: 8, in ascolto sulla porta: 8081. Si parte da una base d'asta di 200!`
+
+*Nota 1: Tale simulazione è stata pensata per un numero massimo di client pari a 3, ma si può modificare semplicemente attraverso il settaggio della variabile d'ambiente N_CLIENTS presente nel file .env. Se si volesse diminuire a 2 non ci sarebbe alcun problema. Nel caso in cui invece si volesse aumentare il numero di client, bisognerà anche aggiungere il token JWT dei nuovi concorrenti nella maniera specificata dalla nota2 qui di seguito.*
+A questo punto è possibile collegare diversi client/concorrenti a tale stanza semplicemente aprendo nuove powershell ed eseguire il seguente comando:
+
+`docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts N"`
+
+*Nota 2: Il numero finale di tale comando si riferisce al nome della variabile di ambiente (presente in .env) corrispondente al token dell'utente che si vuol fare partecipare. Per la presente demo, sarà necessario sostituirlo con 1, 2, 3 rispettivamente per ogni powershell aperta. Come di seguito:* 
+
+`docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts 1"`
+
+`docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts 2"`
+
+`docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts 3"`
+
+
+
+
+- Invece, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie di offerte (codificate manualmente con la chiave pubblica corretta) per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
+
 
 
 
