@@ -8,6 +8,11 @@ Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-e
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
 -	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di una coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
+Di seguito un esempio di chiave privata presente nel database, con cifratura del tipo "PKCS1Padding:
+```
+MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKN/ZtrsnnP/svK2T430ZlyZWP8BszFH9Q7tUX7a/jZC2WBRkqytfNy/1rdB5Y6cIFsw7FjIezRYH28XOPALa0hFzsyzkGPz4MHl3a3tM5lK2m6G2LVSA/slVSZ/5hGpFMpEbov9wHW0nPI9je3duIvwn2tOaxY6BLRmXUUALrrXAgMBAAECgYEAltRSY8aECwkp4aT0UUXVJLnHE0FTOTRjy4h9dSS7/fy/oo6+XBSUKuXDRD5DcsNvShEhCGqy1kAxh3+J5FD0fzbQPd7nd5GPwUAxPOpvd89BzvdpkF9uSk3Gk8WtCb9egBJm68iZaiybThPpXscuHRMr63BaPga/T/YjcRGhLMkCQQDZhRMwYxX6fRwdRm10OF70CO3FJRpRkxqDEIE3QZZIOEYkb6hg4vVnZjFTECs9XRIaLd0BMDK5ijutKeBeaETzAkEAwGvMmH2qNZHSufNsTqMRurgfLDD7tms0ZWAkBM1Age0ApIhgDk4KakNhq1bh6T8gWoGikwD2UsFZry5F4eB7jQJAVi97Fe38tF5D+HmCPs1jGhA7naSA1BeUJqAwgqNTF1Rsvl0beyASGiEMpBvA9jRdStAnRCRDxO43jPoNs3pe7wJBALDUoDHnEjumpfQzKu5dV5azTBptbXTnskATiSZMhaKg7f1GQpgCyfl7sM8nyfZzB8WE6qWTtcq5WzTtHlWE2aUCQHUemtAEgRP7wbRgJa0r6+qWcjRoRppfcCp31gWgSKPi1XGtQyxNw5zd2aEqrivfiKddj8mEBDhKOS5f+x8JGNQ=
+```
+
 ESEMPIO DI COPPIA DI CHIAVI
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
@@ -43,7 +48,8 @@ Get | /api/v1.0.0/credito | bid_participant | si
 Patch | /api/v1.0.0/admin/accredito | admin | si
 Post | /api/v1.0.0/asta | bid_creator | si
 Post | /api/v1.0.0/asta/offerta | bid_participant | si
-Get | /asta/:asta_id/closed| - | -
+Get | /api/v1.0.0/asta/:asta_id/open| (System) | no
+Get | /api/v1.0.0/asta/:asta_id/close| (System) | no
 
 ## Descrizione delle singole rotte
 #### 1) Elenco aste (/api/v1.0.0/aste)
@@ -251,9 +257,12 @@ La risposta, nel caso in cui venissero passati tutti i controlli, sarebbe:
 ```
 Per quando riguarda le offerte relative alle aste in busta chiusa, il body di tali richieste conterrà l'offerta codificata tramite la chiave pubblica associata all'asta. Di conseguenza, dopo aver validato opportunamente tale offerta, il sistema dovrà decodificarla attraverso la relativa chiave primaria, grazie all'ausilio della [libreria crypto](https://nodejs.org/api/crypto.html), prima di poterla inserire nel database.
 Un esempio di body di tale richiesta potrebbe essere il seguente:
-
-ESEMPIO BODY OFFERTA ASTE CHIUSE
-
+```
+{
+    "asta_id": 7,
+    "offerta": "I43UPpy1EBk17LIaeYGBxkasI19J4PTkYthQ/uFuhpMDyCOIqT0rzUWSOXJXusiPzeuR4teVtR71H5CmkU6/abI9EXimHbnI95h1pVno9YnHA0ZYpSR4Zn1Go4Nb7PqW/RcMuNnrp8QvlSpbe/O+i3U50rx30ivuQeiY7zqsTkU="
+}
+```
 
 #### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "NON APERTA" a "IN ESECUZIONE" tramite il suo id, passato nell'url della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto. 
@@ -361,7 +370,15 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 - spiegazone su come avviare il progetto
 
 ## Test
-- allegare la collection di postman con la demo
+Per la fase di test, è stata allegata con tale progetto una collection di Postman, nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
+Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunge delle richieste in grado di simulare nel modo corretto il workflow delle aste.
+Nello specifico, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie offerte (codificate manualmente con la chiave pubblica corretta) per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
+
+Invece, per quanto riguarda la cartella riferita all'asta inglese aperta,..
+
+
+
+In tutte le cartelle sarà presente la rotta di sistema che permetterà di chiudere l'asta e decretare il vincitore secondo la corretta strategia dell'asta.
 
 ## Autori
 - [Riccardo Mancini](https://github.com/RiccardoMancini)
