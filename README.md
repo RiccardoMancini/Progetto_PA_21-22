@@ -1,4 +1,4 @@
-# Sviluppo di un back-end per la gestione di varie tipologie di aste
+# Sviluppo di un back-end per la gestione di varie tipologie di asta
 
 ## Obiettivi
 Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperta, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto. Gli utenti che potranno utilizzare il back-end e, che di conseguenza potranno interagire con le aste prima elencate, saranno:
