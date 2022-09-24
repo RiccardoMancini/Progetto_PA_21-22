@@ -439,8 +439,7 @@ A questo punto è possibile collegare diversi client/concorrenti a tale stanza s
 
 - Invece, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie di offerte, codificate manualmente con la chiave pubblica corretta, per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
 
-
-* Nota: In tutte le cartelle è presente la rotta di sistema che permette di chiudere un'asta "IN ESECUZIONE" e decretare il vincitore secondo la corretta strategia dell'asta. *
+*Nota: In tutte le cartelle è presente la rotta di sistema che permette di chiudere un'asta "IN ESECUZIONE" e decretare il vincitore secondo la corretta strategia dell'asta.*
 
 ## Autori
 - [Riccardo Mancini](https://github.com/RiccardoMancini)
