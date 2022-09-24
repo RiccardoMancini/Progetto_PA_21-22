@@ -1,0 +1,829 @@
+{
+	"info": {
+		"_postman_id": "c3ee8aa1-c85c-4e58-b004-74ed6ebcf30a",
+		"name": "PA project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8923110"
+	},
+	"item": [
+		{
+			"name": "Asta inglese aperta",
+			"item": [
+				{
+					"name": "Creazione asta inglese aperta (bid_creator)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IkFybWVudCIsInJvbGUiOjJ9.TxhP0-moJwH2uZRx15bAKEC24ctdEyp5-M1hYbsljlA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\": 1,\r\n    \"p_min\": 200,\r\n    \"data_i\": \"2022/09/25 13:00\",\r\n    \"data_f\": \"2022/09/25 14:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(System) Apertura asta e wss",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/8/open",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"8",
+								"open"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(System) Chiusura asta e vincitore asta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/8/close",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"8",
+								"close"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Asta in busta chiusa (prezzo+alto)",
+			"item": [
+				{
+					"name": "Nuova offerta (userID: 1 - offerta 300)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 7,\r\n    \"offerta\": \"I43UPpy1EBk17LIaeYGBxkasI19J4PTkYthQ/uFuhpMDyCOIqT0rzUWSOXJXusiPzeuR4teVtR71H5CmkU6/abI9EXimHbnI95h1pVno9YnHA0ZYpSR4Zn1Go4Nb7PqW/RcMuNnrp8QvlSpbe/O+i3U50rx30ivuQeiY7zqsTkU=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 2 - offerta 285)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibmFtZSI6Ik1hcnRpbmEiLCJyb2xlIjozfQ.MPpuQI-2KdQdJ5cuVPDlz84x8O2MXPzEsYqkl97iQns",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 7,\r\n    \"offerta\": \"SlD09wbNgPQ+p2Irlf2i03mrk2fO0uHWL0XYx/BsLn2XihSNbHdFVc3RKCtXSarbX/FRslODg1bC8oaoVr+eHHGw/mrVSP8etr2Z/uNKavdtnd+zzoN+3juh0ivVxPw6PCEkNM/PjS6PVf1tggV1lc+TcZ6mQzOirXgGmPJ4w5A=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 5 - offerta troppo bassa!)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IlBpcHBvIiwicm9sZSI6M30.RiXBXsShF8AVIaaTTz8R6qo1q3ZbmDXQy9XZeEFITxY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 7,\r\n    \"offerta\": \"DGbvvkqlnosJPYj2pTwGSGjcHY+2oFCIvBxFOwy5MTz1QiNxS9Ivc7D2yPdNjZpgQYw9pn7tZO2RORYSXeiR/Gb2MLcdk7+LEKbnlrNtfTR+PKFy/dlzhM1Jsai3OxQTUQQyDIC+MhCK/T4+mWkqj3+3hbcZ/uwT2FJhxzyhXTU=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 6 - offerta 260)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IlBsdXRvIiwicm9sZSI6M30.l32ri4GKwi9ZhLwTQSEqquIzAgZ_oZO0uR03pPc2pyc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 7,\r\n    \"offerta\": \"kqu6GFuX8V47VGaMr8Yf+aJ+ckau/0rkd2H4yzfFmp+LBCLpZ4OLCFQ1tA2GZRtsAx+OnorMMJ1FWC0aZ/lOBui1tmNnj1ATP+brf09+ezgecmqayxwPNQCakRq6qhU8C8+UcP623gPmYJYGcy/MNTyimhKsrxotQGvRcMeM+AU=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(System) Chiusura asta e vincitore asta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/7/close",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"7",
+								"close"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Asta in busta chiusa (secondo prezzo+alto)",
+			"item": [
+				{
+					"name": "Nuova offerta (userID: 1 - offerta 180)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 6,\r\n    \"offerta\": \"i7mn/0vHpk+giNCIjVPRYO4l3nvddxEdU3iuQCRFY78Z7fu8jv2ZImxECwHJhaRsJEOufe3U0kbWcxt4VELQDwel9cS16wFz1oeqCDAP4VVYxGDaeVbO81MLQqlWD0Xp0cL8tlRNooqpd409sJYv9gb/T727LLWFX1g8wSsUCi8=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 2 - offerta 200)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibmFtZSI6Ik1hcnRpbmEiLCJyb2xlIjozfQ.MPpuQI-2KdQdJ5cuVPDlz84x8O2MXPzEsYqkl97iQns",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 6,\r\n    \"offerta\": \"YnfoIx7tYDT1rmeQeaibDoJQonEy7Wn+85EfS0ZHVYl+yY8QOvVTo1tnZvUHV3pwGMvsrIfIcdOgvg/q2i3h0R64MjmQNcQen7lNaBWN1ANqJmTIWFnkqnYC9C5ZxovEuwCfFYbn0f05kSDArRGy+oSdMs9UZiTDKVWBVDsI/mM=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 5 - offerta 220)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IlBpcHBvIiwicm9sZSI6M30.RiXBXsShF8AVIaaTTz8R6qo1q3ZbmDXQy9XZeEFITxY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 6,\r\n    \"offerta\": \"c/16MVoN/UpOjUkvEAXfWkRYBaAzCBfzhR4jo2WuSqINtg0F77PB/SFqCWCqRWBYkB+uUhsva7h29qEJhsK6X/rW62rmKamQuvChcS3IMaQv7ZoAqyVExIh8GDhOF0ScbJ2afhU80uU1sup7kYf0C+nkbd80rw7lmHhVY1cXZVQ=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 6 - offerta 195)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IlBsdXRvIiwicm9sZSI6M30.l32ri4GKwi9ZhLwTQSEqquIzAgZ_oZO0uR03pPc2pyc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 6,\r\n    \"offerta\": \"EaoOF8MlNISFmH/InshUCQX11L0+OGnMQK1s98pRW1/LtWRev1CXLAsiW3UMTbibrkUyD6JYmuIZmBtB5XfYpcHv5eJPKWIZZNDVfy+fGLdIE09Iy3goYPkIdEHrwWgYC7pljGw8tNcpZ3GjPiEmfhpyNEBhL2/gVgteTiizo3I=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(System) Chiusura asta e vincitore asta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/6/close",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"6",
+								"close"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tutte le rotte",
+			"item": [
+				{
+					"name": "Elenco aste",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/aste?stato=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"aste"
+							],
+							"query": [
+								{
+									"key": "stato",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Storico aste con offerte e rilanci (userID: 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/storico/aste",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"storico",
+								"aste"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Storico aste aggiudicate e non (userID: 1)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6M30.wLQhwtsjuNkdotV_odre256Y0qM9l57t7ZQ5N-YFlSw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/storico/aste/closed?date_i=01/01/2021&date_f=2022/12/31",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"storico",
+								"aste",
+								"closed"
+							],
+							"query": [
+								{
+									"key": "date_i",
+									"value": "01/01/2021"
+								},
+								{
+									"key": "date_f",
+									"value": "2022/12/31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Credito attuale (userID: 1)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/credito",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"credito"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accredito utente (admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmFtZSI6ImFkbWluIiwicm9sZSI6MX0.5UrNWo1jIesp9-Dg-SmG_Ls3qe7ogpodnMya_mKqMQc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 1,\r\n    \"credito\": 500\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/admin/accredito",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"admin",
+								"accredito"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crea nuova asta (bid_creator)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6Mn0.qatTVbgDTQsU9IflXjvdFcEkALvCfI-rwZ91rT0ojas",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\": 3,\r\n    \"p_min\": 20,\r\n    \"data_i\": \"2022/09/24\",\r\n    \"data_f\": \"2022/09/24 18:02\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nuova offerta (userID: 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"asta_id\": 4,\r\n    \"offerta\": 800\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/offerta",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"offerta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apertura asta",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/3/open",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"3",
+								"open"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Chiusura asta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1.0.0/asta/4/close",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1.0.0",
+								"asta",
+								"4",
+								"close"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
