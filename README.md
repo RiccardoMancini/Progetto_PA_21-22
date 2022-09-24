@@ -27,10 +27,10 @@ Il sistema deve prevedere la possibilità di:
 -	Opzionare / creare una nuova offerta per una data asta
 -	Ogni utente deve gestire il suo credito sotto forma di token. All’atto di un “rilancio” / offerta, è necessario verificare la capienza dell’utente; se il credito non è disponibile allora la richiesta deve essere rifiutata
 -	Dare la possibilità all’utente di verificare il proprio credito residuo
--	Visualizzare lo storico delle aste alle quali si è partecipato / si sta partecipando, listando tutti gli eventuali rilanci.
--	All’atto della aggiudicazione scalare il credito all’utente che risulta vincitore secondo la strategia dell’asta.
+-	Visualizzare lo storico delle aste alle quali si è partecipato / si sta partecipando, listando tutti gli eventuali rilanci
+-	All’atto della aggiudicazione scalare il credito all’utente che risulta vincitore secondo la strategia dell’asta
 -	consentire ad un utente admin di ricaricare il credito un dato utente
--	Visualizzare lo storico delle aste alle quali si è partecipato distinguendo per quelle che sono state aggiudicate e non.
+-	Visualizzare lo storico delle aste alle quali si è partecipato distinguendo per quelle che sono state aggiudicate e non
 
 ## Strumenti, framework e librerie utilizzate
 -	[Node.JS](https://nodejs.org/en/docs/)
@@ -207,8 +207,8 @@ Rotta accessibile solo al bid_creator e che necessita di una autenticazione JWT 
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IkFybWVudCIsInJvbGUiOjJ9.TxhP0-moJwH2uZRx15bAKEC24ctdEyp5-M1hYbsljlA
 ```
-Il bid_creator in questa rotta va creare una nuova asta mediante una operazione di post, inizializzando quelli che sono i parametri principali dell'asta, ovvero il tipo d'asta, la base d'asta, data di inizio e la data di fine.
-Il tipo di asta è identificato mediante un codice numerico come riportato nella seguente tabella.
+Il bid_creator in questa rotta crea una nuova asta mediante una operazione di post, inizializzando quelli che sono i parametri principali dell'asta, ovvero il tipo d'asta, la base d'asta, data di inizio e la data di fine.
+Il tipo di asta è identificato mediante un codice numerico come riportato di seguito.
 ```
 [1]  Asta inglese aperta   
 [2]  Asta in busta chiusa e pagamento del prezzo più alto 
