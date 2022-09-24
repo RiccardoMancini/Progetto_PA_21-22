@@ -83,7 +83,7 @@ Di seguito un esempio di risposta:
         "data_f": "2022-09-24T18:02:00.000Z"
     }
 ```
-Nel caso in cui non esistessero aste fitrate per un determinato stato, verrebbe resituita la seguente risposa:
+Nel caso in cui non esistessero aste fitrate per un determinato stato, verrebbe restituita la seguente risposta:
 ```
 {
         "messaggio": "Non esistono aste in questo stato!"
@@ -225,7 +225,7 @@ Di seguito un esempio di come dovrebbe essere il body della richiesta:
     "data_f": "2022/09/24 18:00"
 }
 ```
-La risposta, nel caso in cui passassero tutti i controlli e venisse registrata correttamente la nuova asta, sarebbe:
+La risposta, nel caso in cui passasse tutti i controlli e venisse registrata correttamente la nuova asta, sarebbe:
 ```
 {
     "messaggio": "Asta creata!"
@@ -245,7 +245,7 @@ Rotta accessibile solo al bid_participant e che necessita di una autenticazione 
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
 ```
-Il bid_participant in questa rotta va creare una nuova offerta per una certa asta mediante una operazione di post, specificando l'id dell'asta e l'offerta.
+Il bid_participant in questa rotta crea una nuova offerta per una certa asta mediante una operazione di post, specificando l'id dell'asta e l'offerta.
 L'id dell'asta viene validato verificando che sia di tipo numerico e successivamente che esista effettivamente quell'asta nello stato "IN ESECUZIONE".
 Invece l'offerta viene controllata affinchè rispetti la seguente relazione:
 `0 < base asta < offerta ≤ credito utente`
@@ -271,7 +271,7 @@ Un esempio di body di tale richiesta potrebbe essere il seguente:
     "offerta": "I43UPpy1EBk17LIaeYGBxkasI19J4PTkYthQ/uFuhpMDyCOIqT0rzUWSOXJXusiPzeuR4teVtR71H5CmkU6/abI9EXimHbnI95h1pVno9YnHA0ZYpSR4Zn1Go4Nb7PqW/RcMuNnrp8QvlSpbe/O+i3U50rx30ivuQeiY7zqsTkU="
 }
 ```
-*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui vengono effettuate le offerte (se congrua in base alla data fine dell'asta), anche se sono stati testati e sono funzionanti.*
+*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentati i check della data e ora dell'istante in cui vengono effettuate le offerte, ossia se congrua in base alla data di fine dell'asta, anche se sono stati testati e sono funzionanti.*
 
 ### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "NON APERTA" a "IN ESECUZIONE" tramite il suo id, passato nell'url della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto. 
@@ -290,7 +290,7 @@ In tutte le tipologie di asta un esempio di riposta potrebbe essere la seguente:
     "messaggio": "Asta aperta!"
 }
 ```
-*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui viene aperta l'asta (se congrua in base alla data di inizio asta), anche se sono stati testati e sono funzionanti.*
+*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentati i check della data e ora dell'istante in cui viene aperta l'asta, ossia se congrua in base alla data di inizio dell'asta, anche se sono stati testati e sono funzionanti.*
 
 ### 9) Chiusura asta (/api/v1.0.0/asta/:asta_id/close)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "IN ESECUZIONE" a "TERMINATA" tramite il suo id, passato nell'URL della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto.
@@ -313,7 +313,7 @@ Se non dovessero esserci offerte al momento dell'aggiudicazione di una certa ast
 ```
 *Nota 1: Se all'atto di aggiudicazione di un'asta in busta chiusa e pagamento al secondo prezzo più alto, esistesse solamente un'offerta effettuata, tale offerta verrebbe eliminata e l'asta chiusa in qualsiasi caso.*
 
-*Nota 2: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui viene chiusa l'asta (se congrua in base alla data di fine asta), anche se sono stati testati e sono funzionanti.*
+*Nota 2: Per questioni di comodità nel testare l'applicazione sono stati commentati i check della data e ora dell'istante in cui viene chiusa l'asta, ossia se congrua in base alla data di fine asta, anche se sono stati testati e sono funzionanti.*
 
 ## Diagrammi UML
 ### Diagramma ER
@@ -353,17 +353,17 @@ Il model, che, consente attraverso i suoi metodi specifici di accedere ai dati a
 
 Per quanto riguarda il modulo View, questo viene rappresentato dalla piattaforma [Postman](https://www.postman.com/).
 
-Il controller invece, permette, attraverso il View, di riceve le istruzioni da parte dell’utente e richiedere le risorse necessarie a Model per processare e completare la richiesta correttamente.
+Il Controller invece, permette, attraverso il View, di ricevere le istruzioni da parte dell’utente e richiedere le risorse necessarie a Model per processare e completare la richiesta correttamente.
 
 #### Proxy
-Il Proxy è un design pattern, la cui classe condivide la stessa interfaccia dell'oggetto originale e di fatto gliele manda fornendo, con uno strato di astrazione in più, un livello tutto suo per validare i dati presenti nella medesima richiesta.
-Un oggetto Proxy racchiude un altro oggetto e ne intercetta le operazioni e ha una sintassi del tipo
+Il Proxy è un design pattern, la cui classe condivide la stessa interfaccia dell'oggetto originale e di fatto fornisce, con uno strato di astrazione in più, un livello tutto suo per validare i dati presenti nella medesima richiesta.
+Inoltre è stato utilizzato l'oggetto Proxy, il quale racchiude un altro oggetto e ne intercetta le operazioni e ha una sintassi del tipo:
 
 `let proxy = new Proxy(target, handler)`
 
-•	target – è l’oggetto da racchiudere; può essere qualsiasi cosa, anche una funzione.
+•	target – è l’oggetto da validare;
 •	handler – configurazione del proxy: un oggetto con “trappole”, metodi che intercettano operazioni. Ad esempio una “trappola” get per la lettura di una proprietà di target, set per la scrittura di una proprietà di target, e così via.
-In questo progetto  si sono sviluppati 4 Proxy specifici.
+In questo progetto  si sono sviluppati 4 Proxy specifici per ogni modello esistente.
 -	ProxyAsta
 -	ProxyChiavi
 -	ProxyUtenti
@@ -386,11 +386,11 @@ Il proxy chiavi, non ha alcun compito di validazione, in quanto nel presente con
 
 #### Chain of responsibility
 Il Chain of responsability è un pattern comportamentale che permette di passare le richieste lungo una catena di handler (middleware), ognuno dei quali decide se processarla e passarla all'handler successivo (tramite next()), oppure sollevare un errore.
-In questo progetto è stato usato:
+In questo progetto è stato usato per:
 - verificare la presenza e la correttezza dei token JWT; 
 - autenticare gli utenti;
 - gestire gli errori;
-I middleware saranno agganciati direttamente alle rotte, e questo viene fatto per garantire che il controller processi delle richieste fatte da utenti con i giusti privilegi ed in caso sollevando le opportune eccezioni.
+I middleware saranno agganciati direttamente alle rotte, e questo viene fatto per garantire che il controller processi delle richieste eseguite da utenti con i giusti privilegi ed in caso sollevando le opportune eccezioni.
 
 #### Singleton
 Il Singleton è un design pattern creazionale che ha lo scopo di garantire che di una determinata classe venga creata una e una sola istanza, e di fornire un punto di accesso globale a tale istanza.
@@ -398,11 +398,11 @@ Data la definizione appena fornita, il Singleton è stato utilizzato per la crea
 
 #### Factory
 Il Factory è un design pattern creazionale, che ha lo scopo di creare oggetti senza che ne venga specifica la classe esatta.
-Nel presente progetto, il factory viene utilizzato nel contesto degli errori, quando essi vengono sollevati nel sistema. 
-Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  clients e server tramite websocket.
+Nel presente progetto, il factory viene utilizzato molto nel contesto degli errori, quando essi vengono sollevati dal sistema.
+Inoltre, anceh ell'asta inglese è stato sviluppato un factory per lo scambio di messaggi tra clients e server tramite websocket.
 
 #### Builder
-Il Builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
+Il Builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi, alla restituzione di un oggetto come risposta del controller.
 
 
 ## Avvio del servizio
@@ -410,24 +410,24 @@ Per poter avviare tale progetto, basterà semplicemente:
 - clonare la repository in locale;
 - spostarsi nella directory in cui è presente il file "docker-compose.yaml";
 - eseguire il seguente comando: `docker-compose up`;
-- il servizio sarà accessibile sulla porta 8080 del localhost.
+A questo punto il servizio sarà accessibile sulla porta 8080 del localhost.
 
 ## Test
 Per la fase di test, è stata allegata con tale progetto una collection di Postman ("PA project.postman_collection.json"), nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
-Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunge delle richieste in grado di simulare nel modo corretto il workflow delle aste.
+Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunte delle richieste in grado di simulare nel modo corretto il workflow delle aste.
 
-- Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (vedere meglio la rotta "Crea nuova asta"). Una volta creata l'asta, è possibile cambiarle stato e rendere in ascolto il Wss con la richiesta successiva, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (vedere meglio la rotta "Elenco aste"), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata.
-Una volta che la stanza è aperta verra loggato in console un messaggio di questo tipo:
+- Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (vedere meglio la rotta "Crea nuova asta"). Una volta creata l'asta, con la richiesta successiva è possibile cambiarle stato e rendere in ascolto il Wss, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (vedere meglio la rotta "Elenco aste"), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata con stato "NON APERTA".
+Una volta aperta la stanza, verrà loggato in console un messaggio simile al seguente:
 `Stanza dedicata all'asta con ID: 8, in ascolto sulla porta: 8081. Si parte da una base d'asta di 200!`
-Appena l'interazione tra i concorrenti si è conclusa, nella console corrispondente alla stanza dell'asta, verrà stampato il seguente messaggio `'Asta conclusa! A breve verranno registrati i risultati.'` A questo punto sarà possibile eseguire la successiva richiesta su Postman. 
+Appena l'interazione tra i concorrenti si è conclusa, nella console corrispondente alla stanza dell'asta, verrà stampato il seguente messaggio `Asta conclusa! A breve verranno registrati i risultati.` A questo punto sarà possibile eseguire la successiva richiesta su Postman. 
 Per poter avviare l'interazione tra i vari client collegati, seguire le seguenti note.
 
-*Nota 1: Tale simulazione è stata pensata per un numero massimo di client pari a 3, ma si può modificare semplicemente attraverso il settaggio della variabile d'ambiente N_CLIENTS presente nel file .env. Se si volesse diminuire a 2 non ci sarebbe alcun problema. Nel caso in cui invece si volesse aumentare il numero di client, bisognerà anche aggiungere il token JWT dei nuovi concorrenti nella maniera specificata dalla nota2 qui di seguito.*
+*Nota 1: Tale simulazione è stata pensata per un numero massimo di client pari a 3, ma si può modificare semplicemente attraverso il settaggio della variabile d'ambiente N_CLIENTS presente nel file .env. Se si volesse diminuire a 2 non ci sarebbe alcun problema. Nel caso in cui invece si volesse aumentare il numero di clients, bisognerà inoltre aggiungere il token JWT dei nuovi concorrenti nella maniera specificata dalla nota 2 qui di seguito.*
 A questo punto è possibile collegare diversi client/concorrenti a tale stanza semplicemente aprendo nuove powershell ed eseguire il seguente comando:
 
 `docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts N"`
 
-*Nota 2: Il numero finale di tale comando si riferisce al nome della variabile di ambiente (presente in .env) corrispondente al token dell'utente che si vuol fare partecipare. Per la presente demo, sarà necessario sostituirlo con 1, 2, 3 rispettivamente per ogni powershell aperta. Come di seguito:* 
+*Nota 2: Il numero finale di tale comando si riferisce al nome della variabile di ambiente (presente in .env) corrispondente al token dell'utente che si vuol fare partecipare. Per la presente demo, sarà necessario sostituirlo con 1, 2, 3 rispettivamente per ogni powershell aperta. Come di seguito:*
 
 `docker exec web-node-backend bash -c "ts-node src/websockets/websocketclient.ts 1"`
 
@@ -437,10 +437,10 @@ A questo punto è possibile collegare diversi client/concorrenti a tale stanza s
 
 
 
-- Invece, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie di offerte (codificate manualmente con la chiave pubblica corretta) per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
+- Invece, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie di offerte, codificate manualmente con la chiave pubblica corretta, per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
 
 
-* Nota: In tutte le cartelle sarà presente la rotta di sistema che permetterà di chiudere l'asta e decretare il vincitore secondo la corretta strategia dell'asta. *
+* Nota: In tutte le cartelle è presente la rotta di sistema che permette di chiudere un'asta "IN ESECUZIONE" e decretare il vincitore secondo la corretta strategia dell'asta. *
 
 ## Autori
 - [Riccardo Mancini](https://github.com/RiccardoMancini)
