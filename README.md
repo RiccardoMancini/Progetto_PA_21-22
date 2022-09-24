@@ -368,7 +368,11 @@ Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  cli
 
 #### Builder
 Il builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
-#### Diagramma di sequenze WebSocket
+
+#### Diagramma dei casi d'uso
+<img src = "jpg/UML.jpg">
+
+#### Diagramma di sequenze
 ##### titoletto
 <img src = "jpg/APIService.jpg">
 
@@ -384,6 +388,11 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 
 ##### titoletto
 <img src = "jpg/OffertaAsta.jpg">
+
+
+#### Diagramma ER
+<img src = "jpg/ER.jpg">
+
 
 ## Avvio del servizio
 - spiegazone su come avviare il progetto
