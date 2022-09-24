@@ -318,6 +318,7 @@ Se non dovessero esserci offerte al momento dell'aggiudicazione di una certa ast
 ## Diagrammi UML
 ### Diagramma ER
 <img src = "jpg/ER.jpg">
+
 ### Diagramma dei casi d'uso
 <img src = "jpg/UseCaseDiagram1.jpg">
 
