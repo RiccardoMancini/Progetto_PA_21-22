@@ -413,7 +413,7 @@ Per poter avviare tale progetto, basterà semplicemente:
 - il servizio sarà accessibile sulla porta 8080 del localhost.
 
 ## Test
-Per la fase di test, è stata allegata con tale progetto una collection di Postman, nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
+Per la fase di test, è stata allegata con tale progetto una collection di Postman ("PA project.postman_collection.json"), nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
 Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunge delle richieste in grado di simulare nel modo corretto il workflow delle aste.
 
 - Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (vedere meglio la rotta "Crea nuova asta"). Una volta creata l'asta, è possibile cambiarle stato e rendere in ascolto il Wss con la richiesta successiva, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (vedere meglio la rotta "Elenco aste"), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata.
