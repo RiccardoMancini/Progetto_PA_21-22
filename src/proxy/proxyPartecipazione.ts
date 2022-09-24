@@ -5,7 +5,7 @@ import { Asta, tipo_asta } from "../models/asta";
 import { PartecipazioneInterface } from '../models/interface/partecipazioneInterface';
 import { Partecipazione } from '../models/partecipazione';
 import { Utenti } from '../models/utenti';
-import { checkDate } from './proxyAsta';
+import { checkDate } from '../utils/functions'; 
 
 // Oggetto che viene passato come handler dell'oggetto proxy
 const proxyPartHandler = {
@@ -151,7 +151,7 @@ export class ProxyPartecipazione implements PartecipazioneInterface{
 
       // check se esiste già un'offerta dello stesso tipo
       let offerYet: any = await this.getOffersByUserAstaID(user_id, asta.asta_id);
-      if(asta.tipo !== tipo_asta.ASTA_APERTA && offerYet !== null){
+      if(asta.tipo !== tipo_asta.ASTA_APERTA && offerYet.length !== 0 ){
         throw new ErrorFactory().getError(ErrEnum.OfferAlreadyExist);
       }
       else{

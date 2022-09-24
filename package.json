@@ -6,7 +6,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon -L index.ts",
-        "start": "tsc --project .\tsconfig.json & node index.js"
+        "start": "ts-node index.ts"
     },
     "dependencies": {
         "axios": "^0.27.2",

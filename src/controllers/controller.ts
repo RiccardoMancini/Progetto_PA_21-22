@@ -5,44 +5,9 @@ import { stato_asta, tipo_asta} from '../models/asta';
 import { ProxyPartecipazione } from '../proxy/proxyPartecipazione';
 import { ErrEnum, ErrorFactory } from '../factory/errorFactory';
 import { ObjectBuilder } from './builder/objectBuilder';
+import { getRandomKey, checkDataAsta, checkCode64Offer } from '../utils/functions';
 import crypto from 'crypto';
 import axios from 'axios';
-
-/**
- * Funzione che restituisce casualmente una coppia di chiavi
- * tra quelle passate come parametro
- * @param rawKeys elenco di coppie di chiavi pubbliche / private
- * @returns una coppia di chiavi
- */
-function getRandomKey(rawKeys: any): any{    
-    const arrKey: any = rawKeys.map(elem => elem.chiavi_id)
-    let indice: number = Math.round(Math.random() * (arrKey.length - 1));
-    return arrKey[indice];
-}
-
-/**
- * Funzione che verifica se la data passata come parametro
- * è già trascorsa o meno rispetto ad ora
- * @param data data da verificare
- * @returns true se la data è già trascorsa, false altrimenti 
- */
-function checkDataAsta(data: Date): boolean{
-    const now: Date = new Date(Date.now());
-    //console.log(now.toISOString(), data, now > data)
-    return now > data ? true : false
-}
-
-/**
- * Funzione che verifica se la stringa passata come parametro
- * rispetta la codifica base64
- * @param offerCripted stringa codificata
- * @returns true se è correttamente codificata, false altrimenti
- */
-function checkCode64Offer(offerCripted: string): boolean{
-    const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    return base64regex.test(offerCripted) ? true : false;
-
-}
 
 export class Controller {
 
@@ -219,8 +184,7 @@ export class Controller {
                 if(!checkCode64Offer(codedOfferta)) throw new ErrorFactory().getError(ErrEnum.BadCriptedData);  //check del formato base64              
                 const decryptedData = Controller.decriptData(codedOfferta, asta.chiavi.private_key)
                 let offertaOBJ = JSON.parse(decryptedData.toString());
-                req.body.offerta = offertaOBJ.offerta;
-                
+                req.body.offerta = offertaOBJ.offerta;                
             }
             await new ProxyPartecipazione().setOffer(req.user_id, asta, req.body);
             const response: ObjectBuilder = new ObjectBuilder().setMessaggio('Offerta creata!').build();            

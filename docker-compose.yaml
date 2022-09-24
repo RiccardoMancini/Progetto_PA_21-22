@@ -10,6 +10,7 @@ services:
         volumes:
           - ./scripts/full.sql:/docker-entrypoint-initdb.d/full.sql          
     web-node:
+        container_name: web-node-backend
         build: .
         ports:
           - 8080:8080

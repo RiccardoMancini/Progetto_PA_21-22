@@ -37,11 +37,11 @@ CREATE TABLE Partecipazione (
 );
 
 INSERT INTO Utenti (nome, ruolo, credito) VALUES
-('Riccardo', 3, 360), 
+('Riccardo', 3, 1400), 
 ('Martina', 3, 500),
 ('Arment', 2, 999),
 ('admin', 1, 999),
-('Pippo', 3, 360),
+('Pippo', 3, 700),
 ('Pluto', 3, 560);
 
 INSERT INTO Chiavi (public_key, private_key) VALUES
@@ -57,11 +57,11 @@ INSERT INTO Asta (tipo, p_min, stato, data_i, data_f, chiavi_id) VALUES
 (2, 500, 1, '2022-06-27', '2022-12-17', 5),
 (1, 200, 2, '2021-11-14', '2021-12-15', null),
 (1, 200, 3, '2021-11-11', '2021-12-15', 1),
-(3, 200, 2, '2022-06-27', '2022-12-17', 1);
+(3, 150, 2, '2021-09-27', '2021-09-29', 1),
+(2, 250, 2, '2022-10-18', '2022-10-22', 3);
 
 INSERT INTO Partecipazione (user_id, asta_id, aggiudicata, offerta) VALUES
 (2, 5, FALSE, 40),
-(1, 6, FALSE, 205),
 (5, 1, FALSE, 155),
 (1, 2, FALSE, 150),
 (6, 2, FALSE, 140),

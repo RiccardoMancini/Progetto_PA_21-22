@@ -34,7 +34,7 @@ import { tokenToReturn } from './websocketserver'
   
   let credito = await axios.get('http://localhost:8080/api/v1.0.0/credito',{ headers: { Authorization: `Bearer ${token}` }})
                            .then(value => value.data.credito).catch(err => console.log(err.stack));
-  console.log(credito);
+  console.log("Credito attuale", credito);
   const decoded = jwt.verify(token, process.env.SECRET_KEY);
   const user_id: number = decoded.id;
   const user_name: string = decoded.name;
@@ -66,7 +66,6 @@ import { tokenToReturn } from './websocketserver'
       // per simulare gli istanti in cui un concorrente formula una decisione
       else if (msg.type === MessageCode.START){
         globalTimer = setTimeout(() => {
-          console.log('Rilancia!')
           let offerta = rilancio(msg.offerta, actualCredito);
           if(offerta > 0){
             subject.next(factoryMsg.getMessage(MessageCode.OFFER, offerta));

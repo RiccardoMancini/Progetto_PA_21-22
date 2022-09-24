@@ -5,5 +5,5 @@ RUN npm install
 RUN npm install -g typescript
 RUN npm install -g ts-node
 
-# CMD ["nodemon", "-L", "index.js"]
-CMD [ "npm", "run", "dev" ]
+# CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start" ]
