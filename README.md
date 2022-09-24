@@ -370,7 +370,7 @@ Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  cli
 Il builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
 #### Diagramma di sequenze
 
-<img src = "jpg/Api_Service">
+<img src = "jpg/Api_Service,jpg">
 
 ## Avvio del servizio
 - spiegazone su come avviare il progetto
