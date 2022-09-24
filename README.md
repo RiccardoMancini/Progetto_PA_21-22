@@ -315,6 +315,32 @@ Se non dovessero esserci offerte al momento dell'aggiudicazione di una certa ast
 
 *Nota 2: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui viene chiusa l'asta (se congrua in base alla data di fine asta), anche se sono stati testati e sono funzionanti.*
 
+## Diagrammi UML
+### Diagramma ER
+<img src = "jpg/ER.jpg">
+### Diagramma dei casi d'uso
+<img src = "jpg/UseCaseDiagram1.jpg">
+
+### Diagramma di sequenze
+
+#### Apertura asta
+<img src = "jpg/ApriAsta.jpg">
+
+#### Chiusura/aggiudicazione asta
+<img src = "jpg/aggiudicazioneAsta.jpg">
+
+
+#### Creazione asta
+<img src = "jpg/CreaAsta.jpg">
+
+#### Nuova offerta
+<img src = "jpg/OffertaAsta.jpg">
+
+#### Interazione websocket server-client
+<img src = "jpg/APIService.jpg">
+
+
+
 ## Pattern
 
 #### Model-View-Controller
@@ -377,30 +403,6 @@ Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  cli
 
 #### Builder
 Il Builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
-
-#### Diagramma dei casi d'uso
-<img src = "jpg/UseCaseDiagram1.jpg">
-
-#### Diagramma di sequenze
-##### titoletto
-<img src = "jpg/APIService.jpg">
-
-##### titoletto
-<img src = "jpg/ApriAsta.jpg">
-
-##### titoletto
-<img src = "jpg/aggiudicazioneAsta.jpg">
-
-
-##### titoletto
-<img src = "jpg/CreaAsta.jpg">
-
-##### titoletto
-<img src = "jpg/OffertaAsta.jpg">
-
-
-#### Diagramma ER
-<img src = "jpg/ER.jpg">
 
 
 ## Avvio del servizio
