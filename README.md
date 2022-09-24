@@ -4,7 +4,7 @@
 Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperta, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto. Gli utenti che potranno utilizzare il back-end e, che di conseguenza potranno interagire con le aste prima elencate, saranno:
 - Bid participant, ossia utenti che possono partecipare, effettuando offerte a tutte le tipologie di asta, e che potranno direttamente interagire con il loro "credito" e lo storico delle loro partecipazioni e offerte;
 - Bid creator, ossia gli utenti che si occupano di fatto di creare nuove aste;
-- Admin, ossia è l'utente che in questo contesto si occupa solamente di ricaricare il credito degli altri utenti;
+- Admin, ossia è l'utente che in questo contesto si occupa solamente di ricaricare il credito degli altri utenti.
 
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
@@ -271,7 +271,7 @@ Un esempio di body di tale richiesta potrebbe essere il seguente:
     "offerta": "I43UPpy1EBk17LIaeYGBxkasI19J4PTkYthQ/uFuhpMDyCOIqT0rzUWSOXJXusiPzeuR4teVtR71H5CmkU6/abI9EXimHbnI95h1pVno9YnHA0ZYpSR4Zn1Go4Nb7PqW/RcMuNnrp8QvlSpbe/O+i3U50rx30ivuQeiY7zqsTkU="
 }
 ```
-*Nota: *
+*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui vengono effettuate le offerte (se congrua in base alla data fine dell'asta), anche se sono stati testati e sono funzionanti.*
 
 ### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "NON APERTA" a "IN ESECUZIONE" tramite il suo id, passato nell'url della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto. 
@@ -290,6 +290,7 @@ In tutte le tipologie di asta un esempio di riposta potrebbe essere la seguente:
     "messaggio": "Asta aperta!"
 }
 ```
+*Nota: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui viene aperta l'asta (se congrua in base alla data di inizio asta), anche se sono stati testati e sono funzionanti.*
 
 ### 9) Chiusura asta (/api/v1.0.0/asta/:asta_id/close)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "IN ESECUZIONE" a "TERMINATA" tramite il suo id, passato nell'URL della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto.
@@ -310,7 +311,9 @@ Se non dovessero esserci offerte al momento dell'aggiudicazione di una certa ast
     "messaggio": "Nessuna offerta fatta per questa asta!"
 }
 ```
-Nota: Se all'atto di aggiudicazione di un'asta in busta chiusa e pagamento al secondo prezzo più alto, esistesse solamente un'offerta effettuata, tale offerta verrebbe eliminata e l'asta chiusa in qualsiasi caso.
+*Nota 1: Se all'atto di aggiudicazione di un'asta in busta chiusa e pagamento al secondo prezzo più alto, esistesse solamente un'offerta effettuata, tale offerta verrebbe eliminata e l'asta chiusa in qualsiasi caso.*
+
+*Nota 2: Per questioni di comodità nel testare l'applicazione sono stati commentanti i check della data e ora dell'istante in cui viene chiusa l'asta (se congrua in base alla data di fine asta), anche se sono stati testati e sono funzionanti.*
 
 ## Pattern
 
@@ -364,7 +367,7 @@ In questo progetto è stato usato:
 I middleware saranno agganciati direttamente alle rotte, e questo viene fatto per garantire che il controller processi delle richieste fatte da utenti con i giusti privilegi ed in caso sollevando le opportune eccezioni.
 
 #### Singleton
-Il singleton è un design pattern creazionale che ha lo scopo di garantire che di una determinata classe venga creata una e una sola istanza, e di fornire un punto di accesso globale a tale istanza.
+Il Singleton è un design pattern creazionale che ha lo scopo di garantire che di una determinata classe venga creata una e una sola istanza, e di fornire un punto di accesso globale a tale istanza.
 Data la definizione appena fornita, il Singleton è stato utilizzato per la creazione di una e una sola connessione al data base.
 
 #### Factory
@@ -373,7 +376,7 @@ Nel presente progetto, il factory viene utilizzato nel contesto degli errori, qu
 Nell'asta inglese è stato sviluppato un factory per lo scambio di messaggi  clients e server tramite websocket.
 
 #### Builder
-Il builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
+Il Builder è un design pattern molto flessibile nella realizzazione di oggetti complessi, separandone la loro costruzione dalla rappresentazione. In questo progetto è stata implementata una classe "ObjectBuilder", utilizzata appunto per costruire ogni eventuale oggetto necessario ad ogni possibile esigenza; dal passaggio di tale oggetto come parametro dei vari metodi delle classi alla restituzione come risposta del controller.
 
 #### Diagramma dei casi d'uso
 <img src = "jpg/UseCaseDiagram1.jpg">
@@ -401,15 +404,20 @@ Il builder è un design pattern molto flessibile nella realizzazione di oggetti 
 
 
 ## Avvio del servizio
-- spiegazone su come avviare il progetto
+Per poter avviare tale progetto, basterà semplicemente:
+- clonare la repository in locale;
+- spostarsi nella directory in cui è presente il file "docker-compose.yaml";
+- eseguire il seguente comando: `docker-compose up`.
 
 ## Test
 Per la fase di test, è stata allegata con tale progetto una collection di Postman, nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
 Nella collezione, oltre che all'elenco di tutte le rotte raggruppate in una cartella da poter testare liberamente, sono presenti 3 cartelle (1 per tipologia di asta) nelle quali sono state aggiunge delle richieste in grado di simulare nel modo corretto il workflow delle aste.
 
-- Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (LINK CONTROLLO DATE). Una volta creata l'asta, è possibile cambiarle stato e rendere in ascolto il Wss con la richiesta successiva, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (LINK ROTTA ELENCO DATE), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata.
+- Per quanto riguarda la cartella riferita all'asta inglese aperta, è presente una richiesta di creazione dell'asta nella quale bisogna fare attenzione alle date inserite (vedere meglio la rotta "Crea nuova asta"). Una volta creata l'asta, è possibile cambiarle stato e rendere in ascolto il Wss con la richiesta successiva, specificando nel URL l'id dell'asta corrispondente. Se quello già presente non è corretto, ci si può aiutare con la rotta "Elenco aste" (nella cartella "Tutte le rotte") specificando come stato nella query-string il numero 1 (vedere meglio la rotta "Elenco aste"), cosi da poter effettivamente vedere quale sia l'asta aperta appena creata.
 Una volta che la stanza è aperta verra loggato in console un messaggio di questo tipo:
 `Stanza dedicata all'asta con ID: 8, in ascolto sulla porta: 8081. Si parte da una base d'asta di 200!`
+Appena l'interazione tra i concorrenti si è conclusa, nella console corrispondente alla stanza dell'asta, verrà stampato il seguente messaggio `'Asta conclusa! A breve verranno registrati i risultati.'` A questo punto sarà possibile eseguire la successiva richiesta su Postman. 
+Per poter avviare l'interazione tra i vari client collegati, seguire le seguenti note.
 
 *Nota 1: Tale simulazione è stata pensata per un numero massimo di client pari a 3, ma si può modificare semplicemente attraverso il settaggio della variabile d'ambiente N_CLIENTS presente nel file .env. Se si volesse diminuire a 2 non ci sarebbe alcun problema. Nel caso in cui invece si volesse aumentare il numero di client, bisognerà anche aggiungere il token JWT dei nuovi concorrenti nella maniera specificata dalla nota2 qui di seguito.*
 A questo punto è possibile collegare diversi client/concorrenti a tale stanza semplicemente aprendo nuove powershell ed eseguire il seguente comando:
@@ -426,13 +434,10 @@ A questo punto è possibile collegare diversi client/concorrenti a tale stanza s
 
 
 
-
 - Invece, nelle cartelle riferite alle aste in busta chiusa, sono presenti delle richieste che permettono di eseguire una serie di offerte (codificate manualmente con la chiave pubblica corretta) per una specifica asta già nello stato "IN_ESECUZIONE" nel db. La simultaneità temporale di tali offerte è indifferente.
 
 
-
-
-In tutte le cartelle sarà presente la rotta di sistema che permetterà di chiudere l'asta e decretare il vincitore secondo la corretta strategia dell'asta.
+* Nota: In tutte le cartelle sarà presente la rotta di sistema che permetterà di chiudere l'asta e decretare il vincitore secondo la corretta strategia dell'asta. *
 
 ## Autori
 - [Riccardo Mancini](https://github.com/RiccardoMancini)
