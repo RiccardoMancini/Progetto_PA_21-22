@@ -409,7 +409,8 @@ Il Builder è un design pattern molto flessibile nella realizzazione di oggetti 
 Per poter avviare tale progetto, basterà semplicemente:
 - clonare la repository in locale;
 - spostarsi nella directory in cui è presente il file "docker-compose.yaml";
-- eseguire il seguente comando: `docker-compose up`.
+- eseguire il seguente comando: `docker-compose up`;
+- il servizio sarà accessibile sulla porta 8080 del localhost.
 
 ## Test
 Per la fase di test, è stata allegata con tale progetto una collection di Postman, nella quale sono presenti delle demo per testare a dovere il funzionamento del back-end.
