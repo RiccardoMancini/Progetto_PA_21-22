@@ -1,13 +1,14 @@
 # Sviluppo di un back-end per la gestione di varie tipologie di aste
 
 ## Obiettivi
-Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperta, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto. Gli utenti che potranno utilizzare il back-end e, che di conseguenza potranno interagire con le aste prima elencate, saranno: 
+Gli obiettivi del presente progetto, consistono nel realizzare un sistema back-end che permetta di implementare tre tipologie di aste differenti: asta inglese aperta, asta in busta chiusa e pagamento del prezzo più alto, asta in busta chiusa e pagamento del secondo prezzo più alto. Gli utenti che potranno utilizzare il back-end e, che di conseguenza potranno interagire con le aste prima elencate, saranno:
 - Bid participant, ossia utenti che possono partecipare, effettuando offerte a tutte le tipologie di asta, e che potranno direttamente interagire con il loro "credito" e lo storico delle loro partecipazioni e offerte;
 - Bid creator, ossia gli utenti che si occupano di fatto di creare nuove aste;
-- Admin, ossia è l'utente che in questo contesto si occupa solamente di ricaricare gli altri utenti;
+- Admin, ossia è l'utente che in questo contesto si occupa solamente di ricaricare il credito degli altri utenti;
+
 ## Specifiche di progetto
 - Le aste inglesi aperte vengono implementate mediante la tecnologia WebSocket. I concorrenti (clients) sono di fatto connessi nella stessa stanza associata all'asta di riferimento (server). A questo punto, l'interazione tra di essi si svolge attraverso un banditore che parte dal più basso prezzo accettabile, detto base d'asta, e che sollecita le offerte al rialzo fino a quando nessuna offerta viene superata da un altro compratore.
--	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di una coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base 64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Ovviamente per questa tipologia di asta, a differenza della precedente, un utente può fare solo una puntata per ogni asta.
+-	Per le aste in busta chiusa invece, si prevede un meccanismo di protezione basato sull'assegnazione ad ogni nuova asta di una coppia di chiavi (chiave pubblica - privata). Gli utenti che fanno l’offerta devono inviare, oltre al loro JWT nel body della richiesta, il valore di codifica in base64 relativo al JSON contenente l’offerta. Tale offerta dovrà essere codificata con la stessa chiave pubblica associata all'asta alla quale si vuole fare l'offerta; cosicchè alla ricezione della richiesta, il back-end sarà in grado di decodificare tale offerta con la giusta chiave privata. Per queste tipologie di asta, a differenza della precedente, un utente può fare solo una puntata per ognuna.
 Di seguito un esempio di coppia di chiavi pubbliche / private presenti nel database, con cifratura del tipo "PKCS1Padding:
 
 *Chiave pubblica*
@@ -18,6 +19,7 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjf2ba7J5z/7Lytk+N9GZcmVj/AbMxR/UO7VF+2v42
 ```
 MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKN/ZtrsnnP/svK2T430ZlyZWP8BszFH9Q7tUX7a/jZC2WBRkqytfNy/1rdB5Y6cIFsw7FjIezRYH28XOPALa0hFzsyzkGPz4MHl3a3tM5lK2m6G2LVSA/slVSZ/5hGpFMpEbov9wHW0nPI9je3duIvwn2tOaxY6BLRmXUUALrrXAgMBAAECgYEAltRSY8aECwkp4aT0UUXVJLnHE0FTOTRjy4h9dSS7/fy/oo6+XBSUKuXDRD5DcsNvShEhCGqy1kAxh3+J5FD0fzbQPd7nd5GPwUAxPOpvd89BzvdpkF9uSk3Gk8WtCb9egBJm68iZaiybThPpXscuHRMr63BaPga/T/YjcRGhLMkCQQDZhRMwYxX6fRwdRm10OF70CO3FJRpRkxqDEIE3QZZIOEYkb6hg4vVnZjFTECs9XRIaLd0BMDK5ijutKeBeaETzAkEAwGvMmH2qNZHSufNsTqMRurgfLDD7tms0ZWAkBM1Age0ApIhgDk4KakNhq1bh6T8gWoGikwD2UsFZry5F4eB7jQJAVi97Fe38tF5D+HmCPs1jGhA7naSA1BeUJqAwgqNTF1Rsvl0beyASGiEMpBvA9jRdStAnRCRDxO43jPoNs3pe7wJBALDUoDHnEjumpfQzKu5dV5azTBptbXTnskATiSZMhaKg7f1GQpgCyfl7sM8nyfZzB8WE6qWTtcq5WzTtHlWE2aUCQHUemtAEgRP7wbRgJa0r6+qWcjRoRppfcCp31gWgSKPi1XGtQyxNw5zd2aEqrivfiKddj8mEBDhKOS5f+x8JGNQ=
 ```
+
 ## Specifiche sistema back-end
 Il sistema deve prevedere la possibilità di:
 -	Creare una nuova tipologia di asta 
@@ -29,6 +31,7 @@ Il sistema deve prevedere la possibilità di:
 -	All’atto della aggiudicazione scalare il credito all’utente che risulta vincitore secondo la strategia dell’asta.
 -	consentire ad un utente admin di ricaricare il credito un dato utente
 -	Visualizzare lo storico delle aste alle quali si è partecipato distinguendo per quelle che sono state aggiudicate e non.
+
 ## Strumenti, framework e librerie utilizzate
 -	[Node.JS](https://nodejs.org/en/docs/)
 -	[Express](https://expressjs.com/it/4x/api.html)
@@ -40,6 +43,7 @@ Il sistema deve prevedere la possibilità di:
 -	[Visual Studio Code](https://code.visualstudio.com/)
 -	[Docker](https://www.docker.com/)
 -	[Postman](https://www.postman.com/)
+
 
 ## Tipologie di richieste  possibili al sistema 
 
@@ -56,7 +60,7 @@ Get | /api/v1.0.0/asta/:asta_id/open| (system) | no
 Get | /api/v1.0.0/asta/:asta_id/close| (system) | no
 
 ## Descrizione delle singole rotte
-#### 1) Elenco aste (/api/v1.0.0/aste)
+### 1) Elenco aste (/api/v1.0.0/aste)
 Questo tipo di rotta è accessibile da qualsiasi utente e non richiede autorizzazioni. 
 In questa rotta è possibile vedere l'elenco delle aste, e filtrarle in base al loro stato (1:"NON APERTA", 2:"IN ESECUZIONE" e 3:"TERMINATA").
 L'operazione di filtraggio viene attuata tramite query string, nel seguente modo: `?stato=1`.
@@ -85,7 +89,7 @@ Nel caso in cui non esistessero aste fitrate per un determinato stato, verrebbe 
         "messaggio": "Non esistono aste in questo stato!"
 }
 ```
-#### 2) Storico aste con offerte e rilanci (/api/v1.0.0/storico/aste)
+### 2) Storico aste con offerte e rilanci (/api/v1.0.0/storico/aste)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
@@ -95,14 +99,14 @@ Tale rotta restituisce tutte le aste alle quali l'utente autenticato sta parteci
 Di seguito un esempio di risposta:
 ```
 {
-        "asta_id": 15,
+        "asta_id": 7,
         "user_id": 1,
-        "tipo": "ASTA_APERTA",
+        "tipo": "ASTA_CHIUSA_1",
         "stato": "TERMINATA",
-        "data_i": "2022-09-24T00:00:00.000Z",
-        "data_f": "2022-09-24T18:00:00.000Z",
+        "data_i": "2022-10-18T00:00:00.000Z",
+        "data_f": "2022-10-22T00:00:00.000Z",
         "rilanci_offerta": [
-            201
+            300
         ]
     },
     {
@@ -129,13 +133,13 @@ Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente r
 ```
 
 
-#### 3) Storico aste aggiudicate e non (/api/v1.0.0/storico/aste/closed)
+### 3) Storico aste aggiudicate e non (/api/v1.0.0/storico/aste/closed)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
 ```
 Tale rotta restituisce tutte le aste alle quali l'utente autenticato ha partecipato specificando quali sono state aggiudicate e quali no.
-Inoltre questo risultato può essere filtrato specificando il range temporale tramite query string, ne seguente modo: `?date_i=12/2/2021&date_f=2022/02/22`.
+Inoltre questo risultato può essere filtrato specificando il range temporale tramite query-string nel seguente modo: `?date_i=12/2/2021&date_f=2022/02/22`.
 Le data di inizio e di fine devono rispettare i seguenti formati: `dd/mm/yyyy` o `yyyy/mm/dd`; (il separatore della data può essere sia "/" che "-").
 
 Di seguito un esempio di risposta:
@@ -149,12 +153,12 @@ Di seguito un esempio di risposta:
         "data_f": "2022-09-24T18:02:00.000Z"
     },
     {
-        "asta_id": 15,
+        "asta_id": 6,
         "user_id": 1,
-        "tipo": "ASTA_APERTA",
-        "aggiudicata": true,
-        "data_i": "2022-09-24T00:00:00.000Z",
-        "data_f": "2022-09-24T18:00:00.000Z"
+        "tipo": "ASTA_CHIUSA_2",
+        "aggiudicata": false,
+        "data_i": "2021-09-27T00:00:00.000Z",
+        "data_f": "2021-09-29T00:00:00.000Z"
     }
 ```
 Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente risposta:
@@ -163,7 +167,8 @@ Nel caso in cui lo storico fosse ancora vuoto, verrebbe restituita la seguente r
     "messaggio": "Nessuna asta alla quale si è ancora partecipato!"
 }
 ```
-#### 4) Credito attuale (/api/v1.0.0/credito)
+
+### 4) Credito attuale (/api/v1.0.0/credito)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
@@ -176,7 +181,7 @@ Di seguito un esempio di risposta:
 }
 ```
 
-#### 5) Accredito utente (/api/v1.0.0/admin/accredito)
+### 5) Accredito utente (/api/v1.0.0/admin/accredito)
 Rotta accessibile solo all'admin e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmFtZSI6ImFkbWluIiwicm9sZSI6MX0.5UrNWo1jIesp9-Dg-SmG_Ls3qe7ogpodnMya_mKqMQc
@@ -197,7 +202,7 @@ Di seguito, invece, un esempio di risposta:
     "new_credito": "653.340"
 }
 ```
-#### 6) Crea nuova asta (/api/v1.0.0/asta)
+### 6) Crea nuova asta (/api/v1.0.0/asta)
 Rotta accessibile solo al bid_creator e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IkFybWVudCIsInJvbGUiOjJ9.TxhP0-moJwH2uZRx15bAKEC24ctdEyp5-M1hYbsljlA
@@ -235,7 +240,7 @@ La risposta, nel caso in cui passassero tutti i controlli e venisse registrata c
 - inoltre nell'asta inglese aperta il giorno, il mese e l'anno della data iniziale deve coincidere con quella finale. Di conseguenza il tempo deve essere per forza specificato, altrimenti le date di inizio e di fine corrisponderebbero, e non verrebbe rispettato il secondo punto.
 
 
-#### 7) Nuova offerta (/api/v1.0.0/asta/offerta)
+### 7) Nuova offerta (/api/v1.0.0/asta/offerta)
 Rotta accessibile solo al bid_participant e che necessita di una autenticazione JWT (di seguito un esempio valido).
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlJpY2NhcmRvIiwicm9sZSI6M30.f7SVbExgWefAisbyRlD4b3XF-lCkCLR4L_PE71u0goo
@@ -266,8 +271,9 @@ Un esempio di body di tale richiesta potrebbe essere il seguente:
     "offerta": "I43UPpy1EBk17LIaeYGBxkasI19J4PTkYthQ/uFuhpMDyCOIqT0rzUWSOXJXusiPzeuR4teVtR71H5CmkU6/abI9EXimHbnI95h1pVno9YnHA0ZYpSR4Zn1Go4Nb7PqW/RcMuNnrp8QvlSpbe/O+i3U50rx30ivuQeiY7zqsTkU="
 }
 ```
+*Nota: *
 
-#### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
+### 8) Apertura asta (/api/v1.0.0/asta/:asta_id/open)
 Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "NON APERTA" a "IN ESECUZIONE" tramite il suo id, passato nell'url della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto. 
 Nel caso in cui l'asta in questione fosse di tipo "asta aperta", è stata simulata la richiesta ad un microservizio esterno che fornisce di fatto la stanza, dedicata ad essa, alla quale si connetteranno i vari concorrenti.
 Questo funzionamento è stato realizzato utilizzando le potenzialità dei websockets, grazie alla la libreria [Rxjs](https://rxjs.dev/api/webSocket/webSocket). Il WebSocketServer corrisponderà alla stanza nella quale prenderà luogo l'asta. Invece, i WebSockets (client) che si sottoscriveranno al server corrisponderanno ai vari partecipanti collegati.
@@ -285,8 +291,8 @@ In tutte le tipologie di asta un esempio di riposta potrebbe essere la seguente:
 }
 ```
 
-#### 9) Chiusura asta (/api/v1.0.0/asta/:asta_id/close)
-Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "IN ESECUZIONE" a "TERMINATA" tramite il suo id, passato nell'url della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto.
+### 9) Chiusura asta (/api/v1.0.0/asta/:asta_id/close)
+Rotta che non richiede alcuna autenticazione in questo contesto, ma che dovrebbe essere eseguita solamente dal sistema. Questo permette di cambiare lo stato di una determinata asta da "IN ESECUZIONE" a "TERMINATA" tramite il suo id, passato nell'URL della richiesta. Tale richiesta viene validata verificando che effettivamente l'asta esista e che si trovi nello stato corretto.
 Questa rotta simula l'atto di aggiudicazione. Ciò significa che oltre a cambiare lo stato dell'asta, andrà ad addebitare l'offerta al migliore concorrente secondo la strategia dell'asta in questione.
 Di seguito un esempio di risposta:
 ```
@@ -318,7 +324,7 @@ Il model, che, consente attraverso i suoi metodi specifici di accedere ai dati a
 
 Per quanto riguarda il modulo View, questo viene rappresentato dalla piattaforma [Postman](https://www.postman.com/).
 
-Il controller invece, permette, attraverso il View, di riceve le istruzioni da parte dell’utente e individuare le risorse nel model necessarie per completare la richiesta.
+Il controller invece, permette, attraverso il View, di riceve le istruzioni da parte dell’utente e richiedere le risorse necessarie a Model per processare e completare la richiesta correttamente.
 
 #### Proxy
 Il Proxy è un design pattern, la cui classe condivide la stessa interfaccia dell'oggetto originale e di fatto gliele manda fornendo, con uno strato di astrazione in più, un livello tutto suo per validare i dati presenti nella medesima richiesta.
